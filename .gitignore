@@ -1,0 +1,61 @@
+﻿/node_modules
+/vendor
+
+/public/hot
+/public/storage
+/public/build
+
+/storage/*.key
+/storage/logs/*.log
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/tmp
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/testing/.gitignore
+!/storage/framework/views/.gitignore
+
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+
+.env
+.env.*
+!.env.example
+
+.phpunit.result.cache
+.phpunit.cache
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+error_log
+
+# Local/dev environments
+docker-compose.override.yml
+docker-local/
+.ddev/
+Homestead.json
+Homestead.yaml
+
+# IDE/editor
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Keep ACME challenge folder if used for SSL verification
+/public/.well-known
+
+# Local planning/design artifacts
+*.zip
+plan.txt
+new products.html
+update galary.html
+
+.rnd
+
