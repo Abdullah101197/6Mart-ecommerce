@@ -23,7 +23,7 @@
                     <li class="nav-item __nav-item">
                         <a href="<?php echo e(route('admin.users.dashboard')); ?>" id="tourb-6"
                            class="__nav-link <?php echo e(Request::is('admin/users*') ? 'active' : ''); ?>">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/new-img/user.svg')); ?>" alt="public/img">
+                            <img src="<?php echo e(asset('/assets/admin/img/new-img/user.svg')); ?>" alt="public/img">
                             <span><?php echo e(translate('Users')); ?></span>
                         </a>
                     </li>
@@ -31,7 +31,7 @@
                     <li class="nav-item __nav-item">
                         <a href="<?php echo e(route('admin.transactions.store.withdraw_list')); ?>" id="tourb-7"
                            class="__nav-link <?php echo e(Request::is('admin/transactions*') ? 'active' : ''); ?>">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/new-img/transaction-and-report.svg')); ?>"
+                            <img src="<?php echo e(asset('/assets/admin/img/new-img/transaction-and-report.svg')); ?>"
                                  alt="public/img">
                             <span><?php echo e(translate('Transactions & Reports')); ?></span>
                         </a>
@@ -40,7 +40,7 @@
                     <li class="nav-item __nav-item">
                         <a href="<?php echo e(route('admin.business-settings.business-setup')); ?>" id="tourb-3"
                            class="__nav-link <?php echo e(Request::is('admin/business-settings*') ? 'active' : ''); ?>">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/new-img/setting-icon.svg')); ?>" alt="public/img">
+                            <img src="<?php echo e(asset('/assets/admin/img/new-img/setting-icon.svg')); ?>" alt="public/img">
                             <span><?php echo e(translate('messages.Settings')); ?></span>
                             <svg width="14" viewBox="0 0 14 14" fill="none">
                                 <path d="M2.33325 5.25L6.99992 9.91667L11.6666 5.25" stroke="#006161" stroke-width="1.5"
@@ -64,7 +64,7 @@
                                             <a href="<?php echo e(route('admin.business-settings.module.index')); ?>"
                                                class="next-tour">
                                                 <img
-                                                    src="<?php echo e(asset('/public/assets/admin/img/navbar-setting-icon/module.svg')); ?>"
+                                                    src="<?php echo e(asset('/assets/admin/img/navbar-setting-icon/module.svg')); ?>"
                                                     alt="">
                                                 <span><?php echo e(translate('System Module Setup')); ?></span>
                                             </a>
@@ -75,7 +75,7 @@
                                             <a href="<?php echo e(route('admin.business-settings.zone.home')); ?>"
                                                class="next-tour">
                                                 <img
-                                                    src="<?php echo e(asset('/public/assets/admin/img/navbar-setting-icon/location.svg')); ?>"
+                                                    src="<?php echo e(asset('/assets/admin/img/navbar-setting-icon/location.svg')); ?>"
                                                     alt="">
                                                 <span><?php echo e(translate('Zone Setup')); ?></span>
                                             </a>
@@ -86,7 +86,7 @@
                                             <a href="<?php echo e(route('admin.business-settings.business-setup')); ?>"
                                                class="next-tour">
                                                 <img
-                                                    src="<?php echo e(asset('/public/assets/admin/img/navbar-setting-icon/business.svg')); ?>"
+                                                    src="<?php echo e(asset('/assets/admin/img/navbar-setting-icon/business.svg')); ?>"
                                                     alt="">
                                                 <span><?php echo e(translate('Business Settings')); ?></span>
                                             </a>
@@ -95,10 +95,10 @@
 
                                     <?php if(\App\CentralLogics\Helpers::module_permission_check('settings')): ?>
                                         <li>
-                                            <a href="<?php echo e(route('admin.business-settings.third-party.payment-method')); ?>"
+                                            <a href="<?php echo e(route('admin.business-settings.third-party.sms-module')); ?>"
                                                class="next-tour">
                                                 <img
-                                                    src="<?php echo e(asset('/public/assets/admin/img/navbar-setting-icon/third-party.svg')); ?>"
+                                                    src="<?php echo e(asset('/assets/admin/img/navbar-setting-icon/third-party.svg')); ?>"
                                                     alt="">
                                                 <span><?php echo e(translate('3rd Party')); ?></span>
                                             </a>
@@ -107,7 +107,7 @@
                                             <a href="<?php echo e(route('admin.business-settings.social-media.index')); ?>"
                                                class="next-tour">
                                                 <img
-                                                    src="<?php echo e(asset('/public/assets/admin/img/navbar-setting-icon/social.svg')); ?>"
+                                                    src="<?php echo e(asset('/assets/admin/img/navbar-setting-icon/social.svg')); ?>"
                                                     alt="">
                                                 <span><?php echo e(translate('Social Media and Page Setup')); ?></span>
                                             </a>
@@ -125,7 +125,7 @@
                         <li class="nav-item __nav-item">
                             <a href="<?php echo e(route('admin.dispatch.dashboard')); ?>" id="tourb-8"
                                class="__nav-link <?php echo e(Request::is('admin/dispatch*') ? 'active' : ''); ?>">
-                                <img src="<?php echo e(asset('/public/assets/admin/img/new-img/dispatch.svg')); ?>" alt="public/img">
+                                <img src="<?php echo e(asset('/assets/admin/img/new-img/dispatch.svg')); ?>" alt="public/img">
                                 <span><?php echo e(translate('Dispatch Management')); ?></span>
                             </a>
                         </li>
@@ -141,7 +141,7 @@
                                     <span class="bg-E7E6E8 border ctrlplusk d-md-block d-none font-bold fs-12 fw-bold lh-1 ms-1 px-1 rounded text-muted">Ctrl+K</span>
 
                                 </span>
-                                <img width="14" class="h-auto" src="<?php echo e(asset('/public/assets/admin/img/new-img/search.svg')); ?>" class="svg" alt="">
+                                <img width="14" class="h-auto" src="<?php echo e(asset('/assets/admin/img/new-img/search.svg')); ?>" class="svg" alt="">
                             </div>
                         </button>
                     </li>
@@ -149,7 +149,7 @@
                     <li class="nav-item max-sm-m-0  mr-lg-3">
                         <a class="btn btn-icon rounded-circle nav-msg-icon"
                            href="<?php echo e(route('admin.message.list')); ?>">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/new-img/message-icon.svg')); ?>" alt="public/img">
+                            <img src="<?php echo e(asset('/assets/admin/img/new-img/message-icon.svg')); ?>" alt="public/img">
                             <?php ($message=\App\Models\Conversation::whereUserType('admin')->whereHas('last_message', function($query) {
                                 $query->whereColumn('conversations.sender_id', 'messages.sender_id');
                             })->where('unread_message_count', '>', 0)->count()); ?>
@@ -202,14 +202,14 @@
                             <?php if($mod): ?>
                                 <img src="<?php echo e($mod->icon_full_url); ?>"
                                      class="onerror-image"
-                                     data-onerror-image="<?php echo e(asset('/public/assets/admin/img/new-img/module-icon.svg')); ?>"
+                                     data-onerror-image="<?php echo e(asset('/assets/admin/img/new-img/module-icon.svg')); ?>"
                                      width="20px" alt="public/img">
                             <?php else: ?>
-                                <img src="<?php echo e(asset('/public/assets/admin/img/new-img/module-icon.svg')); ?>"
+                                <img src="<?php echo e(asset('/assets/admin/img/new-img/module-icon.svg')); ?>"
                                      alt="public/img">
                             <?php endif; ?>
                             <span class="text-white"><?php echo e($mod ? $mod->module_name : translate('modules')); ?></span>
-                            <img src="<?php echo e(asset('/public/assets/admin/img/new-img/angle-white.svg')); ?>"
+                            <img src="<?php echo e(asset('/assets/admin/img/new-img/angle-white.svg')); ?>"
                                  class="d-none d-lg-block ml-xl-2" alt="public/img">
                         </a>
                         <div class="__nav-module style-2" id="tourb-1">
@@ -247,7 +247,7 @@
                                                 <div class="img w--70px ">
                                                     <img src="<?php echo e($module?->icon_full_url); ?>"
 
-                                                         data-onerror-image="<?php echo e(asset('public/assets/admin/img/new-img/module/e-shop.svg')); ?>"
+                                                         data-onerror-image="<?php echo e(asset('assets/admin/img/new-img/module/e-shop.svg')); ?>"
                                                          alt="new-img" class="mw-100 onerror-image">
                                                 </div>
                                                 <div>
@@ -268,7 +268,7 @@
                                 </div>
                             <?php else: ?>
                                 <div class="__nav-module-body text-center py-5">
-                                    <img class="w--120px" src="<?php echo e(asset('/public/assets/admin/img/empty-box.png')); ?>"
+                                    <img class="w--120px" src="<?php echo e(asset('/assets/admin/img/empty-box.png')); ?>"
                                          alt="">
                                     <h2 class="my-4"><?php echo e(translate('Please, Enable or Create Module First')); ?></h2>
                                     <a href="<?php echo e(route('admin.business-settings.module.index')); ?>"
@@ -316,12 +316,22 @@
 
 <div class="toggle-tour">
     <button type="button" class="tour-guide_btn w-40px h-40px border-0 bg-white d-flex align-items-center justify-content-center ">
-        <span class="w-32 h-32px  min-w-32 d-flex align-items-center justify-content-center  bg-primary rounded-8"><img src="<?php echo e(asset('public/assets/admin/img/solar_multiple-forward-right-line-duotone.svg')); ?>" alt=""></span>
+        <span class="w-32 h-32px  min-w-32 d-flex align-items-center justify-content-center  bg-primary rounded-8"><img src="<?php echo e(asset('assets/admin/img/solar_multiple-forward-right-line-duotone.svg')); ?>" alt=""></span>
     </button>
     <div class="d-flex flex-column">
+ 
+        <?php if(Request::isAny([
+            'taxvat*',
+            'admin/business-settings/seo-settings/page-meta-data*',
+            'admin/business-settings/pages/react-landing-page-settings/meta-data*',
+            'admin/business-settings/pages/admin-landing-page-settings/meta-data*',
+            'admin/business-settings/business-setup*',
+            'admin/store/view/*/meta-data'
+        ])): ?>
 
-    <?php if(Request::is('taxvat*')): ?>
-        <div class="tour-guide-items offcanvas-trigger text-capitalize fs-14 text-title cursor-pointer" data-target="#global_guideline_offcanvas"><?php echo e(translate('Guideline')); ?></div>
+
+            <div class="tour-guide-items offcanvas-trigger text-capitalize fs-14 text-title cursor-pointer"
+                data-target="#global_guideline_offcanvas"><?php echo e(translate('Guideline')); ?></div>
     <?php endif; ?>
 
         <div class="tour-guide-items">

@@ -42,7 +42,7 @@
                 </form>
                 @if ($lang !== 'en')
                 <button class="btn btn--primary d-flex align-items-center justify-content-center gap-2" id="translate-confirm-btn">
-                    <img width="14" height="14" class="svg" src="{{asset('public/assets/admin/img/svg/language-exchange.svg')}}" alt="public">
+                    <img width="14" height="14" class="svg" src="{{asset('assets/admin/img/svg/language-exchange.svg')}}" alt="public">
                     {{ translate('Translate_All') }}
                 </button>
                 @endif
@@ -82,7 +82,7 @@
                                 <button type="button"
                                     data-key="{{$key}}" data-id="{{$count}}"
                                     class="btn btn--primary btn-outline-primary action-btn auto-translate-btn">
-                                    <img width="14" height="14" class="svg" src="{{asset('public/assets/admin/img/svg/language-exchange.svg')}}" alt="public">
+                                    <img width="14" height="14" class="svg" src="{{asset('assets/admin/img/svg/language-exchange.svg')}}" alt="public">
                                 </button>
                             </div>
                         </td>
@@ -92,7 +92,7 @@
                                         data-key="{{$key}}"
                                         data-id="{{$count}}"
                                         class="btn btn--primary action-btn update-language-btn">
-                                         <img width="14" height="14" class="svg" src="{{asset('public/assets/admin/img/svg/disk.svg')}}" alt="public">
+                                         <img width="14" height="14" class="svg" src="{{asset('assets/admin/img/svg/disk.svg')}}" alt="public">
                                 </button>
                             </div>
                         </td>
@@ -108,7 +108,7 @@
                 </div>
                 @if(count($full_data) === 0)
                 <div class="empty--data">
-                    <img src="{{asset('/public/assets/admin/svg/illustrations/sorry.svg')}}" alt="public">
+                    <img src="{{asset('/assets/admin/svg/illustrations/sorry.svg')}}" alt="public">
                     <h5>
                         {{translate('no_data_found')}}
                     </h5>
@@ -125,7 +125,7 @@
                 <div class="modal-body text-center">
                     <div class="py-5">
                         <div class="mb-4">
-                            <img src="{{asset('/public/assets/admin/img/language-complete.png')}}" alt="">
+                            <img src="{{asset('/assets/admin/img/language-complete.png')}}" alt="">
                         </div>
                         <h4 class="mb-3">{{ translate('messages.Are you sure ?') }}</h4>
                         <p class="mb-4 text-9EADC1 max-w-362px mx-auto">
@@ -148,7 +148,7 @@
                 <div class="modal-body text-center">
                     <div class="py-5">
                         <div class="mb-4">
-                            <img src="{{asset('/public/assets/admin/img/language-complete.png')}}" alt="">
+                            <img src="{{asset('/assets/admin/img/language-complete.png')}}" alt="">
                         </div>
                         <h4 class="mb-3">{{ translate('Your_file_has_been_successfully_translated') }}</h4>
                         <p class="mb-4 text-9EADC1 max-w-362px mx-auto">
@@ -168,7 +168,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="d-flex gap-3 align-items-start">
-                        <img src="{{asset('/public/assets/admin/img/invalid-icon.png')}}" alt="">
+                        <img src="{{asset('/assets/admin/img/invalid-icon.png')}}" alt="">
                         <div class="w-0 flex-grow-1">
                             <h3>{{ translate('Warning!') }}</h3>
                             <p>
@@ -192,7 +192,7 @@
                 <div class="modal-body text-center">
                     <div class="py-5 px-sm-2">
                         <div class="progress-circle-container mb-4">
-                            <img width="80px" src="{{asset('/public/assets/admin/img/loader-icon.gif')}}" alt="">
+                            <img width="80px" src="{{asset('/assets/admin/img/loader-icon.gif')}}" alt="">
                         </div>
                         <h4 class="mb-2">{{ translate('Translating_may_take_up_to') }} <span id="time-data"> {{ translate('Hours') }}</span></h4>
                         <p class="mb-4">

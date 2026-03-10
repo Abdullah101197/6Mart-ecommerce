@@ -122,7 +122,7 @@
                                 <div class="fs-12 px-3 py-2 rounded bg-info bg-opacity-10">
                                     <div class="d-flex gap-2 mb-3">
                                         <span class="text-info lh-1 fs-14">
-                                            <img src="{{asset('public/assets/admin/img/svg/bulb.svg')}}" class="svg" alt="">
+                                            <img src="{{asset('assets/admin/img/svg/bulb.svg')}}" class="svg" alt="">
                                         </span>
                                         <h4 class="font-medium mb-0">
                                             {{ translate('messages.If you want to set up your own landing page please follow tha instructions below') }}
@@ -163,7 +163,7 @@
                                                 <div>
                                                     <div class="d-flex gap-2 mb-3">
                                                         <span class="text-info lh-1 fs-14">
-                                                            <img src="{{asset('/public/assets/admin/img/svg/bulb.svg')}}" class="svg" alt="">
+                                                            <img src="{{asset('/assets/admin/img/svg/bulb.svg')}}" class="svg" alt="">
                                                         </span>
                                                         <h4 class="text-title mb-0">
                                                             {{ translate('messages.Instructions') }}
@@ -190,7 +190,7 @@
                                                         <input type="file" accept=".zip" data-max-file-size="10MB" name="file_upload" data-warning-message="{{ translate('messages.please_delete_the_existing_landing_page_first') }}">
                                                         <div class="text-center p-3 p-sm-4">
                                                             <div class="mb-20">
-                                                                <img width="48" height="48" class="svg" src="{{ asset('/public/assets/admin/img/svg/upload-cloud.svg') }}" alt="">
+                                                                <img width="48" height="48" class="svg" src="{{ asset('/assets/admin/img/svg/upload-cloud.svg') }}" alt="">
                                                             </div>
                                                             <p class="mb-0 fs-14 mb-1 text-title">
                                                                 {{ translate('messages.Select a file or Drag & Drop here') }}
@@ -204,7 +204,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="file-preview-list d-flex flex-column gap-4"></div>
-                                                    <div id="file-upload-config" data-icon-src="{{ asset('/public/assets/admin/img/file-view.png') }}"></div>
+                                                    <div id="file-upload-config" data-icon-src="{{ asset('/assets/admin/img/file-view.png') }}"></div>
                                                 </div>
                                                 <div class="mt-4">
                                                     <button type="button" class="btn btn--primary min-w-120">{{ translate('messages.Upload') }}</button>
@@ -282,7 +282,7 @@
                         <div class="item">
                             <div class="mb-20">
                                 <div class="text-center">
-                                    <img src="{{ asset('/public/assets/admin/img/read-instructions.png') }}"
+                                    <img src="{{ asset('/assets/admin/img/read-instructions.png') }}"
                                         alt="" class="mb-20">
                                     <h5 class="modal-title">
                                         {{ translate('If_you_want_to_set_up_your_own_landing_page_please_follow_tha_instructions_below') }}
@@ -322,8 +322,8 @@
     </div>
 @endsection
 @push('script_2')
-            <script src="{{asset('public/assets/admin/js/view-pages/business-settings-landing-page.js')}}"></script>
-            <script href="{{ asset('public/assets/admin/vendor/swiper/swiper-bundle.min.js') }}"></script>
+            <script src="{{asset('assets/admin/js/view-pages/business-settings-landing-page.js')}}"></script>
+            <script href="{{ asset('assets/admin/vendor/swiper/swiper-bundle.min.js') }}"></script>
 
 
     <script>
@@ -431,7 +431,7 @@
                     <input type="file" accept=".zip" data-max-file-size="10MB" name="file_upload" data-warning-message="{{ translate('messages.please_delete_the_existing_landing_page_first') }}">
                     <div class="text-center p-3 p-sm-4">
                         <div class="mb-20">
-                            <img width="48" height="48" class="svg" src="{{ asset('/public/assets/admin/img/svg/upload-cloud.svg') }}" alt="">
+                            <img width="48" height="48" class="svg" src="{{ asset('/assets/admin/img/svg/upload-cloud.svg') }}" alt="">
                         </div>
                         <p class="mb-0 fs-14 mb-1 text-title">
                             {{ translate('messages.Select a file or Drag & Drop here') }}
@@ -445,7 +445,7 @@
                     </div>
                 </div>
                 <div class="file-preview-list d-flex flex-column gap-4"></div>
-                <div id="file-upload-config" data-icon-src="{{ asset('/public/assets/admin/img/file-view.png') }}"></div>
+                <div id="file-upload-config" data-icon-src="{{ asset('/assets/admin/img/file-view.png') }}"></div>
             `);
 
             // Re-initialize file uploads and trigger inputs

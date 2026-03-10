@@ -9,7 +9,7 @@
         <div class="page-header">
             <h1 class="page-header-title mr-3">
                 <span class="page-header-icon">
-                    <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                    <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
                 </span>
                 <span>
                     {{ translate('messages.business_settings') }}
@@ -44,15 +44,15 @@
                                                     <span class="form-label-secondary text-danger d-flex"
                                                         data-toggle="tooltip" data-placement="right"
                                                         data-original-title="{{ translate('messages.When_a_deliveryman_arrives_for_delivery,_Customers_will_get_a_4-digit_verification_code_on_the_order_details_section_in_the_Customer_App_and_needs_to_provide_the_code_to_the_delivery_man_to_verify_the_order.') }}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('messages.order_varification_toggle') }}">
                                                     </span>
                                                 </span>
                                                 <input type="checkbox"
                                                        data-id="odc1"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/order-delivery-verification-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/order-delivery-verification-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/order-delivery-verification-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/order-delivery-verification-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Delivery_Verification?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Delivery_Verification?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If you enable this, the Deliveryman has to verify the order during delivery through a 4-digit verification code.') }}</p>"
@@ -82,14 +82,14 @@
                                                     <span class="form-label-secondary text-danger d-flex"
                                                         data-toggle="tooltip" data-placement="right"
                                                         data-original-title="{{ translate('messages.With_this_feature,_customers_can_place_an_order_by_uploading_prescription._Stores_can_enable/disable_this_feature_from_the_store_settings_if_needed.') }}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('messages.prescription_order_status') }}"> </span>
                                                 </span>
                                                 <input type="checkbox"
                                                        data-id="prescription_order_status"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/prescription-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/prescription-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/prescription-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/prescription-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Place_Order_by_Prescription?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Place_Order_by_Prescription?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If you enable this, customers can place an order by simply uploading their prescriptions in the Pharmacy module from the Customer App or Website. Stores can enable/disable this feature from store settings if needed.') }}</p>"
@@ -118,14 +118,14 @@
                                                     <span class="form-label-secondary text-danger d-flex"
                                                         data-toggle="tooltip" data-placement="right"
                                                         data-original-title="{{ translate('messages.If_you_enable_this_feature,_customers_can_choose_‘Home_Delivery’_and_get_the_product_delivered_to_their_preferred_location.') }}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('Home Delivery') }}"></span>
                                                 </span>
                                                 <input type="checkbox"
                                                        data-id="home_delivery"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/home-delivery-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/home-delivery-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/home-delivery-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/home-delivery-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Home_Delivery?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Home_Delivery?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If you enable this, customers can use the Home Delivery Option during checkout from the Customer App or Website.') }}</p>"
@@ -153,14 +153,14 @@
                                                     <span class="form-label-secondary text-danger d-flex"
                                                         data-toggle="tooltip" data-placement="right"
                                                         data-original-title="{{ translate('messages.If_you_enable_this_feature,_customers_can_place_an_order_and_request_‘Takeaways’_or_‘self-pick-up’_from_stores.') }}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('Home Delivery') }}"></span>
                                                 </span>
                                                 <input type="checkbox"
                                                        data-id="take_away"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/takeaway-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/takeaway-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/takeaway-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/takeaway-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.the_Takeaway_feature?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.the_Takeaway_feature?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If you enable this, customers can use the Takeaway feature during checkout from the Customer App or Website.') }}</p>"
@@ -187,15 +187,15 @@
                                                     <span class="form-label-secondary text-danger d-flex"
                                                         data-toggle="tooltip" data-placement="right"
                                                         data-original-title="{{ translate('messages.With_this_feature,_customers_can_choose_their_preferred_delivery_slot._Customers_can_select_a_delivery_slot_for_ASAP_or_a_specific_date_(within_2_days_from_the_order).')}}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('messages.customer_varification_toggle') }}">
                                                     </span>
                                                 </span>
                                                 <input type="checkbox"
                                                        data-id="schedule_order"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/schedule-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/schedule-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/schedule-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/schedule-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Scheduled Order?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Scheduled Order?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If you enable this, customers can choose a suitable delivery schedule during checkout.') }}</p>"
@@ -226,7 +226,7 @@
                                                     <span class="form-label-secondary text-danger"
                                                     data-toggle="tooltip" data-placement="right"
                                                     data-original-title="{{ translate('messages.By_activating_this_feature,_customers_can_choose_their_suitable_delivery_slot_according_to_a_30-minute_or_1-hour_interval_set_by_the_Admin.') }}"><img
-                                                        src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                        src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                         alt="{{ translate('Home Delivery') }}"></span>
                                                 </span>
                                             </label>
@@ -252,7 +252,7 @@
                                                     <span class="form-label-secondary" data-toggle="tooltip"
                                                           data-placement="right"
                                                           data-original-title="{{ translate('messages.After_a_customer_order_placement,_Admin_can_define_who_will_confirm_the_order_first-_Deliveryman_or_Store?_For_example,_if_you_choose_‘Delivery_man’,_the_deliveryman_nearby_will_confirm_the_order_and_forward_it_to_the_related_store_to_process_the_order._It_works_vice-versa_if_you_choose_‘Store’.') }}">
-                                                        <img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="">
+                                                        <img src="{{asset('assets/admin/img/info-circle.svg')}}" alt="">
                                                     </span>
                                                 </span>
                                             </label>
@@ -289,13 +289,13 @@
                                             <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip"
                                                   data-placement="right"
                                                   data-original-title="{{ translate('messages.Admin_will_get_a_pop-up_notification_with_sounds_for_any_order_placed_by_customers.') }}"><img
-                                                    src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                    src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                     alt="{{ translate('messages.customer_varification_toggle') }}"> *
                                             </span>
                                         </span>
                                                 <input type="checkbox" data-id="aon1" data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/order-notification-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/order-notification-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/order-notification-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/order-notification-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Order_Notification_for_Admin?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Order_Notification_for_Admin?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If_you_enable_this,_the_Admin_will_receive_a_Notification_for_every_order_placed.') }}</p>"
@@ -316,7 +316,7 @@
                                             <span class="form-label-secondary" data-toggle="tooltip"
                                                   data-placement="right"
                                                   data-original-title="{{ translate('For_Firebase,_a_single_real-time_notification_will_be_sent_upon_order_placement,_with_no_repetition._For_the_Manual_option,_notifications_will_appear_at_10-second_intervals_until_the_order_is_viewed.') }}">
-                                                <img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="">
+                                                <img src="{{asset('assets/admin/img/info-circle.svg')}}" alt="">
                                             </span>
                                         </span>
                                             </label>
@@ -343,13 +343,13 @@
                                     @php($extra_packaging_data =json_decode($extra_packaging_data , true))
                                     <div class="mb-3 access_product_approval">
 
-                                        <label class="mb-2 input-label text-capitalize d-flex alig-items-center" for=""> <img src="{{ asset('/public/assets/admin/img/icon-park_ad-product.png') }}" alt=""
+                                        <label class="mb-2 input-label text-capitalize d-flex alig-items-center" for=""> <img src="{{ asset('/assets/admin/img/icon-park_ad-product.png') }}" alt=""
                                             class="card-header-icon align-self-center mr-1">{{ translate('Enable Extra Packaging Charge') }}
 
                                             <span class="form-label-secondary text-danger"
                                             data-toggle="tooltip" data-placement="right"
                                             data-original-title="{{ translate('messages.After_saving_information,_sellers_will_get_the_option_to_offer_extra_packaging_charge_to_the_customer') }}"><img
-                                                src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                 alt="{{ translate('Extra_Packaging_Charge') }}"></span>
 
                                         </label>
@@ -377,8 +377,8 @@
 
                                     <span class="toggle-switch toggle-switch-sm pr-sm-3">
                                         <input type="checkbox" data-id="admin_free_delivery_status" data-type="toggle"
-                                               data-image-on="{{ asset('/public/assets/admin/img/modal/free-delivery-on.png') }}"
-                                               data-image-off="{{ asset('/public/assets/admin/img/modal/free-delivery-off.png') }}"
+                                               data-image-on="{{ asset('/assets/admin/img/modal/free-delivery-on.png') }}"
+                                               data-image-off="{{ asset('/assets/admin/img/modal/free-delivery-off.png') }}"
                                                data-title-on="<strong>{{ translate('messages.Want_to_enable_Free_Delivery_Option?') }}</strong>"
                                                data-title-off="<strong>{{ translate('messages.Want_to_disable_Free_Delivery_Option?') }}</strong>"
                                                class="status toggle-switch-input dynamic-checkbox-toggle"
@@ -442,7 +442,7 @@
                                                         class="text-danger"><span class="form-label-secondary"
                                                                                   data-toggle="tooltip" data-placement="right"
                                                                                   data-original-title="{{ translate('messages.Set_a_minimum_order_value_for_automated_free_delivery._If_the_minimum_amount_is_exceeded,_the_Delivery_Fee_is_deducted_from_Admin’s_commission_and_added_to_Admin’s_expense.') }}"><img
-                                                                src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                                src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                                 alt="{{ translate('messages.free_over_delivery_message') }}"></span>
                                                         *</small></span>
 
@@ -458,7 +458,7 @@
                                                  class="col-sm-6 col-lg-6 {{ $admin_free_delivery_option?->value == 'free_delivery_to_all_store' ? '' : ' d-none' }}">
                                                 <div class="alert fs-13 alert-primary-light text-dark mb-0  mt-md-0 add_text_mute text-muted"
                                                      role="alert">
-                                                    <img src="{{ asset('/public/assets/admin/img/lnfo_light.png') }}" alt="">
+                                                    <img src="{{ asset('/assets/admin/img/lnfo_light.png') }}" alt="">
                                                     {{translate('Free delivery is active for all stores. Cost bearer for the free delivery is')}}
                                                     <strong>{{ translate('Admin') }}</strong>
                                                 </div>
@@ -547,7 +547,7 @@
                                     <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip"
                                         data-placement="right"
                                         data-original-title="{{ translate('When this field is active, user can cancel an order with proper reason.') }}"><img
-                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                             alt="{{ translate('messages.prescription_order_status') }}"></span>
                                 </label>
                                 <select id="user_type" name="user_type" class="form-control h--45px" required>
@@ -770,7 +770,7 @@
                     <div class="max-349 mx-auto mb-20">
                         <div>
                             <div class="text-center">
-                                <img src="{{asset('/public/assets/admin/img/subscription-plan/package-status-disable.png')}}"
+                                <img src="{{asset('/assets/admin/img/subscription-plan/package-status-disable.png')}}"
                                      class="mb-20">
 
                                 <h5 class="modal-title"></h5>
@@ -812,7 +812,7 @@
                     <div class="max-349 mx-auto mb-20">
                         <div>
                             <div class="text-center">
-                                <img src="{{asset('/public/assets/admin/img/subscription-plan/package-status-disable.png')}}"
+                                <img src="{{asset('/assets/admin/img/subscription-plan/package-status-disable.png')}}"
                                      class="mb-20">
 
                                 <h5 class="modal-title"></h5>
@@ -839,7 +839,7 @@
 @endsection
 
 @push('script_2')
-    <script src="{{asset('public/assets/admin/js/view-pages/business-settings-order-page.js')}}"></script>
+    <script src="{{asset('assets/admin/js/view-pages/business-settings-order-page.js')}}"></script>
 
     <script>
         "use strict";

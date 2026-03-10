@@ -11,7 +11,7 @@
             <div class="d-flex align-items-center justify-content-between gap-1 w-100">
                 <h1 class="page-header-title mr-3">
                     <span class="page-header-icon">
-                        <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                        <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
                     </span>
                     <span>
                         {{translate('business_setup')}}
@@ -22,7 +22,7 @@
                     <div class="blinkings active">
                         <i class="tio-info-outined"></i>
                         <div class="business-notes">
-                            <h6><img src="{{asset('/public/assets/admin/img/notes.png')}}" alt=""> {{translate('Note')}}</h6>
+                            <h6><img src="{{asset('/assets/admin/img/notes.png')}}" alt=""> {{translate('Note')}}</h6>
                             <div>
                                 @if (Request::is('admin/business-settings/business-setup/refund-settings'))
                                 {{ translate('messages.*If_the_Admin_enables_the_‘Refund_Request_Mode’,_customers_can_request_a_refund.') }}
@@ -69,8 +69,8 @@
                                                 <input type="checkbox"
                                                        data-id="dm_self_registration1"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/dm-self-reg-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/dm-self-reg-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/dm-self-reg-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/dm-self-reg-off.png') }}"
                                                        data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Deliveryman_Self_Registration?') }}</strong>"
                                                        data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Deliveryman_Self_Registration?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If_you_enable_this,_users_can_register_as_Deliverymen_from_the_Customer_App,_Website_or_Deliveryman_App_or_Admin_Landing_Page.') }}</p>"
@@ -164,8 +164,8 @@
                                             <input type="checkbox"
                                                     data-id="dm_tips_status"
                                                     data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/dm-tips-on.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/dm-tips-off.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/dm-tips-on.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/dm-tips-off.png') }}"
                                                     data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Tips_for_Deliveryman_feature?') }}</strong>"
                                                     data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Tips_for_Deliveryman_feature?') }}</strong>"
                                                     data-text-on="<p>{{ translate('messages.If_you_enable_this,_Customers_can_give_tips_to_a_deliveryman_during_checkout.') }}</p>"
@@ -226,8 +226,8 @@
                                                 <input type="checkbox"
                                                         data-id="show_dm_earning"
                                                         data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/show-earning-in-apps-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/show-earning-in-apps-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/show-earning-in-apps-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/show-earning-in-apps-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Show_Earnings_in_App?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Show_Earnings_in_App?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_Deliverymen_can_see_their_earning_per_order_request_from_the_Order_Details_page_in_the_Deliveryman_App.') }}</p>"
@@ -264,8 +264,8 @@
                                                 <input type="checkbox"
                                                         data-id="dm_picture_upload_status"
                                                         data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/dm-self-reg-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/dm-self-reg-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/dm-self-reg-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/dm-self-reg-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.picture_upload_before_complete?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.picture_upload_before_complete?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_delivery_man_can_upload_order_proof_before_order_delivery.') }}</p>"
@@ -317,8 +317,8 @@
                                                 <input type="checkbox"
                                                        data-id="cash_in_hand_overflow"
                                                        data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/show-earning-in-apps-on.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/show-earning-in-apps-off.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/show-earning-in-apps-on.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/show-earning-in-apps-off.png') }}"
                                                        data-title-on="{{ translate('Want_to_enable') }} <strong>{{ translate('Cash_In_Hand_Overflow') }}</strong>?"
                                                        data-title-off="{{ translate('Want_to_disable') }} <strong>{{ translate('Cash_In_Hand_Overflow') }}</strong>?"
                                                        data-text-on="<p>{{ translate('If_enabled,_delivery_men_have_to_provide_collected_cash_by_themselves.') }}</p>"

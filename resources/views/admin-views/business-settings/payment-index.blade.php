@@ -46,7 +46,7 @@
                 <div class="blinkings trx_top active">
                     <i class="tio-info-outined"></i>
                     <div class="business-notes">
-                        <h6><img src="{{asset('/public/assets/admin/img/notes.png')}}" alt=""> {{translate('Note')}}</h6>
+                        <h6><img src="{{asset('/assets/admin/img/notes.png')}}" alt=""> {{translate('Note')}}</h6>
                         <div>
                             {{translate('Without configuring this section functionality will not work properly. Thus the whole system will not work as it planned')}}
                         </div>
@@ -105,7 +105,7 @@
         <!-- <div class="card border-0">
             <div class="card-header card-header-shadow">
                 <h5 class="card-title align-items-center">
-                    <img src="{{asset('/public/assets/admin/img/payment-method.png')}}" class="mr-1" alt="">
+                    <img src="{{asset('/assets/admin/img/payment-method.png')}}" class="mr-1" alt="">
                     {{translate('Payment Method')}}
                 </h5>
             </div>
@@ -121,15 +121,15 @@
                                     <span class="line--limit-1">
                                         {{translate('Cash On Delivery')}}
                                     </span>
-                                    <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('If_enabled_Customers_will_be_able_to_select_COD_as_a_payment_method_during_checkout')}}"><img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="Veg/non-veg toggle"> * </span>
+                                    <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('If_enabled_Customers_will_be_able_to_select_COD_as_a_payment_method_during_checkout')}}"><img src="{{asset('assets/admin/img/info-circle.svg')}}" alt="Veg/non-veg toggle"> * </span>
                                 </span>
                                 <input type="hidden" name="toggle_type" value="cash_on_delivery">
                                 <input
                                     type="checkbox" id="cash_on_delivery_status"
                                     data-id="cash_on_delivery_status"
                                     data-type="status"
-                                    data-image-on="{{ asset('/public/assets/admin/img/modal/digital-payment-on.png') }}"
-                                    data-image-off="{{ asset('/public/assets/admin/img/modal/digital-payment-off.png') }}"
+                                    data-image-on="{{ asset('/assets/admin/img/modal/digital-payment-on.png') }}"
+                                    data-image-off="{{ asset('/assets/admin/img/modal/digital-payment-off.png') }}"
                                     data-title-on="{{ translate('By Turning ON Cash On Delivery Option') }}"
                                     data-title-off="{{ translate('By Turning OFF Cash On Delivery Option') }}"
                                     data-text-on="<p>{{ translate('Customers will not be able to select COD as a payment method during checkout. Please review your settings and enable COD if you wish to offer this payment option to customers.') }}</p>"
@@ -151,14 +151,14 @@
                                     <span class="line--limit-1">
                                         {{translate('digital payment')}}
                                     </span>
-                                    <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('If_enabled_Customers_will_be_able_to_select_digital_payment_as_a_payment_method_during_checkout')}}"><img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="Veg/non-veg toggle"> * </span>
+                                    <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('If_enabled_Customers_will_be_able_to_select_digital_payment_as_a_payment_method_during_checkout')}}"><img src="{{asset('assets/admin/img/info-circle.svg')}}" alt="Veg/non-veg toggle"> * </span>
                                 </span>
                                 <input type="hidden" name="toggle_type" value="digital_payment">
                                 <input  type="checkbox" id="digital_payment_status"
                                         data-id="digital_payment_status"
                                         data-type="status"
-                                        data-image-on="{{ asset('/public/assets/admin/img/modal/digital-payment-on.png') }}"
-                                        data-image-off="{{ asset('/public/assets/admin/img/modal/digital-payment-off.png') }}"
+                                        data-image-on="{{ asset('/assets/admin/img/modal/digital-payment-on.png') }}"
+                                        data-image-off="{{ asset('/assets/admin/img/modal/digital-payment-off.png') }}"
                                         data-title-on="{{ translate('By Turning ON Digital Payment Option') }}"
                                         data-title-off="{{ translate('By Turning OFF Digital Payment Option') }}"
                                         data-text-on="<p>{{ translate('Customers will not be able to select digital payment as a payment method during checkout. Please review your settings and enable digital payment if you wish to offer this payment option to customers.') }}</p>"
@@ -181,14 +181,14 @@
                                     <span class="line--limit-1">
                                         {{translate('Offline_Payment')}}
                                     </span>
-                                    <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('If_enabled_Customers_will_be_able_to_select_offline_payment_as_a_payment_method_during_checkout')}}"><img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="Veg/non-veg toggle"> * </span>
+                                    <span class="form-label-secondary text-danger d-flex" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('If_enabled_Customers_will_be_able_to_select_offline_payment_as_a_payment_method_during_checkout')}}"><img src="{{asset('assets/admin/img/info-circle.svg')}}" alt="Veg/non-veg toggle"> * </span>
                                 </span>
                                 <input type="hidden" name="toggle_type" value="offline_payment_status" >
                                 <input  type="checkbox" id="offline_payment_status"
                                         data-id="offline_payment_status"
                                         data-type="status"
-                                        data-image-on="{{ asset('/public/assets/admin/img/modal/digital-payment-on.png') }}"
-                                        data-image-off="{{ asset('/public/assets/admin/img/modal/digital-payment-off.png') }}"
+                                        data-image-on="{{ asset('/assets/admin/img/modal/digital-payment-on.png') }}"
+                                        data-image-off="{{ asset('/assets/admin/img/modal/digital-payment-off.png') }}"
                                         data-title-on="{{ translate('By Turning ON Offline Payment Option') }}"
                                         data-title-off="{{ translate('By Turning OFF Offline Payment Option') }}"
                                         data-text-on="<p>{{ translate('Customers will not be able to select Offline Payment as a payment method during checkout. Please review your settings and enable Offline Payment if you wish to offer this payment option to customers.') }}</p>"
@@ -271,8 +271,8 @@
                                                 <input  type="checkbox" id="{{$payment->key_name}}"
                                                         data-id="{{$payment->key_name}}"
                                                         data-type="status"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/feature-status-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/off-danger.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/feature-status-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/off-danger.png') }}"
                                                         data-title-on="{{ translate('Turn ON ') }} {{strtoupper(str_replace('_',' ',$payment->key_name))}} {{ translate('Payment Method') }}"
                                                         data-title-off="{{ translate('Turn OFF ') }} {{strtoupper(str_replace('_',' ',$payment->key_name))}} {{ translate('Payment Method') }}"
                                                         data-text-on="<p>{{ translate('By enabling ') }} {{strtoupper(str_replace('_',' ',$payment->key_name))}} {{ translate(' customers can securely pay with their ')}} {{strtoupper(str_replace('_',' ',$payment->key_name))}} {{ translate('accounts.') }}</p>"
@@ -439,7 +439,7 @@
             </div>
             @else
             <div class="empty--data">
-                <img width="64" class="mb-2" src="{{asset('/public/assets/admin/svg/illustrations/no-data.svg')}}" alt="public">
+                <img width="64" class="mb-2" src="{{asset('/assets/admin/svg/illustrations/no-data.svg')}}" alt="public">
                 <p class="fs-16 mb-20">
                     {{translate('No Payment Method List')}}
                 </p>
@@ -464,7 +464,7 @@
                     <div class="max-349 mx-auto mb-20">
                         <div>
                             <div class="text-center">
-                                <img width="80" src="{{  asset('public/assets/admin/img/modal/gateway.png') }}" class="mb-20">
+                                <img width="80" src="{{  asset('assets/admin/img/modal/gateway.png') }}" class="mb-20">
                                 <h5 class="modal-title"></h5>
                             </div>
                             <div class="text-center" >
@@ -497,7 +497,7 @@
 @endsection
 
 @push('script_2')
-    <script src="{{asset('public/assets/admin/js/view-pages/business-settings-payment-page.js')}}"></script>
+    <script src="{{asset('assets/admin/js/view-pages/business-settings-payment-page.js')}}"></script>
     <script>
         "use strict";
 

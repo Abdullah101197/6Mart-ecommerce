@@ -4,7 +4,7 @@
 
 @push('css_or_js')
     <!-- Custom styles for this page -->
-    <link href="{{asset('public/assets/admin/css/croppie.css')}}" rel="stylesheet">
+    <link href="{{asset('assets/admin/css/croppie.css')}}" rel="stylesheet">
 
 @endpush
 
@@ -43,7 +43,7 @@
 
                                     <div class="h-98p d-center">
                                         <div class="empty--data">
-                                            <img width="64" class="mb-2" src="{{asset('/public/assets/admin/img/no-vendor-list.svg')}}" alt="public">
+                                            <img width="64" class="mb-2" src="{{asset('/assets/admin/img/no-vendor-list.svg')}}" alt="public">
                                             <p class="fs-16 mb-20">
                                                 {{translate('No Conversation List')}}
                                             </p>
@@ -63,7 +63,7 @@
                                 {{-- view here --}} -->
                                 <div class="h-98p d-center">
                                     <div class="empty--data">
-                                        <img width="64" class="mb-3" src="{{asset('/public/assets/admin/img/conversation-no-data.svg')}}" alt="public">
+                                        <img width="64" class="mb-3" src="{{asset('/assets/admin/img/conversation-no-data.svg')}}" alt="public">
                                         <p class="fs-16 mb-20">
                                             {{translate('Select a user to view the Conversation.')}}
                                         </p>

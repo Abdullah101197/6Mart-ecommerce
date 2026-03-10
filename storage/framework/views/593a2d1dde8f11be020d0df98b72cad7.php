@@ -18,8 +18,8 @@
         <div class="top--selling">
             <?php $__currentLoopData = $top_deliveryman; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <a class="grid--card" href="<?php echo e(route('admin.users.delivery-man.preview', [$item['id']])); ?>">
-                    <img class="onerror-image" data-onerror-image="<?php echo e(asset('public/assets/admin/img/admin.png')); ?>"
-                        src="<?php echo e($item['image_full_url'] ?? asset('public/assets/admin/img/admin.png')); ?>"
+                    <img class="onerror-image" data-onerror-image="<?php echo e(asset('assets/admin/img/admin.png')); ?>"
+                        src="<?php echo e($item['image_full_url'] ?? asset('assets/admin/img/admin.png')); ?>"
                         alt="<?php echo e($item['f_name']); ?>">
                     <div class="cont pt-2">
                         <h6 class="mb-1"><?php echo e($item['f_name'] ?? 'Not exist'); ?></h6>
@@ -34,14 +34,14 @@
         </div>
     <?php else: ?>
         <!-- <div class="empty--data">
-            <img src="<?php echo e(asset('/public/assets/admin/svg/illustrations/empty-state.svg')); ?>" alt="public">
+            <img src="<?php echo e(asset('/assets/admin/svg/illustrations/empty-state.svg')); ?>" alt="public">
             <h5>
                 <?php echo e(translate('no_data_found')); ?>
 
             </h5>
         </div> -->
         <div class="empty--data d-flex flex-column align-items-center justify-content-center h-100 w-100">
-            <img src="<?php echo e(asset('/public/assets/admin/img/no-deliveryman.png')); ?>" alt="public">
+            <img src="<?php echo e(asset('/assets/admin/img/no-deliveryman.png')); ?>" alt="public">
             <h5 class="secondary-clr">
                 <?php echo e(translate('No deliveryman available')); ?>
 
@@ -51,5 +51,5 @@
 
 </div>
 
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/view-pages/common.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/view-pages/common.js"></script>
 <?php /**PATH C:\laragon\www\6MartAdminpanel\resources\views/admin-views/partials/_top-deliveryman.blade.php ENDPATH**/ ?>

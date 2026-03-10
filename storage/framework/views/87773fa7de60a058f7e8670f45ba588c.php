@@ -25,8 +25,8 @@
             <?php $__currentLoopData = $top_sell; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <a class="grid--card" href="<?php echo e(route('admin.item.view', [$item['id']])); ?>">
                     <img class="initial--28 onerror-image"
-                        src="<?php echo e($item['image_full_url'] ?? asset('public/assets/admin/img/placeholder-2.png')); ?>"
-                        data-onerror-image="<?php echo e(asset('public/assets/admin/img/placeholder-2.png')); ?>"
+                        src="<?php echo e($item['image_full_url'] ?? asset('assets/admin/img/placeholder-2.png')); ?>"
+                        data-onerror-image="<?php echo e(asset('assets/admin/img/placeholder-2.png')); ?>"
                         alt="<?php echo e($item->name); ?> image">
                     <div class="cont pt-2" title="<?php echo e($item?->name); ?>">
                         <span class="fz--13"><?php echo e(Str::limit($item['name'], 20, '...')); ?></span>
@@ -42,14 +42,14 @@
         </div>
     <?php else: ?>
         <!-- <div class="empty--data">
-            <img src="<?php echo e(asset('/public/assets/admin/svg/illustrations/empty-state.svg')); ?>" alt="public">
+            <img src="<?php echo e(asset('/assets/admin/svg/illustrations/empty-state.svg')); ?>" alt="public">
             <h5>
                 <?php echo e(translate('no_data_found')); ?>
 
             </h5>
         </div> -->
         <div class="empty--data d-flex flex-column align-items-center justify-content-center h-100 w-100">
-            <img src="<?php echo e(asset('/public/assets/admin/img/no-items.png')); ?>" alt="public">
+            <img src="<?php echo e(asset('/assets/admin/img/no-items.png')); ?>" alt="public">
             <h5 class="secondary-clr">
                 <?php echo e(translate('No items available')); ?>
 
@@ -58,5 +58,5 @@
     <?php endif; ?>
 </div>
 
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/view-pages/common.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/view-pages/common.js"></script>
 <?php /**PATH C:\laragon\www\6MartAdminpanel\resources\views/admin-views/partials/_top-selling-foods.blade.php ENDPATH**/ ?>

@@ -4,8 +4,8 @@
 
 @push('css_or_js')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="{{ asset('public/assets/admin/css/tags-input.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('public/assets/admin/css/new-product.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/css/tags-input.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/css/new-product.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -14,7 +14,7 @@
         <div class="page-header d-flex flex-wrap __gap-15px justify-content-between align-items-center mb-4">
             <h1 class="page-header-title">
                 <span class="page-header-icon">
-                    <img src="{{ asset('public/assets/admin/img/items.png') }}" class="w--22" alt="">
+                    <img src="{{ asset('assets/admin/img/items.png') }}" class="w--22" alt="">
                 </span>
                 <span>{{ translate('messages.add_new_item') }}</span>
             </h1>
@@ -82,7 +82,7 @@
                                 data-route="{{ route('admin.product.title-auto-fill') }}">
                                 <div class="btn-svg-wrapper">
                                     <img width="18" height="18" class=""
-                                        src="{{ asset('public/assets/admin/img/svg/blink-right-small.svg') }}" alt="">
+                                        src="{{ asset('assets/admin/img/svg/blink-right-small.svg') }}" alt="">
                                 </div>
                                 <span class="ai-text-animation d-none" role="status">
                                     {{ translate('Just_a_second') }}
@@ -120,7 +120,7 @@
                                        data-route="{{ route('admin.product.description-auto-fill') }}">
                                        <div class="btn-svg-wrapper">
                                             <img width="18" height="18" class=""
-                                                src="{{ asset('public/assets/admin/img/svg/blink-right-small.svg') }}" alt="">
+                                                src="{{ asset('assets/admin/img/svg/blink-right-small.svg') }}" alt="">
                                         </div>
                                         <span class="ai-text-animation d-none" role="status">
                                             {{ translate('Just_a_second') }}
@@ -168,7 +168,7 @@
                                     data-route="{{ route('admin.product.title-auto-fill') }}">
                                     <div class="btn-svg-wrapper">
                                         <img width="18" height="18" class=""
-                                            src="{{ asset('public/assets/admin/img/svg/blink-right-small.svg') }}" alt="">
+                                            src="{{ asset('assets/admin/img/svg/blink-right-small.svg') }}" alt="">
                                     </div>
                                     <span class="ai-text-animation d-none" role="status">
                                         {{ translate('Just_a_second') }}
@@ -197,7 +197,7 @@
                                           data-route="{{ route('admin.product.description-auto-fill') }}">
                                             <div class="btn-svg-wrapper">
                                                 <img width="18" height="18" class=""
-                                                    src="{{ asset('public/assets/admin/img/svg/blink-right-small.svg') }}" alt="">
+                                                    src="{{ asset('assets/admin/img/svg/blink-right-small.svg') }}" alt="">
                                             </div>
                                             <span class="ai-text-animation d-none" role="status">
                                                 {{ translate('Just_a_second') }}
@@ -984,7 +984,7 @@
                     </label>
                     <label class="d-inline-block m-0 position-relative error-wrapper">
                         <img class="img--176 border" id="viewer"
-                            src="{{ asset('public/assets/admin/img/upload-img.png') }}" style="width:176px;height:176px;object-fit:cover" alt="thumbnail" />
+                            src="{{ asset('assets/admin/img/upload-img.png') }}" style="width:176px;height:176px;object-fit:cover" alt="thumbnail" />
                         <div class="icon-file-group">
                             <div class="icon-file"><input type="file" name="image" id="customFileEg1"
                                     class="custom-file-input d-none"
@@ -2206,8 +2206,8 @@
 @endsection
 
 @push('script_2')
-    <script src="{{ asset('public/assets/admin/js/tags-input.min.js') }}"></script>
-    <script src="{{ asset('public/assets/admin/js/spartan-multi-image-picker.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/tags-input.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/spartan-multi-image-picker.js') }}"></script>
     <script>
         function switchTab(btn, panelId) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));

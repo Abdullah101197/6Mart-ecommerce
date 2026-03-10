@@ -26,8 +26,8 @@
                 <li class="cursor-pointer redirect-url" data-url="<?php echo e(route('admin.store.view', $item->store_id)); ?>">
                     <div class="img-container">
                         <img class="onerror-image"
-                            data-onerror-image="<?php echo e(asset('public/assets/admin/img/100x100/1.png')); ?>"
-                            src="<?php echo e($item->store['logo_full_url'] ?? asset('public/assets/admin/img/100x100/1.png')); ?>"
+                            data-onerror-image="<?php echo e(asset('assets/admin/img/100x100/1.png')); ?>"
+                            src="<?php echo e($item->store['logo_full_url'] ?? asset('assets/admin/img/100x100/1.png')); ?>"
                             alt="<?php echo e(translate('store')); ?>" title="<?php echo e($item?->store?->name); ?>">
                         <a href="<?php echo e(route('admin.store.view', $item->store_id)); ?>">
                             <span class="ml-2" title="<?php echo e($item?->store?->name); ?>">
@@ -44,14 +44,14 @@
         </ul>
     <?php else: ?>
         <!-- <div class="empty--data">
-            <img src="<?php echo e(asset('/public/assets/admin/svg/illustrations/empty-state.svg')); ?>" alt="public">
+            <img src="<?php echo e(asset('/assets/admin/svg/illustrations/empty-state.svg')); ?>" alt="public">
             <h5>
                 <?php echo e(translate('no_data_found')); ?>
 
             </h5>
         </div> -->
         <div class="empty--data d-flex flex-column align-items-center justify-content-center h-100 w-100">
-            <img src="<?php echo e(asset('/public/assets/admin/img/no-store.png')); ?>" alt="public">
+            <img src="<?php echo e(asset('/assets/admin/img/no-store.png')); ?>" alt="public">
             <h5 class="secondary-clr">
                 <?php echo e(translate('No stores available')); ?>
 
@@ -61,5 +61,5 @@
 
 
 </div>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/view-pages/common.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/view-pages/common.js"></script>
 <?php /**PATH C:\laragon\www\6MartAdminpanel\resources\views/admin-views/partials/_popular-restaurants.blade.php ENDPATH**/ ?>

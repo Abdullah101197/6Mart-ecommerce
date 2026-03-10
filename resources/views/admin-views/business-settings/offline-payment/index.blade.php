@@ -110,8 +110,8 @@
                                                     <input type="checkbox"
                                                            data-id="status-{{$method->id}}"
                                                            data-type="status"
-                                                           data-image-on="{{asset('/public/assets/admin/img/modal/payment-on.png')}}"
-                                                           data-image-off=" {{asset('/public/assets/admin/img/modal/wallet-off.png')}}"
+                                                           data-image-on="{{asset('/assets/admin/img/modal/payment-on.png')}}"
+                                                           data-image-off=" {{asset('/assets/admin/img/modal/wallet-off.png')}}"
                                                            data-title-on="{{translate('Turn ON '.ucfirst(str_replace('_',' ',$method->method_name)).' payment method')}}"
                                                            data-title-off="{{translate('Turn OFF '.ucfirst(str_replace('_',' ',$method->method_name)).' payment method')}}"
                                                            data-text-on="<p>{{translate('By enabling '.ucfirst(str_replace('_',' ',$method->method_name)).', customers can securely pay with their '.ucfirst(str_replace('_',' ',$method->method_name)).' account.')}}</p>"
@@ -154,7 +154,7 @@
                                 </div>
                             @else
                             <div class="empty--data">
-                                <img width="64" class="mb-2" src="{{asset('/public/assets/admin/svg/illustrations/no-data.svg')}}" alt="public">
+                                <img width="64" class="mb-2" src="{{asset('/assets/admin/svg/illustrations/no-data.svg')}}" alt="public">
                                 <p class="fs-16 mb-20">
                                     {{translate('No Payment Method List')}}
                                 </p>
@@ -181,7 +181,7 @@
                 <div class="modal-body pb-5 pt-0">
                     <div class="mx-auto mb-20">
                         <div class="text-center mb-30">
-                            <img width="64" height="64" src="{{asset('public/assets/admin/img/modal/delete.png')}}" alt="" class="mb-20 initial--10">
+                            <img width="64" height="64" src="{{asset('assets/admin/img/modal/delete.png')}}" alt="" class="mb-20 initial--10">
                             <h3 class="mb-3">
                                 {{ translate('Do you want to delete this payment method?') }}
                             </h3>

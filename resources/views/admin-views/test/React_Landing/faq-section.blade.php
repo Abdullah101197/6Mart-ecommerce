@@ -8,7 +8,7 @@
         <div class="d-flex flex-wrap justify-content-between">
             <h1 class="page-header-title">
                 <span class="page-header-icon">
-                    <img src="{{asset('public/assets/admin/img/landing.png')}}" class="w--20" alt="">
+                    <img src="{{asset('assets/admin/img/landing.png')}}" class="w--20" alt="">
                 </span>
                 <span>
                     {{ translate('messages.react_landing_page') }}
@@ -538,7 +538,7 @@
                                         <div class="d-flex align-items-center gap-3 flex-wrap justify-content-xl-between justify-content-center text-xl-start text-center flex-xl-nowrap">
                                             <div class="d-xl-flex gap-xxl-20 align-items-center flex-xl-nowrap flex-wrap">
                                                 <div class="w-50px bg-white h-50px min-h-50 rounded-circle d-center mx-auto mb-xl-0 mb-2">
-                                                    <img src="{{ asset('/public/assets/admin/img/icons/faq-question.png') }}" alt="" class="object-contain">
+                                                    <img src="{{ asset('/assets/admin/img/icons/faq-question.png') }}" alt="" class="object-contain">
                                                 </div>
                                                 <div>
                                                     <h2 class="mb-lg-1 mb-1 fs-20 text-title">
@@ -628,7 +628,7 @@
                                         <div class="d-flex align-items-center gap-3 flex-wrap justify-content-xl-between justify-content-center text-xl-start text-center flex-xl-nowrap">
                                             <div class="d-xl-flex gap-xxl-20 align-items-center flex-xl-nowrap flex-wrap">
                                                 <div class="w-50px bg-white h-50px min-h-50 rounded-circle d-center mx-auto mb-xl-0 mb-2">
-                                                    <img src="{{ asset('/public/assets/admin/img/icons/faq-question.png') }}" alt="" class="object-contain">
+                                                    <img src="{{ asset('/assets/admin/img/icons/faq-question.png') }}" alt="" class="object-contain">
                                                 </div>
                                                 <div>
                                                     <h2 class="mb-lg-1 mb-1 fs-20 text-title">
@@ -718,7 +718,7 @@
                                         <div class="d-flex align-items-center gap-3 flex-wrap justify-content-xl-between justify-content-center text-xl-start text-center flex-xl-nowrap">
                                             <div class="d-xl-flex gap-xxl-20 align-items-center flex-xl-nowrap flex-wrap">
                                                 <div class="w-50px bg-white h-50px min-h-50 rounded-circle d-center mx-auto mb-xl-0 mb-2">
-                                                    <img src="{{ asset('/public/assets/admin/img/icons/faq-question.png') }}" alt="" class="object-contain">
+                                                    <img src="{{ asset('/assets/admin/img/icons/faq-question.png') }}" alt="" class="object-contain">
                                                 </div>
                                                 <div>
                                                     <h2 class="mb-lg-1 mb-1 fs-20 text-title">

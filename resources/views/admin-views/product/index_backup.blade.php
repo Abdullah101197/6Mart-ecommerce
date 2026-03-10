@@ -4,8 +4,8 @@
 
 @push('css_or_js')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="{{ asset('public/assets/admin/css/tags-input.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('public/assets/admin/css/AI/animation/product/ai-sidebar.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/css/tags-input.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/admin/css/AI/animation/product/ai-sidebar.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -15,7 +15,7 @@
         <div class="page-header d-flex flex-wrap __gap-15px justify-content-between align-items-center">
             <h1 class="page-header-title">
                 <span class="page-header-icon">
-                    <img src="{{ asset('public/assets/admin/img/items.png') }}" class="w--22" alt="">
+                    <img src="{{ asset('assets/admin/img/items.png') }}" class="w--22" alt="">
                 </span>
                 <span>
                     {{ translate('messages.add_new_item') }}
@@ -25,7 +25,7 @@
                 <div class="text--primary-2 d-flex flex-wrap align-items-center mr-2">
                     <a href="{{ route('admin.item.product_gallery') }}"
                         class="btn btn-outline-primary btn--primary d-flex align-items-center bg-not-hover-primary-ash rounded-8 gap-2">
-                        <img src="{{ asset('public/assets/admin/img/product-gallery.png') }}" class="w--22" alt="">
+                        <img src="{{ asset('assets/admin/img/product-gallery.png') }}" class="w--22" alt="">
                         <span>{{ translate('Add Info From Gallery') }}</span>
                     </a>
                 </div>
@@ -81,7 +81,7 @@
                                     </label>
                                     <label class="d-inline-block m-0 position-relative error-wrapper">
                                         <img class="img--176 border" id="viewer"
-                                            src="{{ asset('public/assets/admin/img/upload-img.png') }}" alt="thumbnail" />
+                                            src="{{ asset('assets/admin/img/upload-img.png') }}" alt="thumbnail" />
                                         <div class="icon-file-group">
                                             <div class="icon-file"><input type="file" name="image" id="customFileEg1"
                                                     class="custom-file-input d-none"
@@ -159,27 +159,27 @@
 
 
 @push('script_2')
-    <script src="{{ asset('public/assets/admin') }}/js/tags-input.min.js"></script>
-    <script src="{{ asset('public/assets/admin/js/spartan-multi-image-picker.js') }}"></script>
-    <script src="{{ asset('public/assets/admin') }}/js/view-pages/product-index.js"></script>
+    <script src="{{ asset('assets/admin') }}/js/tags-input.min.js"></script>
+    <script src="{{ asset('assets/admin/js/spartan-multi-image-picker.js') }}"></script>
+    <script src="{{ asset('assets/admin') }}/js/view-pages/product-index.js"></script>
 
 
 
-    <script src="{{ asset('public/assets/admin/js/AI/products/product-title-autofill.js') }}"></script>
-    <script src="{{ asset('public/assets/admin/js/AI/products/product-description-autofill.js') }}"></script>
-    <script src="{{ asset('public/assets/admin/js/AI/products/general-setup-autofill.js') }}"></script>
-    <script src="{{ asset('public/assets/admin/js/AI/products/product-others-autofill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/product-title-autofill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/product-description-autofill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/general-setup-autofill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/product-others-autofill.js') }}"></script>
     @if (Config::get('module.current_module_type') == 'food')
-    <script src="{{ asset('public/assets/admin/js/AI/products/variation-setup-auto-fill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/variation-setup-auto-fill.js') }}"></script>
     @else
-    <script src="{{ asset('public/assets/admin/js/AI/products/other-variation-setup-auto-fill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/other-variation-setup-auto-fill.js') }}"></script>
     @endif
-    <script src="{{ asset('public/assets/admin/js/AI/products/seo-section-autofill.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/seo-section-autofill.js') }}"></script>
 
-    <script src="{{ asset('public/assets/admin/js/AI/products/ai-sidebar.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/AI/products/ai-sidebar.js') }}"></script>
 
-    <script src="{{ asset('/public/assets/admin/js/AI/products/compressor/image-compressor.js') }}"></script>
-    <script src="{{ asset('/public/assets/admin/js/AI/products/compressor/compressor.min.js') }}"></script>
+    <script src="{{ asset('/assets/admin/js/AI/products/compressor/image-compressor.js') }}"></script>
+    <script src="{{ asset('/assets/admin/js/AI/products/compressor/compressor.min.js') }}"></script>
 
 
     <script>
@@ -711,7 +711,7 @@
                 groupClassName: 'spartan_item_wrapper min-w-176px max-w-176px',
                 maxFileSize: 1024 * 1024 * 2,
                 placeholderImage: {
-                    image: "{{ asset('public/assets/admin/img/upload-img.png') }}",
+                    image: "{{ asset('assets/admin/img/upload-img.png') }}",
                     width: '176px'
                 },
                 dropFileLabel: "Drop Here",
@@ -758,7 +758,7 @@
             $('#choice_attributes').val(null).trigger('change');
             $('#customer_choice_options').empty().trigger('change');
             $('#variant_combination').empty().trigger('change');
-            $('#viewer').attr('src', "{{ asset('public/assets/admin/img/upload.png') }}");
+            $('#viewer').attr('src', "{{ asset('assets/admin/img/upload.png') }}");
             $('#customFileEg1').val(null).trigger('change');
             $("#coba").empty();
             initImagePicker();

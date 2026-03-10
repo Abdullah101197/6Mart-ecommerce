@@ -15,7 +15,7 @@
         <div class="fs-12 px-3 py-2 rounded bg-info bg-opacity-10 mb-20">
             <div class="d-flex gap-2 align-items-baseline mb-2">
                 <span class="text-info lh-1 fs-14">
-                    <img src="{{asset('public/assets/admin/img/svg/bulb.svg')}}" class="svg" alt="">
+                    <img src="{{asset('assets/admin/img/svg/bulb.svg')}}" class="svg" alt="">
                 </span>
                 <h6 class="font-regular mb-0">
                     {{ translate('messages.WebSockets enable real-time communication between the server and your app.') }}
@@ -52,8 +52,8 @@
                         <input type="checkbox"
                             data-id="websocket"
                             data-type="toggle"
-                            data-image-on="{{ asset('/public/assets/admin/img/modal/schedule-on.png') }}"
-                            data-image-off="{{ asset('/public/assets/admin/img/modal/schedule-off.png') }}"
+                            data-image-on="{{ asset('/assets/admin/img/modal/schedule-on.png') }}"
+                            data-image-off="{{ asset('/assets/admin/img/modal/schedule-off.png') }}"
                             data-title-on="{{translate('messages.Want_to_enable')}} <strong>{{translate('messages.websocket_?')}}</strong>"
                             data-title-off="{{translate('messages.Want_to_disable')}} <strong>{{translate('messages.websocket_?')}}</strong>'"
                             data-text-on="<p>{{ translate('messages.If_you_enable_this,Deliveyman_last_location_will_be_recorded_by_websocket.') }}</p>"

@@ -15,14 +15,14 @@
     <title><?php echo $__env->yieldContent('title'); ?></title>
     <?php echo $__env->make('layouts.landing._seo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/landing/css/bootstrap.min.css')); ?>" />
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/landing/css/customize-animate.css')); ?>" />
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/landing/css/odometer.css')); ?>" />
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/landing/css/owl.min.css')); ?>" />
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/toastr.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/landing/css/main.css')); ?>"/>
+    <link rel="stylesheet" href="<?php echo e(asset('assets/landing/css/bootstrap.min.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('assets/landing/css/customize-animate.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('assets/landing/css/odometer.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('assets/landing/css/owl.min.css')); ?>" />
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/toastr.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/landing/css/main.css')); ?>"/>
 
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/intltelinput/css/intlTelInput.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/intltelinput/css/intlTelInput.css')); ?>">
 
 
     <link rel="icon" type="image/x-icon" href="<?php echo e(\App\CentralLogics\Helpers::iconFullUrl()); ?>">
@@ -54,7 +54,7 @@
                 <div class="navbar-bottom-wrapper">
 
                     <a href="<?php echo e(route('home')); ?>" class="logo">
-                        <img class="onerror-image"  data-onerror-image="<?php echo e(asset('public/assets/admin/img/160x160/img2.jpg')); ?>"
+                        <img class="onerror-image"  data-onerror-image="<?php echo e(asset('assets/admin/img/160x160/img2.jpg')); ?>"
 
                     src="<?php echo e(\App\CentralLogics\Helpers::logoFullUrl()); ?>"
 
@@ -211,10 +211,9 @@
         <div class="footer-bottom">
             <div class="container">
                 <div class="footer-wrapper ps-xl-5">
-                    <div class="footer-widget">
                         <div class="footer-logo">
                             <a class="logo">
-                                <img  class="onerror-image"  data-onerror-image="<?php echo e(asset('public/assets/admin/img/160x160/img2.jpg')); ?>" src="<?php echo e(\App\CentralLogics\Helpers::logoFullUrl()); ?>" alt="image">
+                                <img  class="onerror-image"  data-onerror-image="<?php echo e(asset('assets/admin/img/160x160/img2.jpg')); ?>" src="<?php echo e(\App\CentralLogics\Helpers::logoFullUrl()); ?>" alt="image">
                             </a>
                         </div>
                         <div class="txt">
@@ -227,7 +226,7 @@
                                 <?php $__currentLoopData = $social_media; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $social): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li>
                                     <a href="<?php echo e($social->link); ?>" target="_blank">
-                                        <img src="<?php echo e(asset('public/assets/landing/img/footer/'. $social->name.'.svg')); ?>" alt="">
+                                        <img src="<?php echo e(asset('assets/landing/img/footer/'. $social->name.'.svg')); ?>" alt="">
                                     </a>
                                 </li>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -237,14 +236,14 @@
                         <?php ($landing_page_links = isset($landing_page_links->value) ? json_decode($landing_page_links->value, true) : null); ?>
                         <?php if(isset($landing_page_links['playstore_url_status']) || isset( $landing_page_links['apple_store_url_status'])): ?>
                         <div class="app-btn-grp">
-                            <?php if(isset($landing_page_links['playstore_url_status'])): ?>
+                             <?php if(isset($landing_page_links['playstore_url_status'])): ?>
                             <a href="<?php echo e(isset($landing_page_links['playstore_url']) ? $landing_page_links['playstore_url'] : ''); ?>">
-                                <img src="<?php echo e(asset('public/assets/landing/img/google.svg')); ?>" alt="">
+                                <img src="<?php echo e(asset('assets/landing/img/google.svg')); ?>" alt="">
                             </a>
                             <?php endif; ?>
                             <?php if(isset($landing_page_links['apple_store_url_status'])): ?>
                             <a href="<?php echo e(isset($landing_page_links['apple_store_url']) ? $landing_page_links['apple_store_url'] : ''); ?>">
-                                <img src="<?php echo e(asset('public/assets/landing/img/apple.svg')); ?>" alt="">
+                                <img src="<?php echo e(asset('assets/landing/img/apple.svg')); ?>" alt="">
                             </a>
                             <?php endif; ?>
                         </div>
@@ -334,14 +333,14 @@
         </div>
     </footer>
     <!-- ======= Footer Section ======= -->
-    <script src="<?php echo e(asset('public/assets/landing/js/jquery-3.6.0.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/landing/js/bootstrap.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/landing/js/viewport.jquery.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/landing/js/wow.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/landing/js/odometer.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/landing/js/owl.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/landing/js/main.js')); ?>"></script>
-    <script src="<?php echo e(asset('public/assets/admin/js/toastr.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/jquery-3.6.0.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/bootstrap.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/viewport.jquery.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/wow.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/odometer.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/owl.min.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/landing/js/main.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/admin/js/toastr.js')); ?>"></script>
     <?php echo Toastr::message(); ?>
 
     <?php if($errors->any()): ?>
@@ -497,7 +496,7 @@
         sync1.owlCarousel();
 
     </script>
-        <script src="<?php echo e(asset('public/assets/admin/intltelinput/js/intlTelInput.min.js')); ?>"></script>
+        <script src="<?php echo e(asset('assets/admin/intltelinput/js/intlTelInput.min.js')); ?>"></script>
 
 <script>
             "use strict";
@@ -505,7 +504,7 @@
             inputs.forEach(input => {
                 window.intlTelInput(input, {
                     initialCountry: "<?php echo e($countryCode); ?>",
-                    utilsScript: "<?php echo e(asset('public/assets/admin/intltelinput/js/utils.js')); ?>",
+                    utilsScript: "<?php echo e(asset('assets/admin/intltelinput/js/utils.js')); ?>",
                     autoInsertDialCode: true,
                     nationalMode: false,
                     formatOnDisplay: false,

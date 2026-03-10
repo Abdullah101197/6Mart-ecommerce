@@ -104,8 +104,8 @@
                                         </span>
                                     </span>
                                     <input type="checkbox" data-id="partial_payment" data-type="toggle"
-                                        data-image-on="{{ asset('/public/assets/admin/img/modal/schedule-on.png') }}"
-                                        data-image-off="{{ asset('/public/assets/admin/img/modal/schedule-off.png') }}"
+                                        data-image-on="{{ asset('/assets/admin/img/modal/schedule-on.png') }}"
+                                        data-image-off="{{ asset('/assets/admin/img/modal/schedule-off.png') }}"
                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.partial_payment_?') }}</strong>"
                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.partial_payment_?') }}</strong>"
                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_customers_can_choose_partial_payment_during_checkout.') }}</p>"

@@ -165,13 +165,13 @@
 
                         <a id="export-excel" class="dropdown-item" href="{{route('admin.notification.export', ['type'=>'excel' , request()->getQueryString()])}}">
                             <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                src="{{ asset('public/assets/admin') }}/svg/components/excel.svg"
+                                src="{{ asset('assets/admin') }}/svg/components/excel.svg"
                                 alt="Image Description">
                             {{ translate('messages.excel') }}
                         </a>
                         <a id="export-csv" class="dropdown-item" href="{{route('admin.notification.export', ['type'=>'csv', request()->getQueryString()])}}">
                             <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                src="{{ asset('public/assets/admin') }}/svg/components/placeholder-csv-format.svg"
+                                src="{{ asset('assets/admin') }}/svg/components/placeholder-csv-format.svg"
                                 alt="Image Description">
                             .{{ translate('messages.csv') }}
                         </a>
@@ -209,7 +209,7 @@
                                 @if($notification['image']!=null)
                                     <img width="60" height="30" class="w-60px object--cover onerror-image"
                                     src="{{ $notification['image_full_url'] }}"
-                                        data-onerror-image="{{asset('public/assets/admin/img/160x160/img2.jpg')}}">
+                                        data-onerror-image="{{asset('assets/admin/img/160x160/img2.jpg')}}">
                                 @else
                                     <label class="badge badge-soft-warning mb-0">{{translate('No Image')}}</label>
                                 @endif
@@ -276,7 +276,7 @@
             </div>
             @if(count($notifications) === 0)
             <div class="empty--data">
-                <img src="{{asset('/public/assets/admin/svg/illustrations/sorry.svg')}}" alt="public">
+                <img src="{{asset('/assets/admin/svg/illustrations/sorry.svg')}}" alt="public">
                 <h5>
                     {{translate('no_data_found')}}
                 </h5>
@@ -399,7 +399,7 @@
                             <div class="text-center mb-3">
                                 <img class="img--vertical rounded aspect-2-1 max-w-300px onerror-image"
                                     src="" id="modal-image"
-                                    data-onerror-image="{{asset('public/assets/admin/img/900x400/img1.jpg')}}" alt="image"/>
+                                    data-onerror-image="{{asset('assets/admin/img/900x400/img1.jpg')}}" alt="image"/>
                             </div>
                             <div class="card card-body mb-3">
                                 <div class="mb-20">
@@ -449,7 +449,7 @@
 @endsection
 
 @push('script_2')
-    <script src="{{asset('public/assets/admin')}}/js/view-pages/notification.js"></script>
+    <script src="{{asset('assets/admin')}}/js/view-pages/notification.js"></script>
     <script>
         "use strict";
         $('#notification').on('submit', function (e) {
@@ -460,7 +460,7 @@
             Swal.fire({
                 title: '{{translate('messages.are_you_sure')}}',
                 text: '{{translate('messages.you want to sent notification to ')}}'+$('#tergat').val()+'?',
-                imageUrl: '{{ asset('public/assets/admin/img/off-danger.png') }}',
+                imageUrl: '{{ asset('assets/admin/img/off-danger.png') }}',
                 imageWidth: 80,
                 imageHeight: 80,
                 imageAlt: 'Custom icon',
@@ -510,7 +510,7 @@
 
             $('#reset_btn').click(function(){
                 $('#zone').val('all').trigger('change');
-                $('#viewer').attr('src','{{asset('public/assets/admin/img/900x400/img1.jpg')}}');
+                $('#viewer').attr('src','{{asset('assets/admin/img/900x400/img1.jpg')}}');
                 $('#customFileEg1').val(null);
             })
 

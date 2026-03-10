@@ -12,7 +12,7 @@
                             data-lang="en">
                             <div class="btn-svg-wrapper">
                                 <img width="18" height="18" class=""
-                                    src="<?php echo e(asset('public/assets/admin/img/svg/blink-right-small.svg')); ?>" alt="">
+                                    src="<?php echo e(asset('assets/admin/img/svg/blink-right-small.svg')); ?>" alt="">
                             </div>
                             <span class="ai-text-animation d-none" role="status">
                                 <?php echo e(translate('Just_a_second')); ?>

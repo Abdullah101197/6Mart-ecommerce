@@ -19,7 +19,7 @@
                             data-lang="en">
                             <div class="btn-svg-wrapper">
                                 <img width="18" height="18" class=""
-                                    src="{{ asset('public/assets/admin/img/svg/blink-right-small.svg') }}"
+                                    src="{{ asset('assets/admin/img/svg/blink-right-small.svg') }}"
                                     alt="">
                             </div>
                             <span class="ai-text-animation d-none" role="status">
@@ -108,7 +108,7 @@
                                     for="exampleFormControlSelect1">{{ translate('messages.sub_category') }}<span
                                         class="form-label-secondary" data-toggle="tooltip" data-placement="right"
                                         data-original-title="{{ translate('messages.category_required_warning') }}"><img
-                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                             alt="{{ translate('messages.category_required_warning') }}"></span></label>
 
 
@@ -372,7 +372,7 @@
                                 for="exampleFormControlSelect1">{{ translate('Select_Add-on') }}<span
                                     class="input-label-secondary" data-toggle="tooltip" data-placement="right"
                                     data-original-title="{{ translate('messages.The_selected_addon’s_will_be_displayed_in_this_food_details') }}"><img
-                                        src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                        src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                         alt="{{ translate('messages.The_selected_addon’s_will_be_displayed_in_this_food_details') }}"></span></label>
                             <select name="addon_ids[]" class="form-control border js-select2-custom"
                                 multiple="multiple" id="add_on">

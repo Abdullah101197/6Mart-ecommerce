@@ -5,8 +5,8 @@
         <td>
             <div class="prod-cell">
                 <div class="prod-img">
-                    <img src="{{ $item['image_full_url'] ?? asset('public/assets/admin/img/160x160/img2.jpg') }}"
-                        onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'" alt="">
+                    <img src="{{ $item['image_full_url'] ?? asset('assets/admin/img/160x160/img2.jpg') }}"
+                        onerror="this.src='{{ asset('assets/admin/img/160x160/img2.jpg') }}'" alt="">
                 </div>
                 <div>
                     <div class="prod-name">{{ $item->name }}</div>
@@ -119,7 +119,7 @@
     <tr>
         <td colspan="10" class="text-center p-5">
             <div class="empty-state">
-                <img src="{{asset('public/assets/admin/img/900x400/img1.jpg')}}"
+                <img src="{{asset('assets/admin/img/900x400/img1.jpg')}}"
                     style="width:120px; opacity:0.5; margin-bottom:15px;">
                 <p style="color:var(--muted)">{{translate('messages.no_data_found')}}</p>
                 <a href="{{ route('admin.item.add-new', ['module_id' => Config::get('module.current_module_id')]) }}"

@@ -1,15 +1,15 @@
+
 <?php ($business_name =    \App\CentralLogics\Helpers::get_business_settings('business_name')); ?>
 <?php $__env->startSection('title', translate('messages.landing_page') . ' | ' . $business_name != 'null' ? $business_name : 'Sixam Mart'); ?>
 <?php $__env->startSection('content'); ?>
 
     <!-- Basic Settings -->
-    <?php ($landing_page_links =   \App\CentralLogics\Helpers::get_business_settings('landing_page_links')); ?>
     <!-- ==== Banner Section Starts Here ==== -->
     <section class="banner-section position-relative">
         <div class="container">
             <div class="banner-content wow fadeInUp">
                 <h1 class="title"><?php echo e($landing_data['fixed_header_title']); ?></h1>
-                <img class="w-100 onerror-image" data-onerror-image="<?php echo e(asset('public/assets/admin/img/160x160/img2.jpg')); ?>"
+                <img class="w-100 onerror-image" data-onerror-image="<?php echo e(asset('assets/admin/img/160x160/img2.jpg')); ?>"
                     src="<?php echo e(\App\CentralLogics\Helpers::logoFullUrl()); ?>"
                     alt="">
                 <div class="text">
@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="px-xl-5 d-flex justify-content-center text-base banner-svg-img">
-            <img src="<?php echo e(asset('public/assets/landing/img/main-banner.svg')); ?>" class="svg" alt="">
+            <img src="<?php echo e(asset('assets/landing/img/main-banner.svg')); ?>" class="svg" alt="">
         </div>
     </section>
     <!-- ==== Banner Section Ends Here ==== -->
@@ -44,8 +44,8 @@
                         <?php $__currentLoopData = $modules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <div class="item">
                                 <img class="__img-50 onerror-image"
-                                    data-onerror-image="<?php echo e(asset('public/assets/admin/img/100x100/2.png')); ?>"
-                                    src="<?php echo e($item['icon_full_url'] ?? asset('public/assets/admin/img/100x100/2.png')); ?>"
+                                    data-onerror-image="<?php echo e(asset('assets/admin/img/100x100/2.png')); ?>"
+                                    src="<?php echo e($item['icon_full_url'] ?? asset('assets/admin/img/100x100/2.png')); ?>"
                                     alt="image">
                                 <div class="txt d-block"><?php echo e(translate("messages.{$item->module_name}")); ?></div>
                             </div>
@@ -66,9 +66,9 @@
                         </div>
                         <div class="col-lg-6 col-md-8">
                             <div class="venture-img mx-1">
-                                <img src="<?php echo e($item['thumbnail_full_url'] ?? asset('public/assets/admin/img/100x100/2.png')); ?>"
+                                <img src="<?php echo e($item['thumbnail_full_url'] ?? asset('assets/admin/img/100x100/2.png')); ?>"
                                     class="img-fluid onerror-image w-100 mw-450"
-                                    data-onerror-image="<?php echo e(asset('public/assets/admin/img/100x100/2.png')); ?>"
+                                    data-onerror-image="<?php echo e(asset('assets/admin/img/100x100/2.png')); ?>"
                                     alt="image">
                             </div>
                         </div>
@@ -104,7 +104,7 @@
 
     <!-- ==== Learn Feature Section Starts Here ==== -->
     <section class="learn-feature-section"
-        style="background: url(<?php echo e(asset('public/assets/landing/img/learn-feature-bg.svg')); ?>) no-repeat center center / cover">
+        style="background: url(<?php echo e(asset('assets/landing/img/learn-feature-bg.svg')); ?>) no-repeat center center / cover">
         <div class="container position-relative">
             <div class="row gy-5 gx-0 gx-xl-4 align-items-center">
                 <div class=" col-lg-6 pe-lg-5">
@@ -852,14 +852,14 @@
                             <div class="dropdown-menu dropdown-menu-end p-0">
                                 <a href="<?php echo e(isset($join_as_seller['playstore_url']) ? $join_as_seller['playstore_url'] : ''); ?>"
                                     class="dropdown-item">
-                                    <img src="<?php echo e(asset('/public/assets/landing/img/google-play.png')); ?>"
+                                    <img src="<?php echo e(asset('/assets/landing/img/google-play.png')); ?>"
                                         alt="">
                                     <?php echo e(translate('google_play')); ?>
 
                                 </a>
                                 <a href="<?php echo e(isset($join_as_seller['apple_store_url']) ? $join_as_seller['apple_store_url'] : ''); ?>"
                                     class="dropdown-item">
-                                    <img src="<?php echo e(asset('/public/assets/landing/img/apple-store.png')); ?>"
+                                    <img src="<?php echo e(asset('/assets/landing/img/apple-store.png')); ?>"
                                         alt="">
                                     <?php echo e(translate('apple_store')); ?>
 
@@ -924,7 +924,7 @@
                             <div class="dropdown-menu p-0">
                                 <a href="<?php echo e(isset($join_as_dm['playstore_url']) ? $join_as_dm['playstore_url'] : ''); ?>"
                                     class="dropdown-item">
-                                    <img src="<?php echo e(asset('/public/assets/landing/img/google-play.png')); ?>"
+                                    <img src="<?php echo e(asset('/assets/landing/img/google-play.png')); ?>"
                                         alt="">
                                     <?php echo e(translate('google_play')); ?>
 
@@ -932,7 +932,7 @@
 
                                 <a href="<?php echo e(isset($join_as_dm['apple_store_url']) ? $join_as_dm['apple_store_url'] : ''); ?>"
                                     class="dropdown-item">
-                                    <img src="<?php echo e(asset('/public/assets/landing/img/apple-store.png')); ?>"
+                                    <img src="<?php echo e(asset('/assets/landing/img/apple-store.png')); ?>"
                                         alt="">
                                     <?php echo e(translate('apple_store')); ?>
 
@@ -1670,7 +1670,7 @@
                                 <div class="feature-card-icon">
                                     <img src="<?php echo e($item['image_full_url']); ?>" alt="<?php echo e($item['title']); ?>"
                                         class="onerror-image"
-                                        data-onerror-image="<?php echo e(asset('public/assets/admin/img/160x160/img2.jpg')); ?>">
+                                        data-onerror-image="<?php echo e(asset('assets/admin/img/160x160/img2.jpg')); ?>">
                                 </div>
                                 <div class="feature-card-cont">
                                     <h4 class="subtitle">
@@ -1882,7 +1882,7 @@
 
                         <div class="right-side d-flex word-nowrap align-items-center">
                             <img class="onerror-image"
-                                data-onerror-image="<?php echo e(asset('public/assets/admin/img/160x160/img2.jpg')); ?>"
+                                data-onerror-image="<?php echo e(asset('assets/admin/img/160x160/img2.jpg')); ?>"
                                 src="<?php echo e(\App\CentralLogics\Helpers::iconFullUrl()); ?>"
                                 alt="image">
                             <?php echo e(translate('messages.Still increasing')); ?>
@@ -1901,7 +1901,7 @@
     <?php if(
         (isset($landing_page_links['playstore_url_status']) && $landing_page_links['playstore_url_status'] == '1') ||
             (isset($landing_page_links['apple_store_url_status']) && $landing_page_links['apple_store_url_status'] == '1')): ?>
-        <section class="download-app-section">
+       <section class="download-app-section">
             <div class="container">
                 <div class="row justify-content-center align-items-center g-4">
                     <div class="col-lg-6 col-md-9">
@@ -1937,7 +1937,7 @@
                                 <div class="dropdown-menu p-0 w-75 w-sm-50">
                                     <?php if(isset($landing_page_links['playstore_url_status']) && $landing_page_links['playstore_url_status'] == '1'): ?>
                                         <a href="<?php echo e($landing_page_links['playstore_url']); ?>" class="dropdown-item">
-                                            <img src="<?php echo e(asset('/public/assets/landing/img/google-play.png')); ?>"
+                                            <img src="<?php echo e(asset('/assets/landing/img/google-play.png')); ?>"
                                                 alt="">
                                             <?php echo e(translate('google_play')); ?>
 
@@ -1945,7 +1945,7 @@
                                     <?php endif; ?>
                                     <?php if(isset($landing_page_links['apple_store_url_status']) && $landing_page_links['apple_store_url_status'] == '1'): ?>
                                         <a href="<?php echo e($landing_page_links['apple_store_url']); ?>" class="dropdown-item">
-                                            <img src="<?php echo e(asset('/public/assets/landing/img/apple-store.png')); ?>"
+                                            <img src="<?php echo e(asset('/assets/landing/img/apple-store.png')); ?>"
                                                 alt="">
                                             <?php echo e(translate('apple_store')); ?>
 
@@ -2101,7 +2101,7 @@
                     </div>
                     <div class="modal-body px-sm-5 pb-5">
                         <div class="text-center">
-                            <img src="<?php echo e(asset('/public/assets/landing/img/welcome.svg')); ?>" class="mw-100 mb-3"
+                            <img src="<?php echo e(asset('/assets/landing/img/welcome.svg')); ?>" class="mw-100 mb-3"
                                 alt="">
                             <h5 class="mb-3"><?php echo e(translate('Welcome_to')); ?> <?php echo e($business_name); ?>!</h5>
                             <p class="m-0 mb-4">

@@ -9,7 +9,7 @@
         <div class="page-header">
             <h1 class="page-header-title mr-3">
                 <span class="page-header-icon">
-                    <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                    <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
                 </span>
                 <span>
                     {{ translate('business_setup') }}
@@ -64,8 +64,8 @@
                                                         </span>
                                                     </span>
                                                     <input type="checkbox" data-id="canceled_by_store" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('Are you sure to allow vendor to cancel orders?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Are you sure to not allow vendor to cancel orders?') }}</strong>"
                                                     data-text-on="{{ translate('Vendors will be able to cancel orders directly from their panel if they cannot fulfill them.') }}"
@@ -105,8 +105,8 @@
                                                 </span>
 
                                                 <input type="checkbox" data-id="store_self_registration" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('Are you sure to enable vendor Self Registration?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Are you sure to disable vendor Self Registration?') }}</strong>"
                                                     data-text-on="{{ translate('This allows new business owners to sign up and apply to sell on your platform by themselves.') }}"
@@ -145,8 +145,8 @@
 
 
                                                 <input type="checkbox" data-id="product_gallery" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('Are you sure to enable Product Gallery?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Are you sure to disable Product Gallery?') }}</strong>"
                                                     data-text-on="{{ translate('This allows vendors to duplicate products and create new products using the gallery.') }}"
@@ -182,8 +182,8 @@
                                                     </span>
                                                 </span>
                                                 <input type="checkbox" data-id="access_all_products" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('Are you sure to enable Access All Products?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Are you sure to disable Access All Products?') }}</strong>"
                                                     data-text-on="{{ translate('If you enable this, vendors can access all products of other available vendors') }}"
@@ -221,8 +221,8 @@
                                                 </span>
 
                                                 <input type="checkbox" data-id="store_review_reply" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('Are you sure to enable Vendor Can Reply Review?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Are you sure to disable Vendor Can Reply Review?') }}</strong>"
                                                     data-text-on="{{ translate('If enabled, vendors can actively engage with the customers by responding to the reviews left for their orders.') }}"
@@ -273,8 +273,8 @@
                                                     <input type="checkbox"
                                                         data-id="product_approval"
                                                         data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/store-reg-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/store-reg-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/store-reg-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/store-reg-off.png') }}"
                                                         data-title-on="<strong>{{translate('Want_to_enable_product_approval?')}}</strong>"
                                                         data-title-off="<strong>{{translate('Want_to_disable_product_approval?')}}</strong>"
                                                         data-text-on="<p>{{ translate('If_you_enable_this,_option_to_require_admin_approval_for_products_to_be_displayed_on_the_user_side') }}</p>"
@@ -397,8 +397,8 @@
                                                     </span>
 
                                                     <input type="checkbox" data-id="cash_in_hand_overflow_store" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('Are you sure to enable Cash in Hand Overflow Suspension?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Are you sure to disable Cash in Hand Overflow Suspension?') }}</strong>"
                                                     data-text-on="{{ translate('After enable vendor will be automatically suspended when their cash in hand exceeds the allowed limit.') }}"
@@ -459,7 +459,7 @@
                                 </div>
                             </div>
                             <div class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 align-items-center d-flex mt-20">
-                                <img src="{{asset('public/assets/admin/img/info-idea.svg')}}" alt="">
+                                <img src="{{asset('assets/admin/img/info-idea.svg')}}" alt="">
                                 <span>
                                     {{translate('To setup vendor cash withdraw method visit')}}
                                     <span class="fz-12px font-semibold info-dark"><a style="color: #245BD1;" href={{ route('admin.transactions.withdraw-method.list') }} target="_blank" rel="noopener noreferrer">{{translate('Withdraw Method List')}}</a></span>

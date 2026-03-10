@@ -1,10 +1,11 @@
+
 <?php $__env->startSection('title', translate('messages.add_new_item')); ?>
 
 <?php $__env->startPush('css_or_js'); ?>
   <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
-  <link href="<?php echo e(asset('public/assets/admin/css/tags-input.min.css')); ?>" rel="stylesheet">
-  <link href="<?php echo e(asset('public/assets/admin/css/AI/animation/product/ai-sidebar.css')); ?>" rel="stylesheet">
-  <link href="<?php echo e(asset('public/assets/admin/css/new-product.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/tags-input.min.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/AI/animation/product/ai-sidebar.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/new-product.css')); ?>" rel="stylesheet">
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -17,14 +18,14 @@
   <div class="page-header d-flex flex-wrap __gap-15px justify-content-between align-items-center mb-3">
     <h1 class="page-header-title">
       <span class="page-header-icon">
-        <img src="<?php echo e(asset('public/assets/admin/img/items.png')); ?>" class="w--22" alt="">
+        <img src="<?php echo e(asset('assets/admin/img/items.png')); ?>" class="w--22" alt="">
       </span>
       <span><?php echo e(translate('messages.add_new_item')); ?></span>
     </h1>
     <div class="d-flex align-items-end">
       <a href="<?php echo e(route('admin.item.product_gallery')); ?>"
         class="btn btn-outline-primary btn--primary d-flex align-items-center bg-not-hover-primary-ash rounded-8 gap-2">
-        <img src="<?php echo e(asset('public/assets/admin/img/product-gallery.png')); ?>" class="w--22" alt="">
+        <img src="<?php echo e(asset('assets/admin/img/product-gallery.png')); ?>" class="w--22" alt="">
         <span><?php echo e(translate('Add Info From Gallery')); ?></span>
       </a>
     </div>
@@ -1119,7 +1120,7 @@
             <div class="np-card-body">
               <label class="np-label">Main Thumbnail <span class="np-req">*</span></label>
               <label class="d-inline-block m-0 position-relative error-wrapper">
-                <img class="img--176 border" id="viewer" src="<?php echo e(asset('public/assets/admin/img/upload-img.png')); ?>"
+                <img class="img--176 border" id="viewer" src="<?php echo e(asset('assets/admin/img/upload-img.png')); ?>"
                   alt="thumbnail">
                 <div class="icon-file-group">
                   <div class="icon-file">
@@ -1627,22 +1628,22 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('script_2'); ?>
-  <script src="<?php echo e(asset('public/assets/admin')); ?>/js/tags-input.min.js"></script>
-  <script src="<?php echo e(asset('public/assets/admin/js/spartan-multi-image-picker.js')); ?>"></script>
-  <script src="<?php echo e(asset('public/assets/admin')); ?>/js/view-pages/product-index.js"></script>
-  <script src="<?php echo e(asset('public/assets/admin/js/AI/products/product-title-autofill.js')); ?>"></script>
-  <script src="<?php echo e(asset('public/assets/admin/js/AI/products/product-description-autofill.js')); ?>"></script>
-  <script src="<?php echo e(asset('public/assets/admin/js/AI/products/general-setup-autofill.js')); ?>"></script>
-  <script src="<?php echo e(asset('public/assets/admin/js/AI/products/product-others-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin')); ?>/js/tags-input.min.js"></script>
+  <script src="<?php echo e(asset('assets/admin/js/spartan-multi-image-picker.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin')); ?>/js/view-pages/product-index.js"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-title-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-description-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/general-setup-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-others-autofill.js')); ?>"></script>
   <?php if(Config::get('module.current_module_type') == 'food'): ?>
-    <script src="<?php echo e(asset('public/assets/admin/js/AI/products/variation-setup-auto-fill.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/admin/js/AI/products/variation-setup-auto-fill.js')); ?>"></script>
   <?php else: ?>
-    <script src="<?php echo e(asset('public/assets/admin/js/AI/products/other-variation-setup-auto-fill.js')); ?>"></script>
+    <script src="<?php echo e(asset('assets/admin/js/AI/products/other-variation-setup-auto-fill.js')); ?>"></script>
   <?php endif; ?>
-  <script src="<?php echo e(asset('public/assets/admin/js/AI/products/seo-section-autofill.js')); ?>"></script>
-  <script src="<?php echo e(asset('public/assets/admin/js/AI/products/ai-sidebar.js')); ?>"></script>
-  <script src="<?php echo e(asset('/public/assets/admin/js/AI/products/compressor/image-compressor.js')); ?>"></script>
-  <script src="<?php echo e(asset('/public/assets/admin/js/AI/products/compressor/compressor.min.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/seo-section-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/ai-sidebar.js')); ?>"></script>
+  <script src="<?php echo e(asset('/assets/admin/js/AI/products/compressor/image-compressor.js')); ?>"></script>
+  <script src="<?php echo e(asset('/assets/admin/js/AI/products/compressor/compressor.min.js')); ?>"></script>
 
   <script>
     "use strict";
@@ -1973,7 +1974,7 @@
           groupClassName: 'spartan_item_wrapper min-w-176px max-w-176px',
           maxFileSize: 1024 * 1024 * 2,
           placeholderImage: {
-            image: "<?php echo e(asset('public/assets/admin/img/upload-img.png')); ?>",
+            image: "<?php echo e(asset('assets/admin/img/upload-img.png')); ?>",
             width: '176px'
           },
           dropFileLabel: "Drop Here",
@@ -2017,7 +2018,7 @@
         $('#unit').val(null).trigger('change');
         $('#veg').val(0).trigger('change');
         $('#discount_type').val('percent').trigger('change');
-        $('#viewer').attr('src', "<?php echo e(asset('public/assets/admin/img/upload-img.png')); ?>");
+        $('#viewer').attr('src', "<?php echo e(asset('assets/admin/img/upload-img.png')); ?>");
         $('#customFileEg1').val(null).trigger('change');
         $("#coba").empty();
         initImagePicker();

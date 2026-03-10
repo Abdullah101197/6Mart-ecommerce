@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title',\App\Models\BusinessSetting::where(['key'=>'business_name'])->first()->value??translate('messages.dashboard')); ?>
 
 <?php $__env->startPush('css_or_js'); ?>
@@ -13,7 +15,7 @@
             <div class="row align-items-center py-2">
                 <div class="col-sm mb-2 mb-sm-0">
                     <div class="d-flex align-items-center">
-                        <img class="onerror-image" data-onerror-image="<?php echo e(asset('/public/assets/admin/img/grocery.svg')); ?>" src="<?php echo e($mod->icon_full_url); ?>"
+                        <img class="onerror-image" data-onerror-image="<?php echo e(asset('/assets/admin/img/grocery.svg')); ?>" src="<?php echo e($mod->icon_full_url); ?>"
                         width="38" alt="img">
                         <div class="w-0 flex-grow pl-2">
                             <h1 class="page-header-title mb-0"><?php echo e(translate($mod->module_name)); ?> <?php echo e(translate('messages.Dashboard')); ?>.</h1>
@@ -61,7 +63,7 @@
                 <div class="row g-2" id="order_stats">
                     <div class="col-sm-6 col-lg-3">
                         <div class="__dashboard-card-2">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/items.svg')); ?>" alt="dashboard/grocery">
+                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/items.svg')); ?>" alt="dashboard/grocery">
                             <h6 class="name"><?php echo e(translate('messages.items')); ?></h6>
                             <h3 class="count"><?php echo e($data['total_items']); ?></h3>
                             <div class="subtxt"><?php echo e($data['new_items']); ?> <?php echo e(translate('newly added')); ?></div>
@@ -69,7 +71,7 @@
                     </div>
                     <div class="col-sm-6 col-lg-3">
                         <div class="__dashboard-card-2">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/orders.svg')); ?>" alt="dashboard/grocery">
+                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/orders.svg')); ?>" alt="dashboard/grocery">
                             <h6 class="name"><?php echo e(translate('messages.orders')); ?></h6>
                             <h3 class="count"><?php echo e($data['total_orders']); ?></h3>
                             <div class="subtxt"><?php echo e($data['new_orders']); ?> <?php echo e(translate('newly added')); ?></div>
@@ -77,7 +79,7 @@
                     </div>
                     <div class="col-sm-6 col-lg-3">
                         <div class="__dashboard-card-2">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/stores.svg')); ?>" alt="dashboard/grocery">
+                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/stores.svg')); ?>" alt="dashboard/grocery">
                             <h6 class="name"><?php echo e(translate('Grocery Stores')); ?></h6>
                             <h3 class="count"><?php echo e($data['total_stores']); ?></h3>
                             <div class="subtxt"><?php echo e($data['new_stores']); ?> <?php echo e(translate('newly added')); ?></div>
@@ -85,7 +87,7 @@
                     </div>
                     <div class="col-sm-6 col-lg-3">
                         <div class="__dashboard-card-2">
-                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/customers.svg')); ?>" alt="dashboard/grocery">
+                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/customers.svg')); ?>" alt="dashboard/grocery">
                             <h6 class="name"><?php echo e(translate('messages.customers')); ?></h6>
                             <h3 class="count"><?php echo e($data['total_customers']); ?></h3>
                             <div class="subtxt"><?php echo e($data['new_customers']); ?> <?php echo e(translate('newly added')); ?></div>
@@ -97,7 +99,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['searching_for_deliverymen'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/unassigned.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/unassigned.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('messages.unassigned_orders')); ?></span>
                                         </h6>
                                         <span class="card-title text-3F8CE8">
@@ -112,7 +114,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['accepted'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/accepted.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/accepted.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('Accepted by Delivery Man')); ?></span>
                                         </h6>
                                         <span class="card-title text-success">
@@ -126,7 +128,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['processing'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/packaging.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/packaging.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('Packaging')); ?></span>
                                         </h6>
                                         <span class="card-title text-FFA800">
@@ -141,7 +143,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['item_on_the_way'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/out-for.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/out-for.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('Out for Delivery')); ?></span>
                                         </h6>
                                         <span class="card-title text-success">
@@ -156,7 +158,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['delivered'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/dashboard/grocery/delivered.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/dashboard/grocery/delivered.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('messages.delivered')); ?></span>
                                         </h6>
                                         <span class="card-title text-success">
@@ -171,7 +173,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['canceled'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/order-status/canceled.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/order-status/canceled.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('messages.canceled')); ?></span>
                                         </h6>
                                         <span class="card-title text-danger">
@@ -186,7 +188,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['refunded'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/order-status/refunded.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/order-status/refunded.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('messages.refunded')); ?></span>
                                         </h6>
                                         <span class="card-title text-danger">
@@ -201,7 +203,7 @@
                                 <a class="order--card h-100" href="<?php echo e(route('admin.order.list',['failed'])); ?>">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="card-subtitle d-flex justify-content-between m-0 align-items-center">
-                                            <img src="<?php echo e(asset('/public/assets/admin/img/order-status/payment-failed.svg')); ?>" alt="dashboard" class="oder--card-icon">
+                                            <img src="<?php echo e(asset('/assets/admin/img/order-status/payment-failed.svg')); ?>" alt="dashboard" class="oder--card-icon">
                                             <span><?php echo e(translate('messages.payment_failed')); ?></span>
                                         </h6>
                                         <span class="card-title text-danger">
@@ -404,12 +406,12 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('script'); ?>
-    <script src="<?php echo e(asset('public/assets/admin')); ?>/vendor/chart.js/dist/Chart.min.js"></script>
-    <script src="<?php echo e(asset('public/assets/admin')); ?>/vendor/chart.js.extensions/chartjs-extensions.js"></script>
-    <script src="<?php echo e(asset('public/assets/admin')); ?>/vendor/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="<?php echo e(asset('assets/admin')); ?>/vendor/chart.js/dist/Chart.min.js"></script>
+    <script src="<?php echo e(asset('assets/admin')); ?>/vendor/chart.js.extensions/chartjs-extensions.js"></script>
+    <script src="<?php echo e(asset('assets/admin')); ?>/vendor/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js"></script>
 
     <!-- Apex Charts -->
-    <script src="<?php echo e(asset('/public/assets/admin/js/apex-charts/apexcharts.js')); ?>"></script>
+    <script src="<?php echo e(asset('/assets/admin/js/apex-charts/apexcharts.js')); ?>"></script>
     <!-- Apex Charts -->
 
 <?php $__env->stopPush(); ?>

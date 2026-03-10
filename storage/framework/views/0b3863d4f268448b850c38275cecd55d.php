@@ -16,27 +16,27 @@ $countryCode= strtolower($country?$country:'auto');
     <link rel="shortcut icon" href="">
     <link rel="icon" type="image/x-icon" href="<?php echo e(\App\CentralLogics\Helpers::get_full_url('business', $logo?->value?? '', $logo?->storage[0]?->value ?? 'public','favicon')); ?>">
     <!-- Font -->
-    <link href="<?php echo e(asset('public/assets/admin/css/fonts.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(asset('assets/admin/css/fonts.css')); ?>" rel="stylesheet">
     <!-- CSS Implementing Plugins -->
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/vendor.min.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/vendor/icon-set/style.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/custom.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/vendor.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/vendor/icon-set/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/custom.css')); ?>">
     <!-- CSS Front Template -->
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/owl.min.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/bootstrap.min.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/theme.minc619.css?v=1.0')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/bootstrap-tour-standalone.min.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/emogi-area.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/style.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/owl.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/bootstrap.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/theme.minc619.css?v=1.0')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/bootstrap-tour-standalone.min.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/emogi-area.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/style.css')); ?>">
 
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/intltelinput/css/intlTelInput.css')); ?>">
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/upload-single-image.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/intltelinput/css/intlTelInput.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/upload-single-image.css')); ?>">
 
 
     <?php echo $__env->yieldPushContent('css_or_js'); ?>
 
-    <script src="<?php echo e(asset('public/assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')); ?>"></script>
-    <link rel="stylesheet" href="<?php echo e(asset('public/assets/admin/css/toastr.css')); ?>">
+    <script src="<?php echo e(asset('assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')); ?>"></script>
+    <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/toastr.css')); ?>">
 </head>
 
 <body class="footer-offset">
@@ -52,7 +52,7 @@ $countryCode= strtolower($country?$country:'auto');
         <div class="col-md-12">
             <div id="loading" class="initial-hidden">
                 <div class="loader--inner">
-                    <img width="200" src="<?php echo e(asset('public/assets/admin/img/loader.gif')); ?>" alt="image">
+                    <img width="200" src="<?php echo e(asset('assets/admin/img/loader.gif')); ?>" alt="image">
                 </div>
             </div>
         </div>
@@ -123,30 +123,31 @@ $countryCode= strtolower($country?$country:'auto');
 
 
     <div class="modal fade" id="toggle-modal">
-        <div class="modal-dialog status-warning-modal">
+        <div class="modal-dialog modal-dialog-centered status-warning-modal">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true" class="tio-clear"></span>
+                <div class="modal-header px-2 pt-2">
+                    <button type="button" class="close btn btn--reset btn-circle" data-dismiss="modal">
+                        <span aria-hidden="true" class="tio-clear fs-20 opacity-70"></span>
                     </button>
                 </div>
-                <div class="modal-body pb-5 pt-0">
-                    <div class="max-349 mx-auto mb-20">
-                        <div>
-                            <div class="text-center">
+                <div class="modal-body pb-4">
+                    <div class="max-349 mx-auto mb-20 mt-2">
+                        <div class="mb-30">
+                            <div class="text-center mb-1">
                                 <img id="toggle-image" alt="" class="mb-20 initial--10">
-                                <h5 class="modal-title" id="toggle-title"></h5>
+                                <h3 class="modal-title" id="toggle-title"></h3>
                             </div>
-                            <div class="text-center" id="toggle-message">
+                            <div class="text-center fs-14" id="toggle-message">
                             </div>
                         </div>
                         <div class="btn--container justify-content-center">
-                            <button type="button" id="toggle-ok-button" class="btn btn--primary min-w-120 confirm-Toggle" data-dismiss="modal" ><?php echo e(translate('Ok')); ?></button>
-                            <button id="reset_btn" type="reset" class="btn btn--cancel min-w-120" data-dismiss="modal">
-                                <?php echo e(translate("Cancel")); ?>
+                            <button id="reset_btn" type="reset" class="btn btn--reset min-w-120" data-dismiss="modal">
+                                <?php echo e(translate("No")); ?>
 
                             </button>
+                            <button type="button" id="toggle-ok-button" class="btn btn--primary min-w-120 confirm-Toggle" data-dismiss="modal" ><?php echo e(translate('Yes')); ?></button>
                         </div>
+                        <div class="text-center mt-3" id="toggle-footer"></div>
                     </div>
                 </div>
             </div>
@@ -154,16 +155,16 @@ $countryCode= strtolower($country?$country:'auto');
     </div>
 
     <div class="modal fade" id="toggle-status-modal">
-        <div class="modal-dialog status-warning-modal">
+        <div class="modal-dialog modal-dialog-centered status-warning-modal">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true" class="tio-clear"></span>
+                <div class="modal-header px-2 pt-2">
+                    <button type="button" class="close btn btn--reset btn-circle" data-dismiss="modal">
+                        <span aria-hidden="true" class="tio-clear fs-20 opacity-70"></span>
                     </button>
                 </div>
-                <div class="modal-body pb-5 pt-0">
+                <div class="modal-body pb-3 pt-0">
                     <div class="max-349 mx-auto mb-20">
-                        <div>
+                        <div class="mb-3">
                             <div class="text-center">
                                 <img id="toggle-status-image" alt="" class="mb-20 initial--10">
                                 <h5 class="modal-title" id="toggle-status-title"></h5>
@@ -172,11 +173,11 @@ $countryCode= strtolower($country?$country:'auto');
                             </div>
                         </div>
                         <div class="btn--container justify-content-center">
-                            <button type="button" id="toggle-status-ok-button" class="btn btn--primary min-w-120 confirm-Status-Toggle" data-dismiss="modal" ><?php echo e(translate('Ok')); ?></button>
-                            <button id="reset_btn" type="reset" class="btn btn--cancel min-w-120" data-dismiss="modal">
-                                <?php echo e(translate("Cancel")); ?>
+                            <button id="reset_btn" type="reset" class="btn btn--reset min-w-120" data-dismiss="modal">
+                                <?php echo e(translate("No")); ?>
 
                             </button>
+                            <button type="button" id="toggle-status-ok-button" class="btn btn--primary min-w-120 confirm-Status-Toggle" data-dismiss="modal" ><?php echo e(translate('Yes')); ?></button>
                         </div>
                     </div>
                 </div>
@@ -184,7 +185,7 @@ $countryCode= strtolower($country?$country:'auto');
         </div>
     </div>
     <div class="modal" id="instruction-modal">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-body">
                     <button type="button" class="close instruction-Modal-Close" data-dismiss="modal" aria-label="Close">
@@ -198,7 +199,7 @@ $countryCode= strtolower($country?$country:'auto');
         </div>
     </div>
     <div class="modal" id="email-modal">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-body">
                     <button type="button" class="close email-Modal-Close" data-dismiss="modal" aria-label="Close">
@@ -215,7 +216,7 @@ $countryCode= strtolower($country?$country:'auto');
 
 
     <div class="modal fade" id="new-dynamic-submit-model">
-        <div class="modal-dialog modal-dialog-centered status-warning-modal">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-centered status-warning-modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">
@@ -269,8 +270,8 @@ $countryCode= strtolower($country?$country:'auto');
                 <div class="modal-body text-center p-3 pt-0">
                     <div class="imageModal_img_wrapper">
                         <img src="" class="img-fluid imageModal_img" alt="<?php echo e(translate('Preview_Image')); ?>">
-                        <div class="imageModal_btn_wrapper">
-                            <a href="javascript:" class="btn icon-btn download_btn" title="<?php echo e(translate('Download')); ?>" download>
+                        <div class="imageModal_btn_wrapper m-1">
+                            <a href="javascript:" class="btn icon-btn px-1 py-1 download_btn" title="<?php echo e(translate('Download')); ?>" download>
                                 <i class="tio-arrow-large-downward"></i>
                             </a>
                         </div>
@@ -281,7 +282,7 @@ $countryCode= strtolower($country?$country:'auto');
     </div>
 
     <div class="d-none" id="default-text-data"
-         data-default-image-src="<?php echo e(asset('public/assets/admin/img/upload-img.png')); ?>"
+         data-default-image-src="<?php echo e(asset('assets/admin/img/upload-img.png')); ?>"
     ></div>
 
 
@@ -297,24 +298,25 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
 <!-- ========== END MAIN CONTENT ========== -->
 
 <!-- ========== END SECONDARY CONTENTS ========== -->
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/custom.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/firebase.min.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/custom.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/firebase.min.js"></script>
 <!-- JS Implementing Plugins -->
 
 <?php echo $__env->yieldPushContent('script'); ?>
 <!-- JS Front -->
 
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/vendor.min.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/jquery.validate.min.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/theme.min.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/sweet_alert.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/bootstrap-tour-standalone.min.js"></script>
-<script src="<?php echo e(asset('public/assets/admin/js/owl.min.js')); ?>"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/emogi-area.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/toastr.js"></script>
-<script src="<?php echo e(asset('public/assets/admin/js/app-blade/admin.js')); ?>"></script>
-<script src="<?php echo e(asset('public/assets/admin/js/form-validate.js')); ?>"></script>
-<script src="<?php echo e(asset('public/assets/admin/js/upload-single-image.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/vendor.min.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/jquery.validate.min.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/theme.min.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/sweet_alert.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/bootstrap-tour-standalone.min.js"></script>
+<script src="<?php echo e(asset('assets/admin/js/owl.min.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/emogi-area.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/toastr.js"></script>
+<script src="<?php echo e(asset('assets/admin/js/app-blade/admin.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/form-validate.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/upload-single-image.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/multiple-file-upload.js')); ?>"></script>
 
 
 <?php echo Toastr::message(); ?>
@@ -338,10 +340,10 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
     let baseUrl = '<?php echo e(url('/')); ?>';
 </script>
 
-<script src="<?php echo e(asset('public/assets/admin/js/view-pages/common.js')); ?>"></script>
-<script src="<?php echo e(asset('public/assets/admin/js/keyword-highlighted.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/view-pages/common.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/keyword-highlighted.js')); ?>"></script>
 <audio id="myAudio">
-    <source src="<?php echo e(asset('public/assets/admin/sound/notification.mp3')); ?>" type="audio/mpeg">
+    <source src="<?php echo e(asset('assets/admin/sound/notification.mp3')); ?>" type="audio/mpeg">
 </audio>
 <script>
     var audio = document.getElementById("myAudio");
@@ -424,7 +426,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
             confirm = '<?php echo e(translate('messages.Yes')); ?>';
         }
         if (!image || image === "") {
-            image = "<?php echo e(asset('public/assets/admin/img/off-danger.png')); ?>";
+            image = "<?php echo e(asset('assets/admin/img/off-danger.png')); ?>";
         }
 
         Swal.fire({
@@ -553,18 +555,10 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
         appId: "<?php echo e(isset($fcm_credentials['appId']) ? $fcm_credentials['appId'] : ''); ?>",
         measurementId: "<?php echo e(isset($fcm_credentials['measurementId']) ? $fcm_credentials['measurementId'] : ''); ?>"
     };
-    const hasFirebaseConfig = firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.messagingSenderId && firebaseConfig.appId;
-    if (hasFirebaseConfig && typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-    }
-    const messaging = (hasFirebaseConfig && typeof firebase !== 'undefined') ? firebase.messaging() : null;
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
 
     function startFCM() {
-        if (!messaging) {
-            return;
-        }
         messaging
             .requestPermission()
             .then(function() {
@@ -658,7 +652,6 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
     let admin_role_id=null;
 
     <?php ($order_notification_type = \App\CentralLogics\Helpers::get_business_settings('order_notification_type') ??'manual'); ?>
-    if (messaging) {
     messaging.onMessage(function(payload) {
         console.log(payload.data)
         if(payload.data.order_id && payload.data.type == "order_request"){
@@ -703,7 +696,6 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
             }
         }
     });
-    }
 
     <?php if(\App\CentralLogics\Helpers::module_permission_check('order') && $order_notification_type == 'manual'): ?>
         <?php ($admin_order_notification=\App\CentralLogics\Helpers::get_business_settings('admin_order_notification') ?? 0); ?>
@@ -789,7 +781,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
             })
         }
 </script>
-        <script src="<?php echo e(asset('public/assets/admin/intltelinput/js/intlTelInput.min.js')); ?>"></script>
+        <script src="<?php echo e(asset('assets/admin/intltelinput/js/intlTelInput.min.js')); ?>"></script>
 
         <script>
 
@@ -798,7 +790,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
     inputs.forEach(input => {
         window.intlTelInput(input, {
             initialCountry: "<?php echo e($countryCode); ?>",
-            utilsScript: "<?php echo e(asset('public/assets/admin/intltelinput/js/utils.js')); ?>",
+            utilsScript: "<?php echo e(asset('assets/admin/intltelinput/js/utils.js')); ?>",
             autoInsertDialCode: true,
             nationalMode: false,
             formatOnDisplay: false,
@@ -872,7 +864,7 @@ $(document).on('keyup', 'input[type="tel"]', function () {
 
                                 htmlContent += '<div class="fs-16 fw-500 mb-2">' + <?php echo json_encode(translate('Search Result'), 15, 512) ?> + '</div>' +
                                     '<div class="search-list h-300 d-flex flex-column gap-2 justify-content-center align-items-center fs-16">' +
-                                        '<img width="30" class="h-auto" src="' + <?php echo json_encode(asset('/public/assets/admin/img/modal/no-search-found.png'), 15, 512) ?> + '" alt="">' + ' ' +
+                                        '<img width="30" class="h-auto" src="' + <?php echo json_encode(asset('/assets/admin/img/modal/no-search-found.png'), 15, 512) ?> + '" alt="">' + ' ' +
                                         <?php echo json_encode(translate('No result found'), 15, 512) ?> +
                                     '</div>';
 
@@ -1016,13 +1008,11 @@ $(document).on('keyup', 'input[type="tel"]', function () {
         });
 
         const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('search', function() {
-                if (!this.value.trim()) {
-                    $('#searchResults').html('<div class="text-center text-muted py-5"></div>');
-                }
-            });
-        }
+        searchInput.addEventListener('search', function() {
+            if (!this.value.trim()) {
+                $('#searchResults').html('<div class="text-center text-muted py-5"></div>');
+            }
+        });
 
         $('#searchForm').submit(function (event) {
             event.preventDefault();
@@ -1033,7 +1023,7 @@ $(document).on('keyup', 'input[type="tel"]', function () {
 </script>
 
 <script>
-    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="<?php echo e(asset('public/assets/admin')); ?>/vendor/babel-polyfill/polyfill.min.js"><\/script>');
+    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="<?php echo e(asset('assets/admin')); ?>/vendor/babel-polyfill/polyfill.min.js"><\/script>');
 </script>
 
     <!-- Landing Tab Menu -->
@@ -1070,24 +1060,22 @@ $(document).on('keyup', 'input[type="tel"]', function () {
                 btnNextWrap.style.display = 'none';
             }
         }
-        if (container) {
-            document.querySelector('.btn-click-prev')?.addEventListener('click', () => {
-                const itemWidth = item?.offsetWidth || 100;
-                container.scrollBy({ left: -itemWidth, behavior: 'smooth' });
-            });
-            document.querySelector('.btn-click-next')?.addEventListener('click', () => {
-                const itemWidth = item?.offsetWidth || 100;
-                container.scrollBy({ left: itemWidth, behavior: 'smooth' });
-            });
+        document.querySelector('.btn-click-prev')?.addEventListener('click', () => {
+            const itemWidth = item?.offsetWidth || 100;
+            container.scrollBy({ left: -itemWidth, behavior: 'smooth' });
+        });
+        document.querySelector('.btn-click-next')?.addEventListener('click', () => {
+            const itemWidth = item?.offsetWidth || 100;
+            container.scrollBy({ left: itemWidth, behavior: 'smooth' });
+        });
 
-            container.addEventListener('scroll', updateArrows);
-            ['load', 'resize'].forEach(evt => window.addEventListener(evt, updateArrows));
-            new MutationObserver(updateArrows).observe(container, { childList: true, subtree: true });
-            new ResizeObserver(updateArrows).observe(container);
+        container.addEventListener('scroll', updateArrows);
+        ['load', 'resize'].forEach(evt => window.addEventListener(evt, updateArrows));
+        new MutationObserver(updateArrows).observe(container, { childList: true, subtree: true });
+        new ResizeObserver(updateArrows).observe(container);
 
-            // Initial update
-            updateArrows();
-        }
+        // Initial update
+        updateArrows();
 
     </script>
 </body>

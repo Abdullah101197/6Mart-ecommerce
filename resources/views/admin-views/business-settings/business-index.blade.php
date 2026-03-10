@@ -13,7 +13,7 @@
             <div class="page-header">
                 <h1 class="page-header-title fs-24 mr-3">
                     <span class="page-header-icon">
-                        <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                        <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
                     </span>
                     <span>
                         {{ translate('messages.business_settings') }}
@@ -492,7 +492,7 @@
                                                         class="form-label-secondary" data-toggle="tooltip"
                                                         data-placement="right"
                                                         data-original-title="{{ translate('messages.click_on_the_map_select_your_defaul_location') }}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('messages.click_on_the_map_select_your_defaul_location') }}"></span></label>
                                                 <input type="text" id="latitude" name="latitude" class="form-control"
                                                     placeholder="{{ translate('messages.Ex:') }} -94.22213"
@@ -507,7 +507,7 @@
                                                         class="form-label-secondary" data-toggle="tooltip"
                                                         data-placement="right"
                                                         data-original-title="{{ translate('messages.click_on_the_map_select_your_defaul_location') }}"><img
-                                                            src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                            src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                             alt="{{ translate('messages.click_on_the_map_select_your_defaul_location') }}"></span></label>
                                                 <input type="text" name="longitude" class="form-control"
                                                     placeholder="{{ translate('messages.Ex:') }} 103.344322" id="longitude"
@@ -520,7 +520,7 @@
 
                             </div> -->
                             <div class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 align-items-center d-flex mt-20">
-                                <img src="{{asset('public/assets/admin/img/info-idea.svg')}}" alt="">
+                                <img src="{{asset('assets/admin/img/info-idea.svg')}}" alt="">
                                 <span>
                                     {{translate('For the address setup you can simply drag the map to pick for the perfect')}}
                                     <strong class="text-title"> {{translate('Lat(Latitude) & Log(Longitude)')}}</strong>
@@ -755,7 +755,7 @@
                                                                     </p>
                                                                     <div
                                                                         class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 d-flex mt-20">
-                                                                        <img src="{{asset('public/assets/admin/img/info-idea.svg')}}"
+                                                                        <img src="{{asset('assets/admin/img/info-idea.svg')}}"
                                                                             alt="">
                                                                         <span>
                                                                             {{translate('To set different commission for commission based restaurants.')}}
@@ -840,8 +840,8 @@
                                                     </span>
                                                 </span>
                                                 <input type="checkbox" data-id="additional_charge_status" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/dm-tips-on.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/dm-tips-off.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/dm-tips-on.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/dm-tips-off.png') }}"
                                                     data-title-on="<strong>{{ translate('messages.Want_to_enable_additional_charge?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('messages.Want_to_disable_additional_charge?') }}</strong>"
                                                     data-text-on="<p>{{ translate('messages.If_you_enable_this,_additional_charge_will_be_added_with_order_amount,_it_will_be_added_in_admin_wallet') }}</p>"
@@ -897,7 +897,7 @@
                                     </div>
                                 </div>
                                 <div class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 d-flex mt-20">
-                                    <img src="{{asset('public/assets/admin/img/info-idea.svg')}}" alt="">
+                                    <img src="{{asset('assets/admin/img/info-idea.svg')}}" alt="">
                                     <span>
                                         {{translate('Only admin will get the additional amount & customer must pay the amount.')}}
                                     </span>
@@ -984,14 +984,14 @@
                                                         <span class="form-label-secondary text-danger d-flex"
                                                             data-toggle="tooltip" data-placement="right"
                                                             data-original-title="{{ translate('messages.If_enabled,_customers_can_make_partial_payments._For_example,_a_customer_can_pay_$20_initially_out_of_their_$50_payment_&_use_other_payment_methods_for_the_rest._Partial_payments_must_be_made_through_their_wallets.')}}"><img
-                                                                src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
+                                                                src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                                 alt="{{ translate('messages.customer_varification_toggle') }}">
                                                             *
                                                         </span>
                                                     </span>
                                                     <input type="checkbox" data-id="partial_payment" data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/schedule-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/schedule-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/schedule-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/schedule-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.partial_payment_?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.partial_payment_?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_customers_can_choose_partial_payment_during_checkout.') }}</p>"
@@ -1076,7 +1076,7 @@
                 <div class="max-349 mx-auto mb-20">
                     <div>
                         <div class="text-center">
-                            <img width="80" src="{{  asset('public/assets/admin/img/modal/currency.png') }}"
+                            <img width="80" src="{{  asset('assets/admin/img/modal/currency.png') }}"
                                 class="mb-20">
                             <h5 class="modal-title"></h5>
                         </div>

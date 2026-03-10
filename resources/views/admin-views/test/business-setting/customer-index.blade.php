@@ -10,7 +10,7 @@
         <div class="page-header">
             <h1 class="page-header-title mr-3">
                 <span class="page-header-icon">
-                    <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                    <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
                 </span>
                 <span>
                     {{ translate('business_setup') }}
@@ -58,8 +58,8 @@
                                         </span>
                                     </span>
                                             <input type="checkbox" data-id="guest_checkout_status" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/dm-tips-on.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/dm-tips-off.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/dm-tips-on.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/dm-tips-off.png') }}"
                                                     data-title-on="<strong>{{ translate('messages.Want_to_enable_guest_checkout?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('messages.Want_to_disable_guest_checkout?') }}</strong>"
                                                     data-text-on="<p>{{ translate('messages.If_you_enable_this,_guest_checkout_will_be_visible_when_customer_is_not_logged_in.') }}</p>"
@@ -117,8 +117,8 @@
                                                     </span>
                                                 </span>
                                                 <input type="checkbox" data-id="country_picker_status" data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/mail-success.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/mail-warning.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/mail-success.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/mail-warning.png') }}"
                                                        data-title-on="<strong>{{ translate('messages.Want_to_enable_country_picker?') }}</strong>"
                                                        data-title-off="<strong>{{ translate('messages.Want_to_disable_country_picker?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If_you_enable_this,_user_can_select_country_from_country_picker') }}</p>"
@@ -151,8 +151,8 @@
                                                     </span>
                                                 </span>
                                                     <input type="checkbox" data-id="vnv1" data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/veg-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/veg-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/veg-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/veg-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable_the') }} <strong>{{ translate('messages.‘Veg/Non-Veg’_feature?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.the_Veg/Non-Veg_Feature?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_customers_can_filter_food_items_by_choosing_food_from_the_Veg/Non-Veg_feature.') }}</p>"
@@ -225,8 +225,8 @@
                                                     <input type="checkbox"
                                                     {{ isset($data['wallet_status']) && $data['wallet_status'] == 1 ? '' : 'disabled' }}
                                                     data-id="refund_to_wallet" data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/refund-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/refund-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/refund-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/refund-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Refund_to_Wallet_feature?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Refund_to_Wallet_feature?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_Customers_will_automatically_receive_the_refunded_amount_in_their_wallets.') }}</p>"
@@ -257,8 +257,8 @@
                                                     </span>
                                                     <input {{ isset($data['wallet_status']) && $data['wallet_status'] == 1 ? '' : 'disabled' }}
                                                     type="checkbox" data-id="add_fund_status" data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/wallet-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/wallet-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/wallet-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/wallet-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('add_fund_to_Wallet_feature?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('add_fund_to_Wallet_feature?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_Customers_can_add_fund_to_wallet_using_payment_module') }}</p>"
@@ -478,8 +478,8 @@
                                                                     <input {{ isset($data['wallet_status']) && $data['wallet_status'] == 1 ? '' : 'disabled' }}
                                                                     type="checkbox" data-id="new_customer_discount_status"
                                                                         data-type="toggle"
-                                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/basic_campaign_on.png') }}"
-                                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/basic_campaign_off.png') }}"
+                                                                        data-image-on="{{ asset('/assets/admin/img/modal/basic_campaign_on.png') }}"
+                                                                        data-image-off="{{ asset('/assets/admin/img/modal/basic_campaign_off.png') }}"
                                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.new_customer_discount?') }}</strong>"
                                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.new_customer_discount?') }}</strong>"
                                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_Customers_will_get_discount_on_first_order.') }}</p>"

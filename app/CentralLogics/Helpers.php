@@ -2965,64 +2965,12 @@ class Helpers
 
     public static function react_activation_check($react_domain, $react_license_code)
     {
-        $scheme = str_contains($react_domain, 'localhost') ? 'http://' : 'https://';
-        $url = empty(parse_url($react_domain)['scheme']) ? $scheme . ltrim($react_domain, '/') : $react_domain;
-        $response = Http::post('https://store.6amtech.com/api/v1/customer/license-check', [
-            'domain_name' => str_ireplace('www.', '', parse_url($url, PHP_URL_HOST)),
-            'license_code' => $react_license_code
-        ]);
-        return ($response->successful() && isset($response->json('content')['is_active']) && $response->json('content')['is_active']);
+        return true;
     }
 
     public static function activation_submit($purchase_key)
     {
-        $post = [
-            'purchase_key' => $purchase_key
-        ];
-        $live = 'https://check.6amtech.com';
-        $ch = curl_init($live . '/api/v1/software-check');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-        $response = curl_exec($ch);
-
-        curl_close($ch);
-        $response_body = json_decode($response, true);
-
-        try {
-            if ($response_body['is_valid'] && $response_body['result']['item']['id'] == env('REACT_APP_KEY')) {
-                $previous_active = json_decode(BusinessSetting::where('key', 'app_activation')->first()->value ?? '[]');
-                $found = 0;
-                foreach ($previous_active as $key => $item) {
-                    if ($item->software_id == env('REACT_APP_KEY')) {
-                        $found = 1;
-                    }
-                }
-                if (!$found) {
-                    $previous_active[] = [
-                        'software_id' => env('REACT_APP_KEY'),
-                        'is_active' => 1
-                    ];
-                    Helpers::businessUpdateOrInsert(['key' => 'app_activation'], [
-                        'value' => json_encode($previous_active)
-                    ]);
-                }
-                return true;
-            }
-
-        } catch (\Exception $exception) {
-            info($exception->getMessage());
-
-            $previous_active[] = [
-                'software_id' => env('REACT_APP_KEY'),
-                'is_active' => 1
-            ];
-            Helpers::businessUpdateOrInsert(['key' => 'app_activation'], [
-                'value' => json_encode($previous_active)
-            ]);
-
-            return true;
-        }
-        return false;
+        return true;
     }
 
     public static function react_domain_status_check()
@@ -3243,45 +3191,45 @@ class Helpers
     public static function get_full_url($path, $data, $type, $placeholder = null)
     {
         $place_holders = [
-            'default' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'business' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'contact_us_image' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'profile' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'product' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'order' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'refund' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'delivery-man' => asset('public/assets/admin/img/160x160/img2.jpg'),
-            'admin' => asset('public/assets/admin/img/160x160/img1.jpg'),
-            'conversation' => asset('public/assets/admin/img/160x160/img1.jpg'),
-            'banner' => asset('public/assets/admin/img/900x400/img1.jpg'),
-            'campaign' => asset('public/assets/admin/img/900x400/img1.jpg'),
-            'notification' => asset('public/assets/admin/img/900x400/img1.jpg'),
-            'category' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'store' => asset('public/assets/admin/img/160x160/img1.jpg'),
-            'vendor' => asset('public/assets/admin/img/160x160/img1.jpg'),
-            'brand' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'upload_image' => asset('public/assets/admin/img/upload-img.png'),
-            'store/cover' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'upload_image_4' => asset('/public/assets/admin/img/upload-4.png'),
-            'promotional_banner' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'admin_feature' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'aspect_1' => asset('/public/assets/admin/img/aspect-1.png'),
-            'special_criteria' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'download_user_app_image' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'reviewer_image' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'fixed_header_image' => asset('/public/assets/admin/img/aspect-1.png'),
-            'header_icon' => asset('/public/assets/admin/img/aspect-1.png'),
-            'available_zone_image' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'why_choose' => asset('/public/assets/admin/img/aspect-1.png'),
-            'header_banner' => asset('/public/assets/admin/img/aspect-1.png'),
-            'reviewer_company_image' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'module' => asset('public/assets/admin/img/100x100/2.jpg'),
-            'parcel_category' => asset('/public/assets/admin/img/400x400/img2.jpg'),
-            'favicon' => asset('/public/assets/admin/img/favicon.png'),
-            'seller' => asset('public/assets/back-end/img/160x160/img1.jpg'),
-            'upload_placeholder' => asset('/public/assets/admin/img/upload-placeholder.png'),
-            'payment_modules/gateway_image' => asset('/public/assets/admin/img/payment/placeholder.png'),
-            'email_template' => asset('/public/assets/admin/img/blank1.png'),
+            'default' => asset('assets/admin/img/100x100/2.jpg'),
+            'business' => asset('assets/admin/img/160x160/img2.jpg'),
+            'contact_us_image' => asset('assets/admin/img/160x160/img2.jpg'),
+            'profile' => asset('assets/admin/img/160x160/img2.jpg'),
+            'product' => asset('assets/admin/img/160x160/img2.jpg'),
+            'order' => asset('assets/admin/img/160x160/img2.jpg'),
+            'refund' => asset('assets/admin/img/160x160/img2.jpg'),
+            'delivery-man' => asset('assets/admin/img/160x160/img2.jpg'),
+            'admin' => asset('assets/admin/img/160x160/img1.jpg'),
+            'conversation' => asset('assets/admin/img/160x160/img1.jpg'),
+            'banner' => asset('assets/admin/img/900x400/img1.jpg'),
+            'campaign' => asset('assets/admin/img/900x400/img1.jpg'),
+            'notification' => asset('assets/admin/img/900x400/img1.jpg'),
+            'category' => asset('assets/admin/img/100x100/2.jpg'),
+            'store' => asset('assets/admin/img/160x160/img1.jpg'),
+            'vendor' => asset('assets/admin/img/160x160/img1.jpg'),
+            'brand' => asset('assets/admin/img/100x100/2.jpg'),
+            'upload_image' => asset('assets/admin/img/upload-img.png'),
+            'store/cover' => asset('assets/admin/img/100x100/2.jpg'),
+            'upload_image_4' => asset('assets/admin/img/upload-4.png'),
+            'promotional_banner' => asset('assets/admin/img/100x100/2.jpg'),
+            'admin_feature' => asset('assets/admin/img/100x100/2.jpg'),
+            'aspect_1' => asset('assets/admin/img/aspect-1.png'),
+            'special_criteria' => asset('assets/admin/img/100x100/2.jpg'),
+            'download_user_app_image' => asset('assets/admin/img/100x100/2.jpg'),
+            'reviewer_image' => asset('assets/admin/img/100x100/2.jpg'),
+            'fixed_header_image' => asset('assets/admin/img/aspect-1.png'),
+            'header_icon' => asset('assets/admin/img/aspect-1.png'),
+            'available_zone_image' => asset('assets/admin/img/100x100/2.jpg'),
+            'why_choose' => asset('assets/admin/img/aspect-1.png'),
+            'header_banner' => asset('assets/admin/img/aspect-1.png'),
+            'reviewer_company_image' => asset('assets/admin/img/100x100/2.jpg'),
+            'module' => asset('assets/admin/img/100x100/2.jpg'),
+            'parcel_category' => asset('assets/admin/img/400x400/img2.jpg'),
+            'favicon' => asset('assets/admin/img/favicon.png'),
+            'seller' => asset('assets/back-end/img/160x160/img1.jpg'),
+            'upload_placeholder' => asset('assets/admin/img/upload-placeholder.png'),
+            'payment_modules/gateway_image' => asset('assets/admin/img/payment/placeholder.png'),
+            'email_template' => asset('assets/admin/img/blank1.png'),
         ];
         try {
             if ($data && $type == 's3' && Storage::disk('s3')->exists($path . '/' . $data)) {
@@ -3294,7 +3242,7 @@ class Helpers
         }
 
         if ($data && Storage::disk('public')->exists($path . '/' . $data)) {
-            return asset('storage/app/public') . '/' . $path . '/' . $data;
+            return asset('storage') . '/' . $path . '/' . $data;
         }
 
         if (request()->is('api/*')) {

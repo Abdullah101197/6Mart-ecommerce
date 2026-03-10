@@ -16,27 +16,27 @@ $countryCode= strtolower($country?$country:'auto');
     <link rel="shortcut icon" href="">
     <link rel="icon" type="image/x-icon" href="{{\App\CentralLogics\Helpers::get_full_url('business', $logo?->value?? '', $logo?->storage[0]?->value ?? 'public','favicon')}}">
     <!-- Font -->
-    <link href="{{asset('public/assets/admin/css/fonts.css')}}" rel="stylesheet">
+    <link href="{{asset('assets/admin/css/fonts.css')}}" rel="stylesheet">
     <!-- CSS Implementing Plugins -->
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/vendor.min.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/vendor/icon-set/style.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/custom.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/vendor.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/vendor/icon-set/style.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/custom.css')}}">
     <!-- CSS Front Template -->
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/owl.min.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/theme.minc619.css?v=1.0')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/bootstrap-tour-standalone.min.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/emogi-area.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/owl.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/theme.minc619.css?v=1.0')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/bootstrap-tour-standalone.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/emogi-area.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/style.css')}}">
 
-    <link rel="stylesheet" href="{{asset('public/assets/admin/intltelinput/css/intlTelInput.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/upload-single-image.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/intltelinput/css/intlTelInput.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/admin/css/upload-single-image.css')}}">
 
 
     @stack('css_or_js')
 
-    <script src="{{asset('public/assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')}}"></script>
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/toastr.css')}}">
+    <script src="{{asset('assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')}}"></script>
+    <link rel="stylesheet" href="{{asset('assets/admin/css/toastr.css')}}">
 </head>
 
 <body class="footer-offset">
@@ -52,7 +52,7 @@ $countryCode= strtolower($country?$country:'auto');
         <div class="col-md-12">
             <div id="loading" class="initial-hidden">
                 <div class="loader--inner">
-                    <img width="200" src="{{asset('public/assets/admin/img/loader.gif')}}" alt="image">
+                    <img width="200" src="{{asset('assets/admin/img/loader.gif')}}" alt="image">
                 </div>
             </div>
         </div>
@@ -279,7 +279,7 @@ $countryCode= strtolower($country?$country:'auto');
     </div>
 
     <div class="d-none" id="default-text-data"
-         data-default-image-src="{{ asset('public/assets/admin/img/upload-img.png') }}"
+         data-default-image-src="{{ asset('assets/admin/img/upload-img.png') }}"
     ></div>
 
 
@@ -295,25 +295,25 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
 <!-- ========== END MAIN CONTENT ========== -->
 
 <!-- ========== END SECONDARY CONTENTS ========== -->
-<script src="{{asset('public/assets/admin')}}/js/custom.js"></script>
-<script src="{{asset('public/assets/admin')}}/js/firebase.min.js"></script>
+<script src="{{asset('assets/admin')}}/js/custom.js"></script>
+<script src="{{asset('assets/admin')}}/js/firebase.min.js"></script>
 <!-- JS Implementing Plugins -->
 
 @stack('script')
 <!-- JS Front -->
 
-<script src="{{asset('public/assets/admin')}}/js/vendor.min.js"></script>
-<script src="{{asset('public/assets/admin')}}/js/jquery.validate.min.js"></script>
-<script src="{{asset('public/assets/admin')}}/js/theme.min.js"></script>
-<script src="{{asset('public/assets/admin')}}/js/sweet_alert.js"></script>
-<script src="{{asset('public/assets/admin')}}/js/bootstrap-tour-standalone.min.js"></script>
-<script src="{{asset('public/assets/admin/js/owl.min.js')}}"></script>
-<script src="{{asset('public/assets/admin')}}/js/emogi-area.js"></script>
-<script src="{{asset('public/assets/admin')}}/js/toastr.js"></script>
-<script src="{{asset('public/assets/admin/js/app-blade/admin.js')}}"></script>
-<script src="{{asset('public/assets/admin/js/form-validate.js')}}"></script>
-<script src="{{asset('public/assets/admin/js/upload-single-image.js')}}"></script>
-<script src="{{asset('public/assets/admin/js/multiple-file-upload.js')}}"></script>
+<script src="{{asset('assets/admin')}}/js/vendor.min.js"></script>
+<script src="{{asset('assets/admin')}}/js/jquery.validate.min.js"></script>
+<script src="{{asset('assets/admin')}}/js/theme.min.js"></script>
+<script src="{{asset('assets/admin')}}/js/sweet_alert.js"></script>
+<script src="{{asset('assets/admin')}}/js/bootstrap-tour-standalone.min.js"></script>
+<script src="{{asset('assets/admin/js/owl.min.js')}}"></script>
+<script src="{{asset('assets/admin')}}/js/emogi-area.js"></script>
+<script src="{{asset('assets/admin')}}/js/toastr.js"></script>
+<script src="{{asset('assets/admin/js/app-blade/admin.js')}}"></script>
+<script src="{{asset('assets/admin/js/form-validate.js')}}"></script>
+<script src="{{asset('assets/admin/js/upload-single-image.js')}}"></script>
+<script src="{{asset('assets/admin/js/multiple-file-upload.js')}}"></script>
 
 
 {!! Toastr::message() !!}
@@ -336,10 +336,10 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
     let baseUrl = '{{ url('/') }}';
 </script>
 
-<script src="{{asset('public/assets/admin/js/view-pages/common.js')}}"></script>
-<script src="{{asset('public/assets/admin/js/keyword-highlighted.js')}}"></script>
+<script src="{{asset('assets/admin/js/view-pages/common.js')}}"></script>
+<script src="{{asset('assets/admin/js/keyword-highlighted.js')}}"></script>
 <audio id="myAudio">
-    <source src="{{asset('public/assets/admin/sound/notification.mp3')}}" type="audio/mpeg">
+    <source src="{{asset('assets/admin/sound/notification.mp3')}}" type="audio/mpeg">
 </audio>
 <script>
     var audio = document.getElementById("myAudio");
@@ -422,7 +422,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
             confirm = '{{ translate('messages.Yes') }}';
         }
         if (!image || image === "") {
-            image = "{{ asset('public/assets/admin/img/off-danger.png') }}";
+            image = "{{ asset('assets/admin/img/off-danger.png') }}";
         }
 
         Swal.fire({
@@ -777,7 +777,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
             })
         }
 </script>
-        <script src="{{asset('public/assets/admin/intltelinput/js/intlTelInput.min.js')}}"></script>
+        <script src="{{asset('assets/admin/intltelinput/js/intlTelInput.min.js')}}"></script>
 
         <script>
 
@@ -786,7 +786,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
     inputs.forEach(input => {
         window.intlTelInput(input, {
             initialCountry: "{{$countryCode}}",
-            utilsScript: "{{ asset('public/assets/admin/intltelinput/js/utils.js') }}",
+            utilsScript: "{{ asset('assets/admin/intltelinput/js/utils.js') }}",
             autoInsertDialCode: true,
             nationalMode: false,
             formatOnDisplay: false,
@@ -860,7 +860,7 @@ $(document).on('keyup', 'input[type="tel"]', function () {
 
                                 htmlContent += '<div class="fs-16 fw-500 mb-2">' + @json(translate('Search Result')) + '</div>' +
                                     '<div class="search-list h-300 d-flex flex-column gap-2 justify-content-center align-items-center fs-16">' +
-                                        '<img width="30" class="h-auto" src="' + @json(asset('/public/assets/admin/img/modal/no-search-found.png')) + '" alt="">' + ' ' +
+                                        '<img width="30" class="h-auto" src="' + @json(asset('/assets/admin/img/modal/no-search-found.png')) + '" alt="">' + ' ' +
                                         @json(translate('No result found')) +
                                     '</div>';
 
@@ -1019,7 +1019,7 @@ $(document).on('keyup', 'input[type="tel"]', function () {
 </script>
 
 <script>
-    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('public/assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
+    if (/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) document.write('<script src="{{asset('assets/admin')}}/vendor/babel-polyfill/polyfill.min.js"><\/script>');
 </script>
 
     <!-- Landing Tab Menu -->

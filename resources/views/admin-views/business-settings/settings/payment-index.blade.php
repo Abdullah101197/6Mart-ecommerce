@@ -9,7 +9,7 @@
     <div class="page-header">
         <h1 class="page-header-title mr-3">
             <span class="page-header-icon">
-                <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
             </span>
             <span>
                 {{ translate('messages.business_settings') }}
@@ -133,8 +133,8 @@
                                         </span>
                                     </span>
                                     <input type="checkbox" data-id="partial_payment" data-type="toggle"
-                                        data-image-on="{{ asset('/public/assets/admin/img/modal/payment_on.png') }}"
-                                        data-image-off="{{ asset('/public/assets/admin/img/modal/payment_off.png') }}"
+                                        data-image-on="{{ asset('/assets/admin/img/modal/payment_on.png') }}"
+                                        data-image-off="{{ asset('/assets/admin/img/modal/payment_off.png') }}"
                                         data-title-on="{{ translate('Are you sure turn on') }} <strong>{{ translate('Combined Payment?') }}</strong>"
                                         data-title-off="{{ translate('Are you sure turn off') }} <strong>{{ translate('Combined Payment?') }}</strong>"
                                         data-text-on="<p>{{ translate('Enabling partial payment will allow customers to pay partially.') }}</p>"

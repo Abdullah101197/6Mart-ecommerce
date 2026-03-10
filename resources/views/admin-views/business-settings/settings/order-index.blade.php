@@ -10,7 +10,7 @@
     <div class="page-header">
         <h1 class="page-header-title mr-3">
             <span class="page-header-icon">
-                <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
             </span>
             <span>
                 {{ translate('messages.business_settings') }}
@@ -29,7 +29,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 align-items-center d-flex mb-20">
-                            <img src="{{asset('public/assets/admin/img/info-idea.svg')}}" alt="">
+                            <img src="{{asset('assets/admin/img/info-idea.svg')}}" alt="">
                             <span>
                                 {{translate('All order you can show & manage them from')}}
                                 <a href="{{route('admin.order.list', ['status' => 'all'])}}"
@@ -167,8 +167,8 @@
                                                         </span>
                                                     </span>
                                                     <input type="checkbox" data-id="aon1" data-type="toggle"
-                                                        data-image-on="{{ asset('/public/assets/admin/img/modal/order-notification-on.png') }}"
-                                                        data-image-off="{{ asset('/public/assets/admin/img/modal/order-notification-off.png') }}"
+                                                        data-image-on="{{ asset('/assets/admin/img/modal/order-notification-on.png') }}"
+                                                        data-image-off="{{ asset('/assets/admin/img/modal/order-notification-off.png') }}"
                                                         data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Order_Notification_for_Admin?') }}</strong>"
                                                         data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Order_Notification_for_Admin?') }}</strong>"
                                                         data-text-on="<p>{{ translate('messages.If_you_enable_this,_the_Admin_will_receive_a_Notification_for_every_order_placed.') }}</p>"
@@ -245,8 +245,8 @@
                                                for="admin_free_delivery_status">
                                             <span class="toggle-switch toggle-switch-sm pr-sm-3">
                                                 <input type="checkbox" data-id="admin_free_delivery_status" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                                     data-title-on="<strong>{{ translate('messages.Are you sure to enable Free Delivery?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('messages.Are you sure to disable Free Delivery?') }}</strong>"
                                                     data-text-on="{{ translate('After enable customers will not be charged a delivery fee for eligible orders.') }}"
@@ -326,7 +326,7 @@
                                                  class="col-sm-6 col-lg-6 {{ $admin_free_delivery_option == 'free_delivery_to_all_store' ? '' : ' d-none' }}">
                                                 <div class="alert fs-13 alert-primary-light text-dark mb-0  mt-md-0 add_text_mute text-muted"
                                                      role="alert">
-                                                    <img src="{{ asset('/public/assets/admin/img/lnfo_light.png') }}" alt="">
+                                                    <img src="{{ asset('/assets/admin/img/lnfo_light.png') }}" alt="">
                                                     {{translate('Free delivery is active for all stores. Cost bearer for the free delivery is')}}
                                                     <strong>{{ translate('Admin') }}</strong>
                                                 </div>
@@ -432,8 +432,8 @@
                                                     <input type="checkbox"
                                                            data-id="prescription_order_status"
                                                            data-type="toggle"
-                                                           data-image-on="{{ asset('/public/assets/admin/img/modal/prescription-on.png') }}"
-                                                           data-image-off="{{ asset('/public/assets/admin/img/modal/prescription-off.png') }}"
+                                                           data-image-on="{{ asset('/assets/admin/img/modal/prescription-on.png') }}"
+                                                           data-image-off="{{ asset('/assets/admin/img/modal/prescription-off.png') }}"
                                                            data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Place_Order_by_Prescription?') }}</strong>"
                                                            data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Place_Order_by_Prescription?') }}</strong>"
                                                            data-text-on="<p>{{ translate('messages.If you enable this, customers can place an order by simply uploading their prescriptions in the Pharmacy module from the Customer App or Website. Stores can enable/disable this feature from store settings if needed.') }}</p>"
@@ -471,8 +471,8 @@
                                                     <input type="checkbox"
                                                            data-id="odc1"
                                                            data-type="toggle"
-                                                           data-image-on="{{ asset('/public/assets/admin/img/modal/order-delivery-verification-on.png') }}"
-                                                           data-image-off="{{ asset('/public/assets/admin/img/modal/order-delivery-verification-off.png') }}"
+                                                           data-image-on="{{ asset('/assets/admin/img/modal/order-delivery-verification-on.png') }}"
+                                                           data-image-off="{{ asset('/assets/admin/img/modal/order-delivery-verification-off.png') }}"
                                                            data-title-on="{{ translate('messages.Want_to_enable') }} <strong>{{ translate('messages.Delivery_Verification?') }}</strong>"
                                                            data-title-off="{{ translate('messages.Want_to_disable') }} <strong>{{ translate('messages.Delivery_Verification?') }}</strong>"
                                                            data-text-on="<p>{{ translate('messages.If you enable this, the Deliveryman has to verify the order during delivery through a 4-digit verification code.') }}</p>"
@@ -747,7 +747,7 @@
                     <div class="max-349 mx-auto mb-20">
                         <div>
                             <div class="text-center">
-                                <img src="{{asset('/public/assets/admin/img/subscription-plan/package-status-disable.png')}}"
+                                <img src="{{asset('/assets/admin/img/subscription-plan/package-status-disable.png')}}"
                                      class="mb-20">
 
                                 <h5 class="modal-title"></h5>
@@ -789,7 +789,7 @@
                     <div class="max-349 mx-auto mb-20">
                         <div>
                             <div class="text-center">
-                                <img src="{{asset('/public/assets/admin/img/subscription-plan/package-status-disable.png')}}"
+                                <img src="{{asset('/assets/admin/img/subscription-plan/package-status-disable.png')}}"
                                      class="mb-20">
 
                                 <h5 class="modal-title"></h5>
@@ -1022,8 +1022,8 @@
 @endpush
 
 @push('script_2')
-    <script src="{{asset('public/assets/admin/js/view-pages/business-settings-order-page.js')}}"></script>
-    <script src="{{asset('public/assets/admin/js/view-pages/offcanvas-edit.js')}}"></script>
+    <script src="{{asset('assets/admin/js/view-pages/business-settings-order-page.js')}}"></script>
+    <script src="{{asset('assets/admin/js/view-pages/offcanvas-edit.js')}}"></script>
 
     <script>
         "use strict";

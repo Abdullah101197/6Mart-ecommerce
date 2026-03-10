@@ -12,7 +12,7 @@
             <div class="page-header">
                 <h1 class="page-header-title fs-24 mr-3">
                     <span class="page-header-icon">
-                        <img src="{{ asset('public/assets/admin/img/business.png') }}" class="w--26" alt="">
+                        <img src="{{ asset('assets/admin/img/business.png') }}" class="w--26" alt="">
                     </span>
                     <span>
                         {{ translate('business_settings') }}
@@ -46,8 +46,8 @@
                                     <input type="checkbox"
                                     data-id="maintenance_mode"
                                     data-type="toggle"
-                                    data-image-on="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
-                                    data-image-off="{{ asset('/public/assets/admin/img/modal/info-warning.png') }}"
+                                    data-image-on="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
+                                    data-image-off="{{ asset('/assets/admin/img/modal/info-warning.png') }}"
                                     data-title-on="{{ translate('Are you sure to enable Maintenance Mode?') }}"
                                     data-title-off="{{ translate('Are you sure to disable Maintenance Mode?') }}"
                                     data-text-on="{{ translate('This will temporarily disable the selected systems at the scheduled date and time. You can turn it off anytime after maintenance is complete.') }}"
@@ -247,7 +247,7 @@
                                 </div>
                             </div>
                             <div class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 align-items-center d-flex mt-20">
-                                <img src="{{asset('public/assets/admin/img/info-idea.svg')}}" alt="">
+                                <img src="{{asset('assets/admin/img/info-idea.svg')}}" alt="">
                                 <span>
                                     {{translate('For the address setup you can simply drag the map to pick for the perfect')}}
                                     <strong class="text-title"> {{translate('Lat(Latitude) & Log(Longitude)')}}</strong>
@@ -474,7 +474,7 @@
                                                                     </p>
                                                                     <div
                                                                         class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 d-flex mt-20">
-                                                                        <img src="{{asset('public/assets/admin/img/info-idea.svg')}}"
+                                                                        <img src="{{asset('assets/admin/img/info-idea.svg')}}"
                                                                             alt="">
                                                                         <span>
                                                                             {{translate('To set different commission for commission based stores.')}}
@@ -559,8 +559,8 @@
                                                     </span>
                                                 </span>
                                                 <input type="checkbox" data-id="additional_charge_status" data-type="toggle"
-                                                    data-image-on="{{ asset('/public/assets/admin/img/modal/dm-tips-on.png') }}"
-                                                    data-image-off="{{ asset('/public/assets/admin/img/modal/dm-tips-off.png') }}"
+                                                    data-image-on="{{ asset('/assets/admin/img/modal/dm-tips-on.png') }}"
+                                                    data-image-off="{{ asset('/assets/admin/img/modal/dm-tips-off.png') }}"
                                                     data-title-on="<strong>{{ translate('Want_to_enable_additional_charge?') }}</strong>"
                                                     data-title-off="<strong>{{ translate('Want_to_disable_additional_charge?') }}</strong>"
                                                     data-text-on="<p>{{ translate('If_you_enable_this,_additional_charge_will_be_added_with_order_amount,_it_will_be_added_in_admin_wallet') }}</p>"
@@ -617,7 +617,7 @@
                                 </div>
                                 <div id="additional_charge_note">
                                     <div class="info-notes-bg px-3 py-2 rounded fz-11  gap-2 d-flex mt-20">
-                                        <img src="{{asset('public/assets/admin/img/info-idea.svg')}}" alt="">
+                                        <img src="{{asset('assets/admin/img/info-idea.svg')}}" alt="">
                                         <span>
                                             {{translate('Only admin will get the additional amount & customer must pay the amount.')}}
                                         </span>
@@ -656,8 +656,8 @@
                                                     </span>
                                                 </span>
                                                 <input type="checkbox" data-id="country_picker_status" data-type="toggle"
-                                                       data-image-on="{{ asset('/public/assets/admin/img/modal/mail-success.png') }}"
-                                                       data-image-off="{{ asset('/public/assets/admin/img/modal/mail-warning.png') }}"
+                                                       data-image-on="{{ asset('/assets/admin/img/modal/mail-success.png') }}"
+                                                       data-image-off="{{ asset('/assets/admin/img/modal/mail-warning.png') }}"
                                                        data-title-on="<strong>{{ translate('messages.Want_to_enable_country_picker?') }}</strong>"
                                                        data-title-off="<strong>{{ translate('messages.Want_to_disable_country_picker?') }}</strong>"
                                                        data-text-on="<p>{{ translate('messages.If_you_enable_this,_user_can_select_country_from_country_picker') }}</p>"
@@ -758,7 +758,7 @@
                 <div class="max-349 mx-auto mb-20">
                     <div>
                         <div class="text-center">
-                            <img width="80" src="{{  asset('public/assets/admin/img/modal/currency.png') }}"
+                            <img width="80" src="{{  asset('assets/admin/img/modal/currency.png') }}"
                                 class="mb-20">
                             <h5 class="modal-title"></h5>
                         </div>
