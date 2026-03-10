@@ -9,8 +9,7 @@
     <div class="d-flex flex-row">
         <!-- Product gallery-->
         <div class="d-flex align-items-center justify-content-center active">
-            <img class="img-responsive initial--20 onerror-image"
-            src="{{ $product['image_full_url'] }}"
+            <img class="img-responsive initial--20 onerror-image" src="{{ $product['image_full_url'] }}"
                 data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
                 data-zoom="{{ asset('storage/app/public/product') }}/{{ $product['image'] }}" alt="Product image"
                 width="">
@@ -18,29 +17,30 @@
         </div>
         <!-- Product details-->
         <div class="details pl-2">
-            <a href="{{ route('admin.item.view', $product->id) }}" class="h3 mb-2 product-title">{{ $product->name }}</a>
+            <a href="{{ route('admin.item.view', $product->id) }}"
+                class="h3 mb-2 product-title">{{ $product->name }}</a>
             @if (isset($product->module_id) && $product->module->module_type == 'food')
-            <div class="mb-3 text-dark">
-                <span class="h3 font-weight-normal text-accent mr-1">
-                    {{ \App\CentralLogics\Helpers::get_food_price_range($product, true) }}
-                </span>
-                @if ($product->discount > 0)
-                    <strike class="initial--18">
-                        {{ \App\CentralLogics\Helpers::get_food_price_range($product) }}
-                    </strike>
-                @endif
-            </div>
+                <div class="mb-3 text-dark">
+                    <span class="h3 font-weight-normal text-accent mr-1">
+                        {{ \App\CentralLogics\Helpers::get_food_price_range($product, true) }}
+                    </span>
+                    @if ($product->discount > 0)
+                        <strike class="initial--18">
+                            {{ \App\CentralLogics\Helpers::get_food_price_range($product) }}
+                        </strike>
+                    @endif
+                </div>
             @else
-            <div class="mb-3 text-dark">
-                <span class="h3 font-weight-normal text-accent mr-1">
-                    {{ \App\CentralLogics\Helpers::get_price_range($product, true) }}
-                </span>
-                @if ($product->discount > 0)
-                    <strike class="initial--18">
-                        {{ \App\CentralLogics\Helpers::get_price_range($product) }}
-                    </strike>
-                @endif
-            </div>
+                <div class="mb-3 text-dark">
+                    <span class="h3 font-weight-normal text-accent mr-1">
+                        {{ \App\CentralLogics\Helpers::get_price_range($product, true) }}
+                    </span>
+                    @if ($product->discount > 0)
+                        <strike class="initial--18">
+                            {{ \App\CentralLogics\Helpers::get_price_range($product) }}
+                        </strike>
+                    @endif
+                </div>
             @endif
 
             @if ($product->discount > 0)
@@ -62,12 +62,12 @@
             </span>
 
 
-            @if (in_array($product->module->module_type ,['food','grocery']))
-                @if (count($product->nutritions) )
+            @if (in_array($product->module->module_type, ['food', 'grocery']))
+                @if (count($product->nutritions))
                     <h4 class="mt-2"> {{ translate('messages.Nutrition_Details') }}</h4>
                     <span class="d-block text-dark text-break">
                         @foreach($product->nutritions as $nutrition)
-                        {{$nutrition->nutrition}}{{ !$loop->last ? ',' : '.'}}
+                            {{$nutrition->nutrition}}{{ !$loop->last ? ',' : '.'}}
                         @endforeach
                     </span>
                 @endif
@@ -75,13 +75,13 @@
                     <h4 class="mt-2"> {{ translate('messages.Allergie_Ingredients') }}</h4>
                     <span class="d-block text-dark text-break">
                         @foreach($product->allergies as $allergy)
-                        {{$allergy->allergy}}{{ !$loop->last ? ',' : '.'}}
+                            {{$allergy->allergy}}{{ !$loop->last ? ',' : '.'}}
                         @endforeach
                     </span>
                 @endif
             @endif
 
-            @if (in_array($product->module->module_type ,['pharmacy']))
+            @if (in_array($product->module->module_type, ['pharmacy']))
                 @if ($product->generic->pluck('generic_name')->first())
                     <h4 class="mt-2"> {{ translate('generic_name') }}</h4>
                     <span class="d-block text-dark text-break">
@@ -100,10 +100,9 @@
                 @if (isset($product->module_id) && $product->module->module_type == 'food')
                     @if ($product->food_variations)
 
-                        @foreach (json_decode($product->food_variations) as $key => $choice)
+                        @foreach ($product->food_variations as $key => $choice)
                             @if (isset($choice->price) == false)
-                                <div class="h3 p-0 pt-2">{{ $choice->name }} <small style="font-size: 12px"
-                                        class="text-muted">
+                                <div class="h3 p-0 pt-2">{{ $choice->name }} <small style="font-size: 12px" class="text-muted">
                                         ({{ $choice->required == 'on' ? translate('messages.Required') : translate('messages.optional') }})
                                     </small>
                                 </div>
@@ -116,20 +115,14 @@
                                 @endif
 
                                 <div>
-                                    <input type="hidden" name="variations[{{ $key }}][min]"
-                                        value="{{ $choice->min }}">
-                                    <input type="hidden" name="variations[{{ $key }}][max]"
-                                        value="{{ $choice->max }}">
-                                    <input type="hidden" name="variations[{{ $key }}][required]"
-                                        value="{{ $choice->required }}">
-                                    <input type="hidden" name="variations[{{ $key }}][name]"
-                                        value="{{ $choice->name }}">
+                                    <input type="hidden" name="variations[{{ $key }}][min]" value="{{ $choice->min }}">
+                                    <input type="hidden" name="variations[{{ $key }}][max]" value="{{ $choice->max }}">
+                                    <input type="hidden" name="variations[{{ $key }}][required]" value="{{ $choice->required }}">
+                                    <input type="hidden" name="variations[{{ $key }}][name]" value="{{ $choice->name }}">
                                     @foreach ($choice->values as $k => $option)
                                         <div class="form-check form--check d-flex pr-5 mr-6">
-                                            <input class="form-check-input"
-                                                type="{{ $choice->type == 'multi' ? 'checkbox' : 'radio' }}"
-                                                id="choice-option-{{ $key }}-{{ $k }}"
-                                                name="variations[{{ $key }}][values][label][]"
+                                            <input class="form-check-input" type="{{ $choice->type == 'multi' ? 'checkbox' : 'radio' }}"
+                                                id="choice-option-{{ $key }}-{{ $k }}" name="variations[{{ $key }}][values][label][]"
                                                 value="{{ $option->label }}" autocomplete="off">
 
                                             <label class="form-check-label"
@@ -143,15 +136,15 @@
                         @endforeach
                     @endif
                 @else
-                    @foreach (json_decode($product->choice_options) as $key => $choice)
+                    @foreach ($product->choice_options as $key => $choice)
                         <div class="h3 p-0 pt-2">{{ $choice->title }}
                         </div>
 
                         <div class="d-flex justify-content-left flex-wrap">
                             @foreach ($choice->options as $key => $option)
                                 <input class="btn-check" type="radio" id="{{ $choice->name }}-{{ $option }}"
-                                    name="{{ $choice->name }}" value="{{ $option }}"
-                                    @if ($key == 0) checked @endif autocomplete="off">
+                                    name="{{ $choice->name }}" value="{{ $option }}" @if ($key == 0) checked @endif
+                                    autocomplete="off">
                                 <label class="btn btn-sm check-label mx-1 choice-input"
                                     for="{{ $choice->name }}-{{ $option }}">{{ Str::limit($option, 20, '...') }}</label>
                             @endforeach
@@ -172,8 +165,8 @@
                                 </button>
                             </span>
                             <input type="text" name="quantity"
-                                class="form-control input-number text-center cart-qty-field" placeholder="1"
-                                value="1" min="1" max="100">
+                                class="form-control input-number text-center cart-qty-field" placeholder="1" value="1"
+                                min="1" max="100">
                             <span class="input-group-btn">
                                 <button class="btn btn-number text-dark p--10" type="button" data-type="plus"
                                     data-field="quantity">
@@ -183,18 +176,17 @@
                         </div>
                     </div>
                 </div>
-                @php($add_ons = json_decode($product->add_ons))
+                @php($add_ons = $product->add_ons)
                 @if (count($add_ons) > 0 && $add_ons[0])
                     <div class="h3 p-0 pt-2">{{ translate('messages.addon') }}
                     </div>
 
                     <div class="d-flex justify-content-left flex-wrap">
                         @foreach (\App\Models\AddOn::withoutGlobalScope(\App\Scopes\StoreScope::class)->whereIn('id', $add_ons)->active()->get() as $key => $add_on)
-                             <div class="flex-column pb-2">
-                                <input type="hidden" name="addon-price{{ $add_on->id }}"
-                                    value="{{ $add_on->price }}">
-                                <input class="btn-check addon-chek addon_quantity_input_toggle" type="checkbox" id="addon{{ $key }}" name="addon_id[]"
-                                    value="{{ $add_on->id }}"   autocomplete="off">
+                            <div class="flex-column pb-2">
+                                <input type="hidden" name="addon-price{{ $add_on->id }}" value="{{ $add_on->price }}">
+                                <input class="btn-check addon-chek addon_quantity_input_toggle" type="checkbox"
+                                    id="addon{{ $key }}" name="addon_id[]" value="{{ $add_on->id }}" autocomplete="off">
                                 <label class="d-flex align-items-center btn btn-sm check-label mx-1 addon-input"
                                     for="addon{{ $key }}">{{ Str::limit($add_on->name, 20, '...') }} <br>
                                     {{ \App\CentralLogics\Helpers::format_currency($add_on->price) }}</label>
@@ -204,8 +196,7 @@
                                     <button class="btn btn-sm h-100 text-dark px-0 addon-stepdown " type="button"><i
                                             class="tio-remove  font-weight-bold"></i></button>
                                     <input type="number" name="addon-quantity{{ $add_on->id }}"
-                                        class="form-control text-center border-0 h-100" placeholder="1"
-                                        value="1" min="1"
+                                        class="form-control text-center border-0 h-100" placeholder="1" value="1" min="1"
                                         max="100" readonly>
                                     <button class="btn btn-sm h-100 text-dark px-0 addon-stepup" type="button"><i
                                             class="tio-add  font-weight-bold"></i></button>
@@ -226,7 +217,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center mt-2">
-                <button class="btn btn--primary h--45px update_order_item" type="button">
+                    <button class="btn btn--primary h--45px update_order_item" type="button">
                         <i class="tio-shopping-cart"></i>
                         {{ translate('messages.add_to_cart') }}
                     </button>
@@ -253,7 +244,7 @@
         input.dispatchEvent(new Event('change')); // manually trigger change
         getVariantPrice();
     });
-     document.querySelectorAll('.addon-chek').forEach(checkbox => {
+    document.querySelectorAll('.addon-chek').forEach(checkbox => {
         checkbox.addEventListener('change', function () {
             const id = this.getAttribute('id'); // e.g., addon3
             const qtyLabel = document.querySelector(`label.addon-quantity-input[for="${id}"]`);
@@ -261,7 +252,7 @@
                 qtyLabel.classList.toggle('d-none', !this.checked);
             }
         });
-         getVariantPrice();
+        getVariantPrice();
     });
 
     // Handle "minus" (step down)

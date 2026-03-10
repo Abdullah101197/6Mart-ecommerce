@@ -214,14 +214,24 @@ class AddonController extends Controller
     //helper functions
     function getDirectories(string $path): array
     {
-        $directories = [];
-        $items = scandir($path);
-        foreach ($items as $item) {
-            if ($item == '..' || $item == '.')
-                continue;
-            if (is_dir($path . '/' . $item))
-                $directories[] = $item;
+        $fullPath = base_path($path);
+
+        if (!is_dir($fullPath)) {
+            return [];
         }
+
+        $directories = [];
+
+        foreach (scandir($fullPath) as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            if (is_dir($fullPath . DIRECTORY_SEPARATOR . $item)) {
+                $directories[] = $item;
+            }
+        }
+
         return $directories;
     }
 

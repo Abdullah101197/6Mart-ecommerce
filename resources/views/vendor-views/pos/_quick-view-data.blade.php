@@ -112,7 +112,7 @@
                 @if ($product->module->module_type == 'food')
                     @if ($product->food_variations)
 
-                        @foreach (json_decode($product->food_variations) as $key => $choice)
+                        @foreach ($product->food_variations as $key => $choice)
                             @if (isset($choice->price) == false)
                                 <div class="h3 p-0 pt-2">{{ $choice->name }} <small  class="text-muted initial--18">
                                         ({{ $choice->required == 'on' ? translate('messages.Required') : translate('messages.optional') }})
@@ -154,7 +154,7 @@
                         @endforeach
                     @endif
                 @else
-                    @foreach (json_decode($product->choice_options) as $choice)
+                    @foreach ($product->choice_options as $choice)
                         <div class="h3 p-0 pt-2">{{ $choice->title }}
                         </div>
 
@@ -194,7 +194,7 @@
                         </div>
                     </div>
                 </div>
-                @php($add_ons = json_decode($product->add_ons))
+                @php($add_ons = $product->add_ons ?: [])
                 @if (count($add_ons) > 0 && $add_ons[0])
                     <div class="h3 p-0 pt-2">{{ translate('messages.addon') }}</div>
 

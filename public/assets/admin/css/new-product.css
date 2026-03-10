@@ -1,0 +1,1161 @@
+/*
+ * New Product Form — Scoped Styles
+ * Colour remapping: task2.html --red → project --primary (#006161)
+ * Scoped under .new-product-form to avoid leaking into admin layout
+ */
+
+.new-product-form {
+    --np-primary: #006161;
+    --np-primary-dk: #004949;
+    --np-primary-lt: #e6f4f4;
+    --np-navy: #0d1b2a;
+    --np-slate: #3d5166;
+    --np-muted: #7a8fa6;
+    --np-border: #dde4ec;
+    --np-bg: #f4f6f9;
+    --np-white: #ffffff;
+    --np-success: #00a550;
+    --np-warn: #f59e0b;
+    --np-info: #0ea5e9;
+    --np-text: #1a2d42;
+    --np-radius: 12px;
+    --np-shadow: 0 2px 12px rgba(13, 27, 42, 0.08);
+}
+
+/* ── TAB NAVIGATION ────────────────────────────────────── */
+.new-product-form .np-tab-nav {
+    display: flex;
+    gap: 2px;
+    padding: 0 0 0 0;
+    background: var(--np-white);
+    border-bottom: 1px solid var(--np-border);
+    overflow-x: auto;
+    margin: -20px -20px 24px -20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.new-product-form .np-tab-btn {
+    padding: 14px 18px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--np-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    outline: none;
+}
+.new-product-form .np-tab-btn:hover {
+    color: var(--np-text);
+}
+.new-product-form .np-tab-btn.active {
+    color: var(--np-primary);
+    border-bottom-color: var(--np-primary);
+    font-weight: 600;
+}
+
+/* ── TAB PANELS ─────────────────────────────────────────── */
+.new-product-form .np-tab-panel {
+    display: none;
+}
+.new-product-form .np-tab-panel.active {
+    display: block;
+    animation: npFadeIn 0.22s ease both;
+}
+
+@keyframes npFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── TWO-COLUMN GRID ────────────────────────────────────── */
+.new-product-form .np-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+    align-items: start;
+}
+
+/* ── CARDS ──────────────────────────────────────────────── */
+.new-product-form .np-card {
+    background: var(--np-white);
+    border-radius: var(--np-radius);
+    border: 1px solid var(--np-border);
+    box-shadow: var(--np-shadow);
+    overflow: hidden;
+    margin-bottom: 18px;
+}
+.new-product-form .np-card:last-child {
+    margin-bottom: 0;
+}
+.new-product-form .np-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--np-border);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--np-white);
+}
+.new-product-form .np-card-icon {
+    font-size: 15px;
+}
+.new-product-form .np-card-title {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--np-navy);
+}
+.new-product-form .np-card-subtitle {
+    font-size: 11px;
+    color: var(--np-muted);
+    margin-left: auto;
+}
+.new-product-form .np-card-body {
+    padding: 18px 20px;
+}
+
+/* ── SECTION HEADINGS ───────────────────────────────────── */
+.new-product-form .np-sec-head {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    color: var(--np-muted);
+    margin: 16px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-sec-head:first-child {
+    margin-top: 0;
+}
+.new-product-form .np-divider {
+    height: 1px;
+    background: var(--np-border);
+    margin: 14px 0;
+}
+
+/* ── FORM ROWS ──────────────────────────────────────────── */
+.new-product-form .np-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.new-product-form .np-form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+.new-product-form .np-form-row-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+}
+.new-product-form .np-form-group {
+    margin-bottom: 14px;
+}
+.new-product-form .np-form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ── LABELS ─────────────────────────────────────────────── */
+.new-product-form .np-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--np-slate);
+    margin-bottom: 5px;
+    letter-spacing: 0.15px;
+}
+.new-product-form .np-req {
+    color: var(--np-primary);
+    margin-left: 2px;
+}
+.new-product-form .np-opt {
+    color: var(--np-muted);
+    font-weight: 400;
+    font-size: 11px;
+    margin-left: 3px;
+}
+
+/* ── INPUTS ─────────────────────────────────────────────── */
+.new-product-form .np-input,
+.new-product-form .np-select,
+.new-product-form .np-textarea {
+    width: 100%;
+    padding: 9px 13px;
+    border: 1.5px solid var(--np-border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--np-text);
+    background: var(--np-white);
+    transition:
+        border 0.18s,
+        box-shadow 0.18s;
+    outline: none;
+    appearance: none;
+}
+.new-product-form .np-input:focus,
+.new-product-form .np-select:focus,
+.new-product-form .np-textarea:focus {
+    border-color: var(--np-primary);
+    box-shadow: 0 0 0 3px rgba(0, 97, 97, 0.1);
+}
+.new-product-form .np-textarea {
+    resize: vertical;
+    min-height: 78px;
+    line-height: 1.6;
+}
+.new-product-form .np-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8fa6' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+    cursor: pointer;
+}
+.new-product-form .np-hint {
+    font-size: 11px;
+    color: var(--np-muted);
+    margin-top: 3px;
+}
+
+/* Input with prefix/suffix */
+.new-product-form .np-iw {
+    position: relative;
+}
+.new-product-form .np-ipfx {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--np-muted);
+    font-weight: 500;
+    pointer-events: none;
+}
+.new-product-form .np-isfx {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--np-muted);
+    pointer-events: none;
+}
+.new-product-form .np-iw .np-input {
+    padding-left: 44px;
+}
+.new-product-form .np-iw.sfx .np-input {
+    padding-right: 44px;
+}
+
+/* ── TAGS ───────────────────────────────────────────────── */
+.new-product-form .np-tag-wrap {
+    border: 1.5px solid var(--np-border);
+    border-radius: 8px;
+    padding: 7px 11px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+    cursor: text;
+    transition: border 0.18s;
+    min-height: 42px;
+}
+.new-product-form .np-tag-wrap:focus-within {
+    border-color: var(--np-primary);
+    box-shadow: 0 0 0 3px rgba(0, 97, 97, 0.1);
+}
+.new-product-form .np-tag-wrap .np-input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 80px;
+    padding: 2px 0;
+    background: transparent;
+    box-shadow: none !important;
+}
+.new-product-form .np-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.new-product-form .np-tag-rm {
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+}
+.new-product-form .t-primary {
+    background: var(--np-primary-lt);
+    color: var(--np-primary-dk);
+}
+.new-product-form .t-blue {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+.new-product-form .t-green {
+    background: #dcfce7;
+    color: #15803d;
+}
+.new-product-form .t-purple {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+.new-product-form .t-orange {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+/* ── UPLOAD ZONE ────────────────────────────────────────── */
+.new-product-form .np-upload-zone {
+    border: 2px dashed var(--np-border);
+    border-radius: var(--np-radius);
+    padding: 34px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--np-bg);
+}
+.new-product-form .np-upload-zone:hover,
+.new-product-form .np-upload-zone.drag {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+}
+.new-product-form .np-upload-icon {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+.new-product-form .np-upload-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--np-navy);
+}
+.new-product-form .np-upload-sub {
+    font-size: 11.5px;
+    color: var(--np-muted);
+    margin-top: 4px;
+}
+.new-product-form .np-upload-link {
+    color: var(--np-primary);
+    text-decoration: underline;
+}
+
+/* ── IMAGE GRID ─────────────────────────────────────────── */
+.new-product-form .np-img-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+.new-product-form .np-img-thumb {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1.5px solid var(--np-border);
+    overflow: hidden;
+    position: relative;
+    background: var(--np-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.new-product-form .np-img-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.new-product-form .np-th-rm {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.new-product-form .np-img-thumb:hover .np-th-rm {
+    opacity: 1;
+}
+.new-product-form .np-th-main {
+    position: absolute;
+    bottom: 3px;
+    left: 3px;
+    background: var(--np-primary);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 5px;
+}
+
+/* ── STATUS PILLS ───────────────────────────────────────── */
+.new-product-form .np-pill-row {
+    display: flex;
+    gap: 8px;
+}
+.new-product-form .np-pill {
+    flex: 1;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--np-border);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--np-muted);
+}
+.new-product-form .np-pill:hover {
+    border-color: var(--np-primary);
+    color: var(--np-primary);
+}
+.new-product-form .np-pill.sel {
+    border-color: var(--np-success);
+    background: #f0fff6;
+    color: var(--np-success);
+}
+.new-product-form .np-pill.sel.out {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+    color: var(--np-primary);
+}
+.new-product-form .np-pill.sel.draft {
+    border-color: var(--np-warn);
+    background: #fffbeb;
+    color: var(--np-warn);
+}
+.new-product-form .np-sdot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 4px;
+    background: currentColor;
+}
+
+/* ── TOGGLE ─────────────────────────────────────────────── */
+.new-product-form .np-trow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-trow:last-child {
+    border-bottom: none;
+}
+.new-product-form .np-tlbl {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--np-text);
+}
+.new-product-form .np-tdsc {
+    font-size: 11px;
+    color: var(--np-muted);
+    margin-top: 1px;
+}
+.new-product-form .np-tog {
+    position: relative;
+    width: 38px;
+    height: 21px;
+    flex-shrink: 0;
+}
+.new-product-form .np-tog input {
+    display: none;
+}
+.new-product-form .np-tog-track {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background: var(--np-border);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.new-product-form .np-tog-track::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+.new-product-form .np-tog input:checked + .np-tog-track {
+    background: var(--np-success);
+}
+.new-product-form .np-tog input:checked + .np-tog-track::after {
+    transform: translateX(17px);
+}
+
+/* ── NUTRITION TABLE ────────────────────────────────────── */
+.new-product-form .np-ntbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+}
+.new-product-form .np-ntbl th {
+    background: var(--np-bg);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--np-muted);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+.new-product-form .np-ntbl td {
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-ntbl tr:last-child td {
+    border-bottom: none;
+}
+.new-product-form .np-ntbl input {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: var(--np-text);
+    width: 100%;
+    background: transparent;
+}
+.new-product-form .np-ntbl input:focus {
+    background: var(--np-primary-lt);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: -2px -6px;
+}
+.new-product-form .np-ind {
+    padding-left: 22px !important;
+    color: var(--np-muted);
+    font-style: italic;
+}
+
+/* ── CHECK GRID ─────────────────────────────────────────── */
+.new-product-form .np-chk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.new-product-form .np-chk-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.new-product-form .np-chk-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--np-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 12px;
+    color: var(--np-text);
+    font-weight: 400;
+    user-select: none;
+}
+.new-product-form .np-chk-item:hover {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+}
+.new-product-form .np-chk-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--np-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.new-product-form .np-chk-item.on {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+    color: var(--np-primary-dk);
+    font-weight: 500;
+}
+
+/* ── VARIANT TABLE ──────────────────────────────────────── */
+.new-product-form .np-vtbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+}
+.new-product-form .np-vtbl th {
+    background: var(--np-bg);
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--np-muted);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-vtbl td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-vtbl tr:last-child td {
+    border-bottom: none;
+}
+.new-product-form .np-vtbl .np-input,
+.new-product-form .np-vtbl .np-select {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+/* ── QUALITY BAR ────────────────────────────────────────── */
+.new-product-form .np-q-lbl {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--np-muted);
+    margin-bottom: 5px;
+}
+.new-product-form .np-q-bar {
+    height: 7px;
+    background: var(--np-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.new-product-form .np-q-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--np-primary), #00a8a8);
+    transition: width 0.4s;
+}
+
+/* ── DELIVERY CARDS ─────────────────────────────────────── */
+.new-product-form .np-dlv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.new-product-form .np-dlv-card {
+    border: 2px solid var(--np-border);
+    border-radius: 10px;
+    padding: 11px 13px;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+.new-product-form .np-dlv-card:hover {
+    border-color: var(--np-primary);
+}
+.new-product-form .np-dlv-card.sel {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+}
+.new-product-form .np-dlv-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+.new-product-form .np-dlv-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--np-navy);
+}
+.new-product-form .np-dlv-time {
+    font-size: 11px;
+    color: var(--np-muted);
+}
+
+/* ── SEO PREVIEW ────────────────────────────────────────── */
+.new-product-form .np-seo-preview {
+    background: var(--np-bg);
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid var(--np-border);
+}
+.new-product-form .np-seo-url {
+    font-size: 11.5px;
+    color: var(--np-success);
+    margin-bottom: 3px;
+    word-break: break-all;
+}
+.new-product-form .np-seo-title {
+    font-size: 15px;
+    color: #1a0dab;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+.new-product-form .np-seo-desc {
+    font-size: 12.5px;
+    color: #4d5156;
+    line-height: 1.5;
+}
+
+/* ── COLOR COUNTER ──────────────────────────────────────── */
+.new-product-form .np-cc {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+.new-product-form .np-cc-ok {
+    background: #dcfce7;
+    color: #15803d;
+}
+.new-product-form .np-cc-warn {
+    background: #fef3c7;
+    color: #92400e;
+}
+.new-product-form .np-cc-over {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ── COLOR SWATCHES ─────────────────────────────────────── */
+.new-product-form .np-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+.new-product-form .np-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    position: relative;
+}
+.new-product-form .np-swatch:hover,
+.new-product-form .np-swatch.sel {
+    border-color: var(--np-text);
+    transform: scale(1.1);
+}
+.new-product-form .np-swatch.sel::after {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* ── BUTTONS ────────────────────────────────────────────── */
+.new-product-form .np-btn-tiny {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    border: 1.5px solid var(--np-border);
+    background: white;
+    color: var(--np-muted);
+    transition: all 0.15s;
+}
+.new-product-form .np-btn-tiny:hover {
+    border-color: var(--np-primary);
+    color: var(--np-primary);
+    background: var(--np-primary-lt);
+}
+.new-product-form .np-btn-tiny.del:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.new-product-form .np-btn-add {
+    background: var(--np-bg);
+    border: 1.5px dashed var(--np-border);
+    color: var(--np-muted);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    padding: 9px;
+    font-size: 12.5px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-top: 10px;
+}
+.new-product-form .np-btn-add:hover {
+    border-color: var(--np-primary);
+    color: var(--np-primary);
+    background: var(--np-primary-lt);
+}
+
+/* ── INFO BOX ───────────────────────────────────────────── */
+.new-product-form .np-info-box {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #0c4a6e;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+/* ── INCOTERM PILLS ─────────────────────────────────────── */
+.new-product-form .np-inco-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.new-product-form .np-inco-pill {
+    border: 2px solid var(--np-border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--np-muted);
+}
+.new-product-form .np-inco-pill:hover {
+    border-color: var(--np-primary);
+    color: var(--np-primary);
+}
+.new-product-form .np-inco-pill.sel {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+    color: var(--np-primary-dk);
+}
+.new-product-form .np-inco-sub {
+    font-size: 9.5px;
+    font-weight: 400;
+    color: var(--np-muted);
+    display: block;
+    margin-top: 2px;
+}
+
+/* ── WAREHOUSE ROW ──────────────────────────────────────── */
+.new-product-form .np-wh-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 80px auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-wh-row:last-of-type {
+    border-bottom: none;
+}
+
+/* ── MINI PROGRESS BAR ──────────────────────────────────── */
+.new-product-form .np-mini-bar {
+    height: 5px;
+    background: var(--np-border);
+    border-radius: 3px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+.new-product-form .np-mini-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--np-primary);
+    transition: width 0.4s;
+}
+
+/* ── OEM OPTION CARDS ───────────────────────────────────── */
+.new-product-form .np-oem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.new-product-form .np-oem-card {
+    border: 2px solid var(--np-border);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+}
+.new-product-form .np-oem-card:hover {
+    border-color: var(--np-primary);
+}
+.new-product-form .np-oem-card.sel {
+    border-color: var(--np-primary);
+    background: var(--np-primary-lt);
+}
+.new-product-form .np-oem-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--np-navy);
+}
+.new-product-form .np-oem-desc {
+    font-size: 11px;
+    color: var(--np-muted);
+    margin-top: 3px;
+    line-height: 1.5;
+}
+
+/* ── CHART BARS ─────────────────────────────────────────── */
+.new-product-form .np-chart-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.new-product-form .np-chart-lbl {
+    font-size: 12px;
+    color: var(--np-slate);
+    min-width: 60px;
+    text-align: right;
+}
+.new-product-form .np-chart-bar-wrap {
+    flex: 1;
+    background: var(--np-border);
+    border-radius: 3px;
+    height: 10px;
+    overflow: hidden;
+}
+.new-product-form .np-chart-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s;
+}
+.new-product-form .np-chart-count {
+    font-size: 11.5px;
+    color: var(--np-muted);
+    min-width: 24px;
+    text-align: right;
+}
+
+/* ── STAT GRID ──────────────────────────────────────────── */
+.new-product-form .np-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.new-product-form .np-stat-card {
+    background: var(--np-white);
+    border: 1px solid var(--np-border);
+    border-radius: var(--np-radius);
+    padding: 16px;
+    text-align: center;
+}
+.new-product-form .np-stat-val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--np-navy);
+    margin-bottom: 2px;
+}
+.new-product-form .np-stat-lbl {
+    font-size: 11.5px;
+    color: var(--np-muted);
+}
+
+/* ── REVIEW CARDS ───────────────────────────────────────── */
+.new-product-form .np-review-card {
+    border: 1.5px solid var(--np-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+}
+.new-product-form .np-review-card:last-child {
+    margin-bottom: 0;
+}
+.new-product-form .np-review-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.new-product-form .np-reviewer-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--np-primary), #00a8a8);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.new-product-form .np-reviewer-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--np-navy);
+}
+.new-product-form .np-reviewer-date {
+    font-size: 11px;
+    color: var(--np-muted);
+    margin-left: auto;
+}
+.new-product-form .np-review-stars {
+    display: flex;
+    gap: 2px;
+    font-size: 13px;
+    color: var(--np-warn);
+}
+.new-product-form .np-review-body {
+    font-size: 12.5px;
+    color: var(--np-slate);
+    line-height: 1.6;
+    margin-top: 4px;
+}
+.new-product-form .np-review-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.new-product-form .np-review-badge {
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+.new-product-form .rb-pub {
+    background: #dcfce7;
+    color: #15803d;
+}
+.new-product-form .rb-hide {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.new-product-form .rb-flag {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ── ACTION BAR ─────────────────────────────────────────── */
+.new-product-form .np-action-bar {
+    background: var(--np-white);
+    border-top: 1px solid var(--np-border);
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+}
+.new-product-form .np-action-info {
+    font-size: 12px;
+    color: var(--np-muted);
+}
+.new-product-form .np-btn-row {
+    display: flex;
+    gap: 10px;
+}
+.new-product-form .np-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+}
+.new-product-form .np-btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--np-border);
+    color: var(--np-slate);
+}
+.new-product-form .np-btn-ghost:hover {
+    border-color: var(--np-slate);
+    background: var(--np-bg);
+}
+.new-product-form .np-btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--np-primary);
+    color: var(--np-primary);
+}
+.new-product-form .np-btn-outline:hover {
+    background: var(--np-primary-lt);
+}
+.new-product-form .np-btn-primary {
+    background: var(--np-primary);
+    color: white;
+}
+.new-product-form .np-btn-primary:hover {
+    background: var(--np-primary-dk);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 97, 97, 0.3);
+}
+
+/* ── MONO FONT ──────────────────────────────────────────── */
+.new-product-form .np-mono {
+    font-family: "Courier New", Courier, monospace;
+}
+
+/* ── TIER TABLE ─────────────────────────────────────────── */
+.new-product-form .np-tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.new-product-form .np-tier-table th {
+    background: var(--np-bg);
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--np-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-tier-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--np-border);
+}
+.new-product-form .np-tier-table tr:last-child td {
+    border-bottom: none;
+}
+.new-product-form .np-tier-table .np-input {
+    padding: 7px 10px;
+    font-size: 12.5px;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .new-product-form .np-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 768px) {
+    .new-product-form .np-form-row,
+    .new-product-form .np-form-row-3,
+    .new-product-form .np-form-row-4 {
+        grid-template-columns: 1fr;
+    }
+    .new-product-form .np-stat-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .new-product-form .np-inco-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

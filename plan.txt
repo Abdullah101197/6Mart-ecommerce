@@ -1,0 +1,124 @@
+﻿Product Gallery Redesign Plan
+Project: 6MartAdminpanel
+Target Area: Admin Panel > Product Setup > Product Gallery
+Source Design: update galary.html
+
+Phase 0: Discovery and Baseline Freeze
+1. Confirm current Product Gallery flow and dependencies:
+   - Route: admin.item.product_gallery
+   - Controller methods: product_gallery(), search()
+   - Views: product_gallery.blade.php, partials/_gallery.blade.php
+2. Snapshot current behavior before changes:
+   - Existing filters, pagination mode, and "Use this product info" action
+3. Identify reusable logic from Product List page:
+   - Status toggle, stock update patterns, filtering conventions
+4. Record data availability from current schema:
+   - Available: name, category, brand, price, stock, status, tax/vat
+   - Missing (for full template parity): sku, ean/barcode, cost_price, expiry_days
+
+Phase 1: UI Integration (Theme-Preserving)
+1. Rebuild Product Gallery UI using update galary.html structure while preserving existing admin theme:
+   - Keep color scheme, spacing language, and existing asset system
+2. Replace static mock sections with Blade + dynamic placeholders:
+   - Stats cards
+   - Advanced filters row
+   - Table layout with sortable headers
+   - Bulk action toolbar
+   - Pagination/footer controls
+3. Keep current working features intact:
+   - Existing navigation and permissions
+   - Existing "Use this product info" edit flow
+
+Phase 2: Dynamic Data Wiring (Backend + AJAX)
+1. Extend backend query in ItemController@product_gallery and @search:
+   - Search by product name and mapped identifiers (where available)
+   - Filter by brand, category, status, VAT range, price range
+   - Sorting and page-size support
+2. Replace mock front-end array logic with server-side query output
+3. Render table body via dedicated partial (AJAX refresh)
+4. Keep backward compatibility for existing parameters to avoid regressions
+
+Phase 3: Bulk Operations (Safe First)
+1. Add bulk-selection workflow in Product Gallery UI
+2. Implement backend endpoints for bulk actions:
+   - Activate selected
+   - Deactivate selected
+   - Optional: bulk delete (permission-gated)
+   - Optional: bulk discount apply
+3. Add validation and authorization checks for each bulk action
+4. Return structured JSON responses for toast/notification handling
+
+Phase 4: Feature Parity Decisions for Missing Fields
+1. Map template fields to existing schema where possible
+2. For truly missing fields, implement only after approval:
+   - Migration: items.sku, items.ean, items.cost_price, items.expiry_days
+   - Model fillable/casts updates
+   - Form validation and persistence updates
+3. Update UI columns and quick-edit modal based on approved schema changes
+
+Phase 5: Modal Actions and Progressive Enablement
+1. Quick Edit Modal:
+   - Wire to real update route with validation and success/error feedback
+2. Import Modal:
+   - Either connect to existing import mechanism or disable until endpoint is ready
+3. Bulk Discount Modal:
+   - Wire to bulk action endpoint with server-side rules
+4. Ensure no modal appears enabled unless backend endpoint exists
+
+Phase 6: Sidebar and Module Integrity
+1. Keep Product Gallery under Product Setup as current
+2. Brand module handling:
+   - Use existing Brands module (already present)
+   - No new brand module creation required
+3. If future design requires additional brand metadata, extend existing module only
+
+Phase 7: QA and Regression Testing
+1. Functional tests:
+   - Filters (single + combined)
+   - Sorting and pagination
+   - Bulk actions and validation failures
+   - Quick edit save path
+2. Regression checks:
+   - Existing product edit route with product_gellary flag
+   - Permissions and role access
+   - Theme consistency across admin pages
+3. Browser checks:
+   - Console errors
+   - Broken asset references
+
+Phase 8: Performance and Hardening
+1. Query optimization:
+   - Eager loading for category/brand relations
+   - Avoid random query patterns for management pages
+2. Index recommendations (if needed):
+   - status, category_id, store_id, price, tax fields
+3. UX hardening:
+   - Debounced search
+   - Loading states and empty states
+
+Phase 9: Rollout Strategy
+1. Deliver in two controlled milestones:
+   - Milestone A: Dynamic redesigned gallery with existing schema only
+   - Milestone B: Optional schema extension and full template parity fields
+2. Keep fallback path:
+   - Ability to switch to previous gallery partial during validation window
+3. Final signoff checklist:
+   - Admin acceptance for visuals
+   - Product operations acceptance for workflows
+   - No critical console/backend errors
+
+Execution Order Recommendation
+1. Phase 0
+2. Phase 1 + 2 (core usable release)
+3. Phase 3
+4. Phase 5
+5. Phase 4 (optional, approval-gated)
+6. Phase 7 + 8
+7. Phase 9
+
+Definition of Done
+1. Product Gallery matches new design direction while keeping existing theme language
+2. Data and actions are fully dynamic (no mock JS dataset)
+3. Existing workflows remain functional
+4. No critical console errors, 404 asset issues, or broken admin actions
+5. Optional schema fields implemented only if explicitly approved

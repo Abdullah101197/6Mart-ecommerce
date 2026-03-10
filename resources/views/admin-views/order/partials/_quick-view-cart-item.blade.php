@@ -111,7 +111,7 @@
                         @php($singleArray_name = [])
                         @php($values = [])
 
-                        @php($selected_variations = json_decode($cart_item['variation'], true))
+                        @php($selected_variations = $cart_item['variation'])
                         @if (is_array($selected_variations))
 
                             @php($singleArray = array_column($selected_variations, 'values'))
@@ -134,7 +134,7 @@
 
 
 
-                        @foreach (json_decode($product->food_variations) as $key => $choice)
+                        @foreach ($product->food_variations as $key => $choice)
                             @if (isset($choice->name) && isset($choice->values))
                                 <div class="h3 p-0 pt-2">{{ $choice->name }} <small style="font-size: 12px"
                                         class="text-muted">
@@ -195,7 +195,7 @@
 
                         if (is_array($temp) && isset($itemType)) {
                             $typeParts = explode('-', $itemType);
-                            $choiceOptions = json_decode($product->choice_options ?? '[]');
+                            $choiceOptions = $product->choice_options ?? [];
 
                             foreach ($choiceOptions as $index => $choice) {
                                 if (isset($choice->name)) {
@@ -205,7 +205,7 @@
                         }
                         ?>
 
-                @foreach (json_decode($product->choice_options) as $key => $choice)
+                @foreach ($product->choice_options as $key => $choice)
                         <div class="h3 p-0 pt-2">{{ $choice->title }}
                         </div>
 
@@ -258,7 +258,7 @@
                         </div>
                     </div>
                 </div>
-                @php($add_ons = json_decode($product->add_ons))
+                @php($add_ons = $product->add_ons)
                 @if (count($add_ons) > 0 && $add_ons[0])
                     <div class="h3 p-0 pt-2">{{ translate('messages.addon') }}
                     </div>

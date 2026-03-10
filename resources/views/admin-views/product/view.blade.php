@@ -74,10 +74,10 @@
                             </div>
                             <div class="col-lg-7 col-md-6 mx-auto">
                                 <ul class="list-unstyled list-unstyled-py-2 mb-0 rating--review-right py-3">
-                                    @php($total = $product->rating ? array_sum(json_decode($product->rating, true)) : 0)
+                                    @php($total = $product->rating ? array_sum($product->rating) : 0)
                                     <!-- Review Ratings -->
                                     <li class="d-flex align-items-center font-size-sm">
-                                        @php($five = $product->rating ? json_decode($product->rating, true)[5] : 0)
+                                        @php($five = $product->rating ? ($product->rating[5] ?? 0) : 0)
                                         <span class="progress-name mr-3">{{ translate('excellent_') }}</span>
                                         <div class="progress flex-grow-1">
                                             <div class="progress-bar" role="progressbar"
@@ -91,7 +91,7 @@
 
                                     <!-- Review Ratings -->
                                     <li class="d-flex align-items-center font-size-sm">
-                                        @php($four = $product->rating ? json_decode($product->rating, true)[4] : 0)
+                                        @php($four = $product->rating ? ($product->rating[4] ?? 0) : 0)
                                         <span class="progress-name mr-3">{{ translate('good') }}</span>
                                         <div class="progress flex-grow-1">
                                             <div class="progress-bar" role="progressbar"
@@ -105,7 +105,7 @@
 
                                     <!-- Review Ratings -->
                                     <li class="d-flex align-items-center font-size-sm">
-                                        @php($three = $product->rating ? json_decode($product->rating, true)[3] : 0)
+                                        @php($three = $product->rating ? ($product->rating[3] ?? 0) : 0)
                                         <span class="progress-name mr-3">{{ translate('average') }}</span>
                                         <div class="progress flex-grow-1">
                                             <div class="progress-bar" role="progressbar"
@@ -119,7 +119,7 @@
 
                                     <!-- Review Ratings -->
                                     <li class="d-flex align-items-center font-size-sm">
-                                        @php($two = $product->rating ? json_decode($product->rating, true)[2] : 0)
+                                        @php($two = $product->rating ? ($product->rating[2] ?? 0) : 0)
                                         <span class="progress-name mr-3">{{ translate('below_average') }}</span>
                                         <div class="progress flex-grow-1">
                                             <div class="progress-bar" role="progressbar"
@@ -133,7 +133,7 @@
 
                                     <!-- Review Ratings -->
                                     <li class="d-flex align-items-center font-size-sm">
-                                        @php($one = $product->rating ? json_decode($product->rating, true)[1] : 0)
+                                        @php($one = $product->rating ? ($product->rating[1] ?? 0) : 0)
                                         <span class="progress-name mr-3">{{ translate('poor') }}</span>
                                         <div class="progress flex-grow-1">
                                             <div class="progress-bar" role="progressbar"
@@ -285,8 +285,8 @@
                                 </td>
                                 <td class="px-4">
                                     @if ($product->module->module_type == 'food')
-                                        @if ($product->food_variations && is_array(json_decode($product['food_variations'], true)))
-                                            @foreach (json_decode($product->food_variations, true) as $variation)
+                                        @if ($product->food_variations && is_array($product->food_variations))
+                                            @foreach ($product->food_variations as $variation)
                                                 @if (isset($variation['price']))
                                                     <span class="d-block mb-1 text-capitalize">
                                                         <strong>
@@ -327,8 +327,8 @@
                                             @endforeach
                                         @endif
                                     @else
-                                        @if ($product->variations && is_array(json_decode($product['variations'], true)))
-                                            @foreach (json_decode($product['variations'], true) as $variation)
+                                        @if ($product->variations && is_array($product->variations))
+                                            @foreach ($product->variations as $variation)
                                                 <span class="d-block mb-1 text-capitalize">
                                                     {{ $variation['type'] }} :
                                                     {{ \App\CentralLogics\Helpers::format_currency($variation['price']) }}
@@ -341,7 +341,7 @@
 
                                     <td class="px-4">
                                         @if (config('module.' . $product->module->module_type)['add_on'])
-                                            @foreach (\App\Models\AddOn::whereIn('id', json_decode($product['add_ons'], true))->get() as $addon)
+                                            @foreach (\App\Models\AddOn::whereIn('id', $product->add_ons ?: [])->get() as $addon)
                                                 <span class="d-block mb-1 text-capitalize">
                                                     {{ $addon['name'] }} :
                                                     {{ \App\CentralLogics\Helpers::format_currency($addon['price']) }}

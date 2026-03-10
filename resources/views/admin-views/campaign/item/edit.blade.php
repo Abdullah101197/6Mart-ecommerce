@@ -385,7 +385,7 @@
                                 <div class="col-md-12 error-wrapper" >
                                     <div id="add_new_option">
                                     @if (isset($campaign->food_variations))
-                                        @foreach (json_decode($campaign->food_variations,true) as $key_choice_options=>$item)
+                                        @foreach ($campaign->food_variations as $key_choice_options=>$item)
                                             @if (isset($item["price"]))
                                                 @break
                                             @else
@@ -420,7 +420,7 @@
                                         <label class="input-label" for="exampleFormControlSelect1">{{translate('messages.attribute')}}<span class="input-label-secondary"></span></label>
                                         <select name="attribute_id[]" id="choice_attributes" class="form-control js-select2-custom" multiple="multiple">
                                             @foreach(\App\Models\Attribute::orderBy('name')->get() as $attribute)
-                                            <option value="{{$attribute['id']}}" {{in_array($attribute->id,json_decode($campaign['attributes'],true))?'selected':''}}>{{$attribute['name']}}</option>
+                                            <option value="{{$attribute['id']}}" {{in_array($attribute->id,$campaign['attributes'])?'selected':''}}>{{$attribute['name']}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -428,7 +428,7 @@
 
                                 <div class="col-md-12">
                                     <div class="customer_choice_options error-wrapper" id="customer_choice_options">
-                                        @include('admin-views.product.partials._choices',['choice_no'=>json_decode($campaign['attributes']),'choice_options'=>json_decode($campaign['choice_options'],true)])
+                                        @include('admin-views.product.partials._choices',['choice_no'=>$campaign['attributes'],'choice_options'=>$campaign['choice_options']])
                                     </div>
                                 </div>
                                 <div class="col-md-12">
@@ -857,7 +857,7 @@
 
 
 
-    var count= {{isset($campaign->food_variations)?count(json_decode($campaign->food_variations,true)):0}};
+    var count= {{isset($campaign->food_variations)?count($campaign->food_variations):0}};
 
     $(document).ready(function(){
         console.log(count);

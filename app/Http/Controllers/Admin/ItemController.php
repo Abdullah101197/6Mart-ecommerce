@@ -8,12 +8,15 @@ use App\Models\Tag;
 use App\Models\Item;
 use App\Models\Brand;
 use App\Models\Store;
+use App\Models\Module;
 use App\Models\Review;
 use App\Models\Allergy;
 use App\Models\Category;
 use App\Models\Nutrition;
 use App\Scopes\StoreScope;
+use App\Scopes\ZoneScope;
 use App\Models\GenericName;
+use App\Models\ItemSeoData;
 use App\Models\TempProduct;
 use App\Models\Translation;
 use Illuminate\Support\Str;
@@ -43,16 +46,20 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $categories = Category::where(['position' => 0])->get();
+        $language = getWebConfig('language');
+        $languages = is_array($language) ? $language : [];
+        $defaultLang = str_replace('_', '-', app()->getLocale());
 
         $taxData = Helpers::getTaxSystemType();
         $productWiseTax = $taxData['productWiseTax'];
         $taxVats = $taxData['taxVats'];
 
-        return view('admin-views.product.index', compact('categories', 'productWiseTax', 'taxVats'));
+        return view('admin-views.product.index', compact('categories', 'language', 'languages', 'defaultLang', 'productWiseTax', 'taxVats'));
     }
 
     public function store(Request $request)
     {
+        $isDraftMode = $request->boolean('draft_mode');
 
         $validator = Validator::make($request->all(), [
             'name.0' => 'required',
@@ -60,21 +67,20 @@ class ItemController extends Controller
             'category_id' => 'required',
             'image' => [
                 Rule::requiredIf(function () use ($request) {
-                    return (Config::get('module.current_module_type') != 'food' && $request?->product_gellary == null);
+                    return !$request->boolean('draft_mode')
+                        && (Config::get('module.current_module_type') != 'food' && $request?->product_gellary == null);
                 })
             ],
             'price' => 'required|numeric|between:.01,999999999999.99',
             'discount' => 'required|numeric|min:0',
             'store_id' => 'required',
             'description.*' => 'max:1000',
-            'name.0' => 'required',
             'description.0' => 'required',
         ], [
             'description.*.max' => translate('messages.description_length_warning'),
             'name.0.required' => translate('messages.item_name_required'),
             'category_id.required' => translate('messages.category_required'),
             'image.required' => translate('messages.thumbnail image is required'),
-            'name.0.required' => translate('default_name_is_required'),
             'description.0.required' => translate('default_description_is_required'),
         ]);
         if ($request['discount_type'] == 'percent') {
@@ -112,9 +118,9 @@ class ItemController extends Controller
                 $newDisk = Helpers::getDisk();
 
                 try {
-                    if($newDisk == 's3' && $item_data->image){
-                            Storage::disk($newDisk)->put($newPath, Storage::disk($oldDisk)->get($oldPath));
-                        } else{
+                    if ($newDisk == 's3' && $item_data->image) {
+                        Storage::disk($newDisk)->put($newPath, Storage::disk($oldDisk)->get($oldPath));
+                    } else {
                         if (Storage::disk($oldDisk)->exists($oldPath)) {
                             if (!Storage::disk($newDisk)->exists($dir)) {
                                 Storage::disk($newDisk)->makeDirectory($dir);
@@ -127,7 +133,7 @@ class ItemController extends Controller
                 }
             }
             foreach ($item_data->images as $key => $value) {
-                if (!in_array(is_array($value) ?   $value['img'] : $value, explode(",", $request->removedImageKeys))) {
+                if (!in_array(is_array($value) ? $value['img'] : $value, explode(",", $request->removedImageKeys))) {
                     $value = is_array($value) ? $value : ['img' => $value, 'storage' => 'public'];
                     $oldDisk = $value['storage'];
                     $oldPath = "product/{$value['img']}";
@@ -136,9 +142,9 @@ class ItemController extends Controller
                     $dir = 'product/';
                     $newDisk = Helpers::getDisk();
                     try {
-                        if($newDisk == 's3'){
+                        if ($newDisk == 's3') {
                             Storage::disk($newDisk)->put($newPath, Storage::disk($oldDisk)->get($oldPath));
-                        } else{
+                        } else {
                             if (Storage::disk($oldDisk)->exists($oldPath)) {
                                 if (!Storage::disk($newDisk)->exists($dir)) {
                                     Storage::disk($newDisk)->makeDirectory($dir);
@@ -229,7 +235,7 @@ class ItemController extends Controller
         }
         $item->category_ids = json_encode($category);
         $item->category_id = $request->sub_category_id ? $request->sub_category_id : $request->category_id;
-        $item->description =  $request->description[array_search('default', $request->lang)];
+        $item->description = $request->description[array_search('default', $request->lang)];
 
         $choice_options = [];
         if ($request->has('choice')) {
@@ -272,7 +278,7 @@ class ItemController extends Controller
                 $temp['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
 
 
-                if ($request->discount_type == 'amount' &&  $temp['price']  <   $request->discount) {
+                if ($request->discount_type == 'amount' && $temp['price'] < $request->discount) {
                     $validator->getMessageBag()->add('unit_price', translate("Variation price must be greater than discount amount"));
                     return response()->json(['errors' => Helpers::error_processor($validator)]);
                 }
@@ -299,7 +305,7 @@ class ItemController extends Controller
                 $temp_variation['min'] = $option['min'] ?? 0;
                 $temp_variation['max'] = $option['max'] ?? 0;
                 $temp_variation['required'] = $option['required'] ?? 'off';
-                if ($option['min'] > 0 &&  $option['min'] > $option['max']) {
+                if ($option['min'] > 0 && $option['min'] > $option['max']) {
                     $validator->getMessageBag()->add('name', translate('messages.minimum_value_can_not_be_greater_then_maximum_value'));
                     return response()->json(['errors' => Helpers::error_processor($validator)]);
                 }
@@ -328,7 +334,7 @@ class ItemController extends Controller
         $item->food_variations = json_encode($food_variations);
         $item->variations = json_encode($variations);
         $item->price = $request->price;
-        $item->image =  $request->has('image') ? Helpers::upload('product/', 'png', $request->file('image')) : $newFileNamethumb ?? null;
+        $item->image = $request->has('image') ? Helpers::upload('product/', 'png', $request->file('image')) : $newFileNamethumb ?? null;
         $item->available_time_starts = $request->available_time_starts ?? '00:00:00';
         $item->available_time_ends = $request->available_time_ends ?? '23:59:59';
         $item->discount = $request->discount_type == 'amount' ? $request->discount : $request->discount;
@@ -345,8 +351,18 @@ class ItemController extends Controller
             $item->organic = $request->organic ?? 0;
         }
         $item->stock = $request->current_stock ?? 0;
+        $item->module_id = $request->module_id
+            ?? Config::get('module.current_module_id')
+            ?? Store::withoutGlobalScope(ZoneScope::class)->find($request->store_id)?->module_id;
+        $item->sku = $request->sku;
+        $item->ean = $request->ean;
+        $item->cost_price = $request->cost_price ?? 0;
+        $item->expiry_days = $request->expiry_days;
+        $item->discount_expires_at = $request->discount_expires_at;
         $item->images = $images;
-        $item->is_halal =  $request->is_halal ?? 0;
+        $item->is_halal = $request->is_halal ?? 0;
+// Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
+        $item->status = $isDraftMode ? 0 : 1;
         $item->save();
         $item->tags()->sync($tag_ids);
         $item->nutritions()->sync($nutrition_ids);
@@ -386,7 +402,15 @@ class ItemController extends Controller
         Helpers::add_or_update_translations(request: $request, key_data: 'name', name_field: 'name', model_name: 'Item', data_id: $item->id, data_value: $item->name);
         Helpers::add_or_update_translations(request: $request, key_data: 'description', name_field: 'description', model_name: 'Item', data_id: $item->id, data_value: $item->description);
 
-        return response()->json(['success' => translate('messages.product_added_successfully')], 200);
+        if ($module_type == 'ecommerce') {
+            $this->addOrUpdateMetaData($request, $item->id);
+        }
+
+        return response()->json([
+            'success' => $isDraftMode ? translate('messages.product_added_successfully') : translate('messages.product_added_successfully'),
+            'item_id' => $item->id,
+            'draft_mode' => $isDraftMode,
+        ], 200);
     }
 
     public function view($id)
@@ -441,6 +465,8 @@ class ItemController extends Controller
 
     public function update(Request $request, $id)
     {
+        $item = Item::withoutGlobalScope(StoreScope::class)->find($id);
+        $isDraftMode = $request->boolean('draft_mode');
         $validator = Validator::make($request->all(), [
             'name' => 'array',
             'name.0' => 'required',
@@ -453,11 +479,20 @@ class ItemController extends Controller
             'discount' => 'required|numeric|min:0',
             'name.0' => 'required',
             'description.0' => 'required',
+            'image' => [
+                Rule::requiredIf(function () use ($request, $item) {
+                    return !$request->boolean('draft_mode')
+                        && Config::get('module.current_module_type') != 'food'
+                        && !$request->has('image')
+                        && blank($item?->image);
+                })
+            ],
         ], [
             'description.*.max' => translate('messages.description_length_warning'),
             'category_id.required' => translate('messages.category_required'),
             'name.0.required' => translate('default_name_is_required'),
             'description.0.required' => translate('default_description_is_required'),
+            'image.required' => translate('messages.thumbnail image is required'),
         ]);
 
         if ($request['discount_type'] == 'percent') {
@@ -474,7 +509,6 @@ class ItemController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)]);
         }
 
-        $item = Item::withoutGlobalScope(StoreScope::class)->find($id);
         $tag_ids = [];
         if ($request->tags != null) {
             $tags = explode(",", $request->tags);
@@ -550,7 +584,7 @@ class ItemController extends Controller
         $images = $item['images'];
         if (!$request?->temp_product) {
             foreach ($item->images as $key => $value) {
-                if (in_array(is_array($value) ?   $value['img'] : $value, explode(",", $request->removedImageKeys))) {
+                if (in_array(is_array($value) ? $value['img'] : $value, explode(",", $request->removedImageKeys))) {
                     $value = is_array($value) ? $value : ['img' => $value, 'storage' => 'public'];
                     Helpers::check_and_delete('product/', $value['img']);
                     unset($images[$key]);
@@ -568,7 +602,7 @@ class ItemController extends Controller
 
         $item->category_id = $request->sub_category_id ? $request->sub_category_id : $request->category_id;
         $item->category_ids = json_encode($category);
-        $item->description =  $request->description[array_search('default', $request->lang)];
+        $item->description = $request->description[array_search('default', $request->lang)];
 
         $choice_options = [];
         if ($request->has('choice')) {
@@ -610,7 +644,7 @@ class ItemController extends Controller
                 $temp['type'] = $str;
                 $temp['price'] = abs($request['price_' . str_replace('.', '_', $str)]);
 
-                if ($request->discount_type == 'amount' &&  $temp['price']  <   $request->discount) {
+                if ($request->discount_type == 'amount' && $temp['price'] < $request->discount) {
                     $validator->getMessageBag()->add('unit_price', translate("Variation price must be greater than discount amount"));
                     return response()->json(['errors' => Helpers::error_processor($validator)]);
                 }
@@ -629,7 +663,7 @@ class ItemController extends Controller
                 $temp_variation['type'] = $option['type'];
                 $temp_variation['min'] = $option['min'] ?? 0;
                 $temp_variation['max'] = $option['max'] ?? 0;
-                if ($option['min'] > 0 &&  $option['min'] > $option['max']) {
+                if ($option['min'] > 0 && $option['min'] > $option['max']) {
                     $validator->getMessageBag()->add('name', translate('messages.minimum_value_can_not_be_greater_then_maximum_value'));
                     return response()->json(['errors' => Helpers::error_processor($validator)]);
                 }
@@ -663,7 +697,7 @@ class ItemController extends Controller
         $item->available_time_starts = $request->available_time_starts ?? '00:00:00';
         $item->available_time_ends = $request->available_time_ends ?? '23:59:59';
 
-        $item->discount =  $request->discount;
+        $item->discount = $request->discount;
         $item->discount_type = $request->discount_type;
         $item->unit_id = $request->unit;
         $item->attributes = $request->has('attribute_id') ? json_encode($request->attribute_id) : json_encode([]);
@@ -672,10 +706,16 @@ class ItemController extends Controller
         $item->maximum_cart_quantity = $request->maximum_cart_quantity;
         // $item->module_id= $request->module_id;
         $item->stock = $request->current_stock ?? 0;
+        $item->sku = $request->sku;
+        $item->ean = $request->ean;
+        $item->cost_price = $request->cost_price ?? 0;
+        $item->expiry_days = $request->expiry_days;
+        $item->discount_expires_at = $request->discount_expires_at;
         $item->is_halal = $request->is_halal ?? 0;
         $item->organic = $request->organic ?? 0;
         $item->veg = $request->veg ?? 0;
         $item->images = $images;
+        $item->status = $isDraftMode ? 0 : 1;
         if (Helpers::get_mail_status('product_approval') && $request?->temp_product) {
 
 
@@ -683,7 +723,7 @@ class ItemController extends Controller
 
             if ($request->removedImageKeys) {
                 foreach ($images as $key => $value) {
-                    if (in_array(is_array($value) ?   $value['img'] : $value, explode(",", $request->removedImageKeys))) {
+                    if (in_array(is_array($value) ? $value['img'] : $value, explode(",", $request->removedImageKeys))) {
                         unset($images[$key]);
                     }
                 }
@@ -737,7 +777,7 @@ class ItemController extends Controller
             $item->is_approved = 1;
             try {
 
-                if (Helpers::getNotificationStatusData('store', 'store_product_approve', 'push_notification_status', $item?->store->id)  &&  $item?->store?->vendor?->firebase_token) {
+                if (Helpers::getNotificationStatusData('store', 'store_product_approve', 'push_notification_status', $item?->store->id) && $item?->store?->vendor?->firebase_token) {
                     $data = [
                         'title' => translate('product_approved'),
                         'description' => translate('Product_Request_Has_Been_Approved_By_Admin'),
@@ -755,13 +795,101 @@ class ItemController extends Controller
                     ]);
                 }
 
-                if (config('mail.status') && Helpers::get_mail_status('product_approve_mail_status_store') == '1' &&  Helpers::getNotificationStatusData('store', 'store_product_approve', 'mail_status', $item?->store?->id)) {
+                if (config('mail.status') && Helpers::get_mail_status('product_approve_mail_status_store') == '1' && Helpers::getNotificationStatusData('store', 'store_product_approve', 'mail_status', $item?->store?->id)) {
                     Mail::to($item?->store?->vendor?->email)->send(new \App\Mail\VendorProductMail($item?->store?->name, 'approved'));
                 }
             } catch (\Exception $e) {
                 info($e->getMessage());
             }
         }
+// Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
+        if (Helpers::get_mail_status('product_approval') && $request?->temp_product) {
+
+
+            $images = $item->temp_product?->images ?? [];
+
+            if ($request->removedImageKeys) {
+                foreach ($images as $key => $value) {
+                    if (in_array(is_array($value) ? $value['img'] : $value, explode(",", $request->removedImageKeys))) {
+                        unset($images[$key]);
+                    }
+                }
+                $images = array_values($images);
+            }
+
+            foreach ($images as $k => $value) {
+                $value = is_array($value) ? $value : ['img' => $value, 'storage' => 'public'];
+                $oldDisk = $value['storage'];
+                $oldPath = "product/{$value['img']}";
+                $newFileName = Carbon::now()->toDateString() . "-" . uniqid() . ".png";
+                $newPath = "product/{$newFileName}";
+                $dir = 'product/';
+                $newDisk = Helpers::getDisk();
+                try {
+                    if (Storage::disk($oldDisk)->exists($oldPath)) {
+                        if (!Storage::disk($newDisk)->exists($dir)) {
+                            Storage::disk($newDisk)->makeDirectory($dir);
+                        }
+                        $fileContents = Storage::disk($oldDisk)->get($oldPath);
+                        Storage::disk($newDisk)->put($newPath, $fileContents);
+                        unset($images[$k]);
+                    }
+                } catch (\Exception $e) {
+                }
+                $images[] = ['img' => $newFileName, 'storage' => Helpers::getDisk()];
+            }
+
+            $images = array_values($images);
+
+            if ($request->has('item_images')) {
+                foreach ($request->item_images as $img) {
+                    $image = Helpers::upload('product/', 'png', $img);
+                    array_push($images, ['img' => $image, 'storage' => Helpers::getDisk()]);
+                }
+            }
+
+
+            $item->images = $images;
+
+            $item->temp_product?->translations()->delete();
+            $item?->pharmacy_item_details()?->delete();
+            if ($item->module->module_type == 'pharmacy') {
+                DB::table('pharmacy_item_details')->where('temp_product_id', $item->temp_product?->id)->update([
+                    'item_id' => $item->id,
+                    'temp_product_id' => null
+                ]);
+            }
+            $item?->temp_product?->taxVats()->delete();
+            $item->temp_product?->delete();
+            $item->is_approved = 1;
+            try {
+
+                if (Helpers::getNotificationStatusData('store', 'store_product_approve', 'push_notification_status', $item?->store->id) && $item?->store?->vendor?->firebase_token) {
+                    $data = [
+                        'title' => translate('product_approved'),
+                        'description' => translate('Product_Request_Has_Been_Approved_By_Admin'),
+                        'order_id' => '',
+                        'image' => '',
+                        'type' => 'product_approve',
+                        'order_status' => '',
+                    ];
+                    Helpers::send_push_notif_to_device($item?->store?->vendor?->firebase_token, $data);
+                    DB::table('user_notifications')->insert([
+                        'data' => json_encode($data),
+                        'vendor_id' => $item?->store?->vendor_id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+                }
+
+                if (config('mail.status') && Helpers::get_mail_status('product_approve_mail_status_store') == '1' && Helpers::getNotificationStatusData('store', 'store_product_approve', 'mail_status', $item?->store?->id)) {
+                    Mail::to($item?->store?->vendor?->email)->send(new \App\Mail\VendorProductMail($item?->store?->name, 'approved'));
+                }
+            } catch (\Exception $e) {
+                info($e->getMessage());
+            }
+        }
+// Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
         $item->save();
         $item->tags()->sync($tag_ids);
         $item->nutritions()->sync($nutrition_ids);
@@ -779,6 +907,7 @@ class ItemController extends Controller
                 );
         }
         if ($item->module->module_type == 'ecommerce') {
+            $this->addOrUpdateMetaData($request, $item->id);
             DB::table('ecommerce_item_details')
                 ->updateOrInsert(
                     ['item_id' => $item->id],
@@ -791,7 +920,7 @@ class ItemController extends Controller
 
         if (addon_published_status('TaxModule')) {
             $taxVatIds = $item->taxVats()->pluck('tax_id')->toArray() ?? [];
-            $newTaxVatIds =  array_map('intval', $request['tax_ids'] ?? []);
+            $newTaxVatIds = array_map('intval', $request['tax_ids'] ?? []);
             sort($newTaxVatIds);
             sort($taxVatIds);
             if ($newTaxVatIds != $taxVatIds) {
@@ -816,7 +945,11 @@ class ItemController extends Controller
         Helpers::add_or_update_translations(request: $request, key_data: 'name', name_field: 'name', model_name: 'Item', data_id: $item->id, data_value: $item->name);
         Helpers::add_or_update_translations(request: $request, key_data: 'description', name_field: 'description', model_name: 'Item', data_id: $item->id, data_value: $item->description);
 
-        return response()->json(['success' => translate('messages.product_updated_successfully')], 200);
+        return response()->json([
+            'success' => translate('messages.product_updated_successfully'),
+            'item_id' => $item->id,
+            'draft_mode' => $isDraftMode,
+        ], 200);
     }
 
     public function delete(Request $request)
@@ -918,7 +1051,7 @@ class ItemController extends Controller
                     $addon_price += $request['addon-price' . $id] * $request['addon-quantity' . $id];
                 }
             }
-            $product_variations = json_decode($product->food_variations, true);
+            $product_variations = $product->food_variations;
             if ($request->variations && $product_variations && count($product_variations)) {
 
                 $price += Helpers::food_variation_price($product_variations, $request->variations);
@@ -949,7 +1082,7 @@ class ItemController extends Controller
                 $count = count(json_decode($product->variations));
                 for ($i = 0; $i < $count; $i++) {
                     if (json_decode($product->variations)[$i]->type == $str) {
-                        $price = json_decode($product->variations)[$i]->price - Helpers::product_discount_calculate($product, json_decode($product->variations)[$i]->price, $product->store)['discount_amount'];
+                        $price = ($product->variations[$i]['price'] ?? 0) - Helpers::product_discount_calculate($product, ($product->variations[$i]['price'] ?? 0), $product->store)['discount_amount'];
                     }
                 }
             } else {
@@ -1044,7 +1177,7 @@ class ItemController extends Controller
             $stock = $row->stock ?? 0;
 
             $res .= '<option value="' . e($row->id) . '" ' . $selected . '>'
-                . e($row->name) . ' ('.translate('Stock:').' ' . e($stock) . ')'
+                . e($row->name) . ' (' . translate('Stock:') . ' ' . e($stock) . ')'
                 . ($storeName ? ' (' . e($storeName) . ')' : '')
                 . '</option>';
         }
@@ -1116,7 +1249,7 @@ class ItemController extends Controller
         $taxData = Helpers::getTaxSystemType(getTaxVatList: false);
         $productWiseTax = $taxData['productWiseTax'];
 
-        return view('admin-views.product.list', compact('items', 'store', 'category', 'type', 'sub_category', 'condition','productWiseTax'));
+        return view('admin-views.product.list', compact('items', 'store', 'category', 'type', 'sub_category', 'condition', 'productWiseTax'));
     }
 
     public function remove_image(Request $request)
@@ -1152,11 +1285,11 @@ class ItemController extends Controller
 
         if ($request?->temp_product) {
             TempProduct::withoutGlobalScope(StoreScope::class)->where('id', $request['id'])->update([
-                'images' => json_encode($array),
+                'images' => $array,
             ]);
         } else {
             Item::withoutGlobalScope(StoreScope::class)->where('id', $request['id'])->update([
-                'images' => json_encode($array),
+                'images' => $array,
             ]);
         }
         Toastr::success(translate('item_image_removed_successfully'));
@@ -1165,35 +1298,129 @@ class ItemController extends Controller
 
     public function search(Request $request)
     {
-        $view = 'admin-views.product.partials._table';
-        $key = explode(' ', $request['search']);
-        $store_id = $request->query('store_id', 'all');
-        $category_id = $request->query('category_id', 'all');
-        $items = Item::withoutGlobalScope(StoreScope::class)
-            ->where(function ($q) use ($key) {
-                foreach ($key as $value) {
-                    $q->where('name', 'like', "%{$value}%");
+        $search = $request->input('search', '');
+        $key = array_filter(explode(' ', $search));
+        $store_id = $request->input('store_id', 'all');
+        $category_id = $request->input('category_id', 'all');
+        $status = $request->input('status_filter', $request->input('status', 'all'));
+        $min_price = $request->input('min_price');
+        $max_price = $request->input('max_price');
+        $brand_id = $request->input('brand_id', 'all');
+        $vat = $request->input('vat');          // e.g. '0' or '5'
+        $sort_by = $request->input('sort_by', 'name_asc');
+        $limit = (int) $request->input('limit', config('default_pagination', 20));
+
+        $baseQuery = Item::with(['category', 'store', 'module', 'category.parent'])
+            ->withoutGlobalScope(StoreScope::class)
+            ->withoutGlobalScope(ZoneScope::class)
+            ->where(function ($q) use ($key, $search) {
+                if (!empty($key)) {
+                    $q->where(function ($sub) use ($key) {
+                        foreach ($key as $value) {
+                            $sub->where('name', 'like', "%{$value}%");
+                        }
+                    })
+                        ->orWhere('sku', 'like', "%{$search}%")
+                        ->orWhere('ean', 'like', "%{$search}%");
                 }
-            })->when(is_numeric($store_id), function ($query) use ($store_id) {
+            })
+            ->when(is_numeric($store_id), function ($query) use ($store_id) {
                 return $query->where('store_id', $store_id);
             })
             ->when(is_numeric($category_id), function ($query) use ($category_id) {
                 return $query->whereHas('category', function ($q) use ($category_id) {
                     return $q->whereId($category_id)->orWhere('parent_id', $category_id);
                 });
-            })->module(Config::get('module.current_module_id'))->where('is_approved', 1);
+            })
+            ->when(is_numeric($brand_id), function ($query) use ($brand_id) {
+                return $query->whereHas('ecommerce_item_details', function ($q) use ($brand_id) {
+                    return $q->where('brand_id', $brand_id);
+                });
+            })
+            ->when(is_numeric($min_price), function ($query) use ($min_price) {
+                return $query->where('price', '>=', $min_price);
+            })
+            ->when(is_numeric($max_price), function ($query) use ($max_price) {
+                return $query->where('price', '<=', $max_price);
+            })
+            ->when($vat !== null && $vat !== '' && $vat !== 'all', function ($query) use ($vat) {
+                // Filter by tax rate – stored on item or taxVats relation
+                return $query->where('tax', (float) $vat);
+            })
+            ->module(Config::get('module.current_module_id'))
+            ->where('is_approved', 1);
 
-        if (isset($request->product_gallery) && $request->product_gallery == 1) {
-            $items =   $items->limit(12)->get();
-            $view = 'admin-views.product.partials._gallery';
-        } else {
-            $items = $items->latest()->limit(50)->get();
+        // Stats calculation (before status filter to keep counts accurate)
+        $active_count = (clone $baseQuery)->where('status', 1)->count();
+        $draft_count = (clone $baseQuery)->where('status', 0)->count();
+        $oos_count = (clone $baseQuery)->where('stock', '<=', 0)->count();
+        $expiry_count = (clone $baseQuery)->whereNotNull('expiry_days')->where('expiry_days', '<=', 30)->where('expiry_days', '>', 0)->count();
+        $total_count = (clone $baseQuery)->count();
+
+        // Apply Status Filter
+        if ($status == 'active') {
+            $baseQuery->where('status', 1);
+        } elseif ($status == 'draft') {
+            $baseQuery->where('status', 0);
+        } elseif ($status == 'oos') {
+            $baseQuery->where('stock', '<=', 0);
+        } elseif ($status == 'expiry') {
+            $baseQuery->whereNotNull('expiry_days')->where('expiry_days', '<=', 30)->where('expiry_days', '>', 0);
         }
 
-        return response()->json([
-            'count' => $items->count(),
-            'view' => view($view, compact('items'))->render()
-        ]);
+        // Apply Sorting
+        switch ($sort_by) {
+            case 'name_desc':
+                $baseQuery->orderBy('name', 'desc');
+                break;
+            case 'price_asc':
+                $baseQuery->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $baseQuery->orderBy('price', 'desc');
+                break;
+            case 'stock_asc':
+                $baseQuery->orderBy('stock', 'asc');
+                break;
+            case 'stock_desc':
+                $baseQuery->orderBy('stock', 'desc');
+                break;
+            case 'margin':
+                $baseQuery->select('*')->selectRaw('((price - cost_price) / price) * 100 as margin_val')
+                    ->orderBy('margin_val', 'desc');
+                break;
+            case 'expiry':
+                $baseQuery->orderBy('expiry_days', 'asc');
+                break;
+            case 'name_asc':
+            default:
+                $baseQuery->orderBy('name', 'asc');
+                break;
+        }
+
+        if (isset($request->product_gallery) && $request->product_gallery == 1) {
+            $items = $baseQuery->paginate($limit);
+            $view = 'admin-views.product.partials._gallery';
+
+            return response()->json([
+                'count' => $items->total(),
+                'total' => $total_count,
+                'stats' => [
+                    'active' => $active_count,
+                    'draft' => $draft_count,
+                    'oos' => $oos_count,
+                    'expiry' => $expiry_count
+                ],
+                'view' => view($view, compact('items'))->render(),
+                'pagination' => (string) $items->links()
+            ]);
+        } else {
+            $items = $baseQuery->latest()->limit(50)->get();
+            return response()->json([
+                'count' => $items->count(),
+                'view' => view('admin-views.product.partials._table', compact('items'))->render()
+            ]);
+        }
     }
 
     public function review_list(Request $request)
@@ -1340,7 +1567,7 @@ class ItemController extends Controller
                         Toastr::error(translate('messages.Discount_must_be_greater_then_0_on_id') . ' ' . $collection['Id']);
                         return back();
                     }
-                    if (data_get($collection, 'Image') != "" &&  strlen(data_get($collection, 'Image')) > 30) {
+                    if (data_get($collection, 'Image') != "" && strlen(data_get($collection, 'Image')) > 30) {
                         Toastr::error(translate('messages.Image_name_must_be_in_30_char._on_id') . ' ' . $collection['Id']);
                         return back();
                     }
@@ -1360,9 +1587,8 @@ class ItemController extends Controller
                         'name' => $collection['Name'],
                         'description' => $collection['Description'],
                         'image' => $collection['Image'],
-                        'images' => $collection['Images'] ?? json_encode([]),
-                        'category_id' => $collection['SubCategoryId'] ? $collection['SubCategoryId'] : $collection['CategoryId'],
-                        'category_ids' => json_encode([['id' => $collection['CategoryId'], 'position' => 1], ['id' => $collection['SubCategoryId'], 'position' => 2]]),
+                        'images' => isset($collection['Images']) ? (is_array($collection['Images']) ? $collection['Images'] : json_decode($collection['Images'], true)) : [],
+                        'category_ids' => [['id' => $collection['CategoryId'], 'position' => 1], ['id' => $collection['SubCategoryId'], 'position' => 2]],
                         'unit_id' => is_int($collection['UnitId']) ? $collection['UnitId'] : null,
                         'stock' => is_numeric($collection['Stock']) ? abs($collection['Stock']) : 0,
                         'price' => $collection['Price'],
@@ -1370,11 +1596,11 @@ class ItemController extends Controller
                         'discount_type' => $collection['DiscountType'],
                         'available_time_starts' => $collection['AvailableTimeStarts'] ?? '00:00:00',
                         'available_time_ends' => $collection['AvailableTimeEnds'] ?? '23:59:59',
-                        'variations' => $module_type == 'food' ? json_encode([]) : $collection['Variations'] ?? json_encode([]),
-                        'choice_options' => $module_type == 'food' ? json_encode([]) : $collection['ChoiceOptions'] ?? json_encode([]),
-                        'food_variations' => $module_type == 'food' ? $collection['Variations'] ?? json_encode([]) : json_encode([]),
-                        'add_ons' => $collection['AddOns'] ? ($collection['AddOns'] == "" ? json_encode([]) : $collection['AddOns']) : json_encode([]),
-                        'attributes' => $collection['Attributes'] ? ($collection['Attributes'] == "" ? json_encode([]) : $collection['Attributes']) : json_encode([]),
+                        'variations' => $module_type == 'food' ? [] : (isset($collection['Variations']) ? (is_array($collection['Variations']) ? $collection['Variations'] : json_decode($collection['Variations'], true)) : []),
+                        'choice_options' => $module_type == 'food' ? [] : (isset($collection['ChoiceOptions']) ? (is_array($collection['ChoiceOptions']) ? $collection['ChoiceOptions'] : json_decode($collection['ChoiceOptions'], true)) : []),
+                        'food_variations' => $module_type == 'food' ? (isset($collection['Variations']) ? (is_array($collection['Variations']) ? $collection['Variations'] : json_decode($collection['Variations'], true)) : []) : [],
+                        'add_ons' => $collection['AddOns'] ? ($collection['AddOns'] == "" ? [] : (is_array($collection['AddOns']) ? $collection['AddOns'] : json_decode($collection['AddOns'], true))) : [],
+                        'attributes' => $collection['Attributes'] ? ($collection['Attributes'] == "" ? [] : (is_array($collection['Attributes']) ? $collection['Attributes'] : json_decode($collection['Attributes'], true))) : [],
                         'store_id' => $collection['StoreId'],
                         'module_id' => $module_id,
                         'status' => $collection['Status'] == 'active' ? 1 : 0,
@@ -1396,8 +1622,8 @@ class ItemController extends Controller
                 foreach ($chunk_items as $key => $chunk_item) {
                     //                    DB::table('items')->insert($chunk_item);
                     foreach ($chunk_item as $item) {
-                        $insertedId = DB::table('items')->insertGetId($item);
-                        Helpers::updateStorageTable(get_class(new Item), $insertedId, $item['image']);
+                        $newItem = Item::create($item);
+                        Helpers::updateStorageTable(get_class(new Item), $newItem->id, $item['image']);
                     }
                 }
                 DB::commit();
@@ -1429,7 +1655,7 @@ class ItemController extends Controller
                     Toastr::error(translate('messages.Discount_must_be_less_then_100') . ' ' . $collection['Id']);
                     return back();
                 }
-                if (data_get($collection, 'Image') != "" &&  strlen(data_get($collection, 'Image')) > 30) {
+                if (data_get($collection, 'Image') != "" && strlen(data_get($collection, 'Image')) > 30) {
                     Toastr::error(translate('messages.Image_name_must_be_in_30_char_on_id') . ' ' . $collection['Id']);
                     return back();
                 }
@@ -1450,9 +1676,9 @@ class ItemController extends Controller
                     'name' => $collection['Name'],
                     'description' => $collection['Description'],
                     'image' => $collection['Image'],
-                    'images' => $collection['Images'] ?? json_encode([]),
+                    'images' => isset($collection['Images']) ? (is_array($collection['Images']) ? $collection['Images'] : json_decode($collection['Images'], true)) : [],
                     'category_id' => $collection['SubCategoryId'] ? $collection['SubCategoryId'] : $collection['CategoryId'],
-                    'category_ids' => json_encode([['id' => $collection['CategoryId'], 'position' => 1], ['id' => $collection['SubCategoryId'], 'position' => 2]]),
+                    'category_ids' => [['id' => $collection['CategoryId'], 'position' => 1], ['id' => $collection['SubCategoryId'], 'position' => 2]],
                     'unit_id' => is_int($collection['UnitId']) ? $collection['UnitId'] : null,
                     'stock' => is_numeric($collection['Stock']) ? abs($collection['Stock']) : 0,
                     'price' => $collection['Price'],
@@ -1460,11 +1686,11 @@ class ItemController extends Controller
                     'discount_type' => $collection['DiscountType'],
                     'available_time_starts' => $collection['AvailableTimeStarts'] ?? '00:00:00',
                     'available_time_ends' => $collection['AvailableTimeEnds'] ?? '23:59:59',
-                    'variations' => $module_type == 'food' ? json_encode([]) : $collection['Variations'] ?? json_encode([]),
-                    'choice_options' => $module_type == 'food' ? json_encode([]) : $collection['ChoiceOptions'] ?? json_encode([]),
-                    'food_variations' => $module_type == 'food' ? $collection['Variations'] ?? json_encode([]) : json_encode([]),
-                    'add_ons' => $collection['AddOns'] ? ($collection['AddOns'] == "" ? json_encode([]) : $collection['AddOns']) : json_encode([]),
-                    'attributes' => $collection['Attributes'] ? ($collection['Attributes'] == "" ? json_encode([]) : $collection['Attributes']) : json_encode([]),
+                    'variations' => $module_type == 'food' ? [] : (isset($collection['Variations']) ? (is_array($collection['Variations']) ? $collection['Variations'] : json_decode($collection['Variations'], true)) : []),
+                    'choice_options' => $module_type == 'food' ? [] : (isset($collection['ChoiceOptions']) ? (is_array($collection['ChoiceOptions']) ? $collection['ChoiceOptions'] : json_decode($collection['ChoiceOptions'], true)) : []),
+                    'food_variations' => $module_type == 'food' ? (isset($collection['Variations']) ? (is_array($collection['Variations']) ? $collection['Variations'] : json_decode($collection['Variations'], true)) : []) : [],
+                    'add_ons' => $collection['AddOns'] ? ($collection['AddOns'] == "" ? [] : (is_array($collection['AddOns']) ? $collection['AddOns'] : json_decode($collection['AddOns'], true))) : [],
+                    'attributes' => $collection['Attributes'] ? ($collection['Attributes'] == "" ? [] : (is_array($collection['Attributes']) ? $collection['Attributes'] : json_decode($collection['Attributes'], true))) : [],
                     'store_id' => $collection['StoreId'],
                     'module_id' => $module_id,
                     'status' => $collection['Status'] == 'active' ? 1 : 0,
@@ -1490,9 +1716,12 @@ class ItemController extends Controller
             foreach ($chunk_items as $key => $chunk_item) {
                 //                DB::table('items')->upsert($chunk_item, ['id', 'module_id'], ['name', 'description', 'image', 'images', 'category_id', 'category_ids', 'unit_id', 'stock', 'price', 'discount', 'discount_type', 'available_time_starts', 'available_time_ends','choice_options', 'variations', 'food_variations', 'add_ons', 'attributes', 'store_id', 'status', 'veg', 'recommended']);
                 foreach ($chunk_item as $item) {
-                    if (isset($item['id']) && DB::table('items')->where('id', $item['id'])->exists()) {
-                        DB::table('items')->where('id', $item['id'])->update($item);
-                        Helpers::updateStorageTable(get_class(new Item), $item['id'], $item['image']);
+                    if (isset($item['id'])) {
+                        $existingItem = Item::find($item['id']);
+                        if ($existingItem) {
+                            $existingItem->update($item);
+                            Helpers::updateStorageTable(get_class(new Item), $item['id'], $item['image']);
+                        }
                     } else {
                         $insertedId = DB::table('items')->insertGetId($item);
                         Helpers::updateStorageTable(get_class(new Item), $insertedId, $item['image']);
@@ -1554,25 +1783,55 @@ class ItemController extends Controller
 
     public function stock_update(Request $request)
     {
-        $variations = [];
-        $stock_count = $request['current_stock'];
-        if ($request->has('type')) {
-            foreach ($request['type'] as $key => $str) {
-                $item = [];
-                $item['type'] = $str;
-                $item['price'] = abs($request['price_' . $key . '_' . str_replace('.', '_', $str)]);
-                $item['stock'] = abs($request['stock_' . $key . '_' . str_replace('.', '_', $str)]);
-                array_push($variations, $item);
+        $id = $request->id ?? $request->product_id;
+        $item = Item::withoutGlobalScope(StoreScope::class)->find($id);
+
+        if (!$item) {
+            if ($request->ajax()) {
+                return response()->json(['message' => translate('messages.product_not_found')], 404);
+            }
+            Toastr::error(translate('messages.product_not_found'));
+            return back();
+        }
+
+        // Handle generic field updates (for Product Gallery inline edit)
+        $fields = ['price', 'stock', 'cost_price', 'expiry_days', 'sku', 'ean'];
+        $updated = false;
+        foreach ($fields as $field) {
+            if ($request->has($field)) {
+                $item->$field = $request->$field;
+                $updated = true;
             }
         }
 
+        // Handle legacy variation stock update if type is present
+        if ($request->has('type')) {
+            $variations = [];
+            foreach ($request['type'] as $key => $str) {
+                $v = [];
+                $v['type'] = $str;
+                $v['price'] = abs($request['price_' . $key . '_' . str_replace('.', '_', $str)]);
+                $v['stock'] = abs($request['stock_' . $key . '_' . str_replace('.', '_', $str)]);
+                array_push($variations, $v);
+            }
+            $item->variations = json_encode($variations);
+            if ($request->has('current_stock')) {
+                $item->stock = $request->current_stock;
+            }
+            $updated = true;
+        }
 
-        $product = Item::withoutGlobalScope(StoreScope::class)->find($request['product_id']);
+        if ($updated) {
+            $item->save();
+        }
 
-        $product->stock = $stock_count ?? 0;
-        $product->variations = json_encode($variations);
-        $product->save();
-        Toastr::success(translate("messages.Stock_updated_successfully"));
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => translate('messages.product_updated_successfully')
+            ], 200);
+        }
+
+        Toastr::success(translate("messages.product_updated_successfully"));
         return back();
     }
 
@@ -1667,6 +1926,8 @@ class ItemController extends Controller
         $category_id = $request->query('category_id', 'all');
         $sub_category_id = $request->query('sub_category_id', 'all');
         $zone_id = $request->query('zone_id', 'all');
+        $brand_id = $request->query('brand_id', 'all');
+        $vat = $request->query('vat');
 
         $model = app("\\App\\Models\\Item");
         if ($request?->table && $request?->table == 'TempProduct') {
@@ -1694,6 +1955,14 @@ class ItemController extends Controller
                 return $query->whereHas('store', function ($q) use ($zone_id) {
                     return $q->where('zone_id', $zone_id);
                 });
+            })
+            ->when(is_numeric($brand_id), function ($query) use ($brand_id) {
+                return $query->whereHas('ecommerce_item_details', function ($q) use ($brand_id) {
+                    return $q->where('brand_id', $brand_id);
+                });
+            })
+            ->when($request->query('vat') !== null && $request->query('vat') !== '', function ($query) use ($request) {
+                return $query->where('tax', (float) $request->query('vat'));
             })
             ->when($request['search'], function ($query) use ($key) {
                 return $query->where(function ($q) use ($key) {
@@ -1765,7 +2034,7 @@ class ItemController extends Controller
                 $temp_variation['min'] = $option['min'] ?? 0;
                 $temp_variation['max'] = $option['max'] ?? 0;
                 $temp_variation['required'] = $option['required'] ?? 'off';
-                if ($option['min'] > 0 &&  $option['min'] > $option['max']) {
+                if ($option['min'] > 0 && $option['min'] > $option['max']) {
                     $validator->getMessageBag()->add('name', translate('messages.minimum_value_can_not_be_greater_then_maximum_value'));
                     return response()->json(['errors' => Helpers::error_processor($validator)]);
                 }
@@ -1864,8 +2133,8 @@ class ItemController extends Controller
         $type = $request->query('type', 'all');
         $filter = $request->query('filter');
         $key = explode(' ', $request['search']);
-        $from =  $request->query('from');
-        $to =  $request->query('to');
+        $from = $request->query('from');
+        $to = $request->query('to');
 
         $items = TempProduct::withoutGlobalScope(StoreScope::class)
             ->when($request->query('module_id', null), function ($query) use ($request) {
@@ -1933,7 +2202,7 @@ class ItemController extends Controller
 
         try {
 
-            if (Helpers::getNotificationStatusData('store', 'store_product_reject', 'push_notification_status', $data?->store->id)  &&  $data?->store?->vendor?->firebase_token) {
+            if (Helpers::getNotificationStatusData('store', 'store_product_reject', 'push_notification_status', $data?->store->id) && $data?->store?->vendor?->firebase_token) {
                 $ndata = [
                     'title' => translate('product_rejected'),
                     'description' => translate('Product_Request_Has_Been_Rejected_By_Admin'),
@@ -1952,7 +2221,7 @@ class ItemController extends Controller
             }
 
 
-            if (config('mail.status') && Helpers::get_mail_status('product_deny_mail_status_store')  == '1' &&  Helpers::getNotificationStatusData('store', 'store_product_reject', 'mail_status', $data?->store?->id)) {
+            if (config('mail.status') && Helpers::get_mail_status('product_deny_mail_status_store') == '1' && Helpers::getNotificationStatusData('store', 'store_product_reject', 'mail_status', $data?->store?->id)) {
                 Mail::to($data?->store?->vendor?->email)->send(new \App\Mail\VendorProductMail($data?->store?->name, 'denied'));
             }
         } catch (\Exception $e) {
@@ -1967,7 +2236,7 @@ class ItemController extends Controller
         $item = Item::withoutGlobalScope(StoreScope::class)->withoutGlobalScope('translate')->with('translations')->findOrfail($data->item_id);
 
         $item->name = $data->name;
-        $item->description =  $data->description;
+        $item->description = $data->description;
 
 
         if ($item->image) {
@@ -2005,7 +2274,7 @@ class ItemController extends Controller
 
         $item->organic = $data->organic;
         $item->is_halal = $data->is_halal;
-        $item->stock =  $data->stock;
+        $item->stock = $data->stock;
         $item->is_approved = 1;
 
         $item->save();
@@ -2048,7 +2317,7 @@ class ItemController extends Controller
 
         try {
 
-            if (Helpers::getNotificationStatusData('store', 'store_product_approve', 'push_notification_status', $item?->store->id)  &&  $item?->store?->vendor?->firebase_token) {
+            if (Helpers::getNotificationStatusData('store', 'store_product_approve', 'push_notification_status', $item?->store->id) && $item?->store?->vendor?->firebase_token) {
                 $data = [
                     'title' => translate('product_approved'),
                     'description' => translate('Product_Request_Has_Been_Approved_By_Admin'),
@@ -2067,7 +2336,7 @@ class ItemController extends Controller
             }
 
 
-            if (config('mail.status') && Helpers::get_mail_status('product_approve_mail_status_store') == '1' &&  Helpers::getNotificationStatusData('store', 'store_product_approve', 'mail_status', $item?->store?->id)) {
+            if (config('mail.status') && Helpers::get_mail_status('product_approve_mail_status_store') == '1' && Helpers::getNotificationStatusData('store', 'store_product_approve', 'mail_status', $item?->store?->id)) {
                 Mail::to($item?->store?->vendor?->email)->send(new \App\Mail\VendorProductMail($item?->store?->name, 'approved'));
             }
         } catch (\Exception $e) {
@@ -2081,11 +2350,22 @@ class ItemController extends Controller
     {
         $store_id = $request->query('store_id', 'all');
         $category_id = $request->query('category_id', 'all');
+        $status = $request->query('status', 'all');
         $type = $request->query('type', 'all');
-        $key = explode(' ', $request['search']);
-        $items = Item::withoutGlobalScope(StoreScope::class)
-            ->when($request->query('module_id', null), function ($query) use ($request) {
-                return $query->module($request->query('module_id'));
+        $sort_by = $request->query('sort_by', 'name_asc');
+
+        $moduleId = Config::get('module.current_module_id');
+        if (!$moduleId) {
+            $moduleId = $request->get('module_id') ?? session()->get('current_module');
+        }
+        if (!$moduleId) {
+            $firstModule = Module::active()->first();
+            $moduleId = $firstModule ? $firstModule->id : null;
+        }
+
+        $baseQuery = Item::with(['category', 'store', 'module'])->withoutGlobalScope(StoreScope::class)
+            ->when($moduleId, function ($query) use ($moduleId) {
+                return $query->module($moduleId);
             })
             ->when(is_numeric($store_id), function ($query) use ($store_id) {
                 return $query->where('store_id', $store_id);
@@ -2095,21 +2375,147 @@ class ItemController extends Controller
                     return $q->whereId($category_id)->orWhere('parent_id', $category_id);
                 });
             })
-            ->when($request['search'], function ($query) use ($key) {
-                return $query->where(function ($q) use ($key) {
-                    foreach ($key as $value) {
-                        $q->where('name', 'like', "%{$value}%");
-                    }
+            ->when(is_numeric($request->query('brand_id')), function ($query) use ($request) {
+                return $query->whereHas('ecommerce_item_details', function ($q) use ($request) {
+                    return $q->where('brand_id', $request->query('brand_id'));
                 });
-            })
-            ->orderByRaw("FIELD(name, ?) DESC", [$request['name']])
-            ->where('is_approved', 1)
-            ->module(Config::get('module.current_module_id'))
-            ->type($type)
-            // ->latest()->paginate(config('default_pagination'));
-            ->inRandomOrder()->limit(12)->get();
+            })->where('is_approved', 1);
+
+        // Stats calculation (before status filter to keep counts accurate)
+        $active_count = (clone $baseQuery)->where('status', 1)->count();
+        $draft_count = (clone $baseQuery)->where('status', 0)->count();
+        $oos_count = (clone $baseQuery)->where('stock', '<=', 0)->count();
+        $expiry_count = (clone $baseQuery)->whereNotNull('expiry_days')->where('expiry_days', '<=', 30)->where('expiry_days', '>', 0)->count();
+        $total_count = (clone $baseQuery)->count();
+        \file_put_contents('c:\laragon\www\6MartAdminpanel\search_debug.log', \date('Y-m-d H:i:s') . " - LOGGED - Total: " . $total_count . " | Request: " . \json_encode($request->all()) . "\n", FILE_APPEND);
+        \file_put_contents('c:\laragon\www\6MartAdminpanel\search_debug.log', \date('Y-m-d H:i:s') . " - LOGGED - Total: " . $total_count . " | Request: " . \json_encode($request->all()) . "\n", FILE_APPEND);
+
+        // Apply Status Filter
+        if ($status == 'active') {
+            $baseQuery->where('status', 1);
+        } elseif ($status == 'draft') {
+            $baseQuery->where('status', 0);
+        } elseif ($status == 'oos') {
+            $baseQuery->where('stock', '<=', 0);
+        } elseif ($status == 'expiry') {
+            $baseQuery->whereNotNull('expiry_days')->where('expiry_days', '<=', 30)->where('expiry_days', '>', 0);
+        }
+
+        // Apply Sorting
+        switch ($sort_by) {
+            case 'name_desc':
+                $baseQuery->orderBy('name', 'desc');
+                break;
+            case 'price_asc':
+                $baseQuery->orderBy('price', 'asc');
+                break;
+            case 'price_desc':
+                $baseQuery->orderBy('price', 'desc');
+                break;
+            case 'stock_asc':
+                $baseQuery->orderBy('stock', 'asc');
+                break;
+            case 'stock_desc':
+                $baseQuery->orderBy('stock', 'desc');
+                break;
+            case 'margin':
+                $baseQuery->select('*')->selectRaw('((price - cost_price) / price) * 100 as margin_val')
+                    ->orderBy('margin_val', 'desc');
+                break;
+            case 'expiry':
+                $baseQuery->orderBy('expiry_days', 'asc');
+                break;
+            case 'name_asc':
+            default:
+                $baseQuery->orderBy('name', 'asc');
+                break;
+        }
+
+        $items = $baseQuery->paginate(config('default_pagination'));
+
         $store = $store_id != 'all' ? Store::findOrFail($store_id) : null;
         $category = $category_id != 'all' ? Category::findOrFail($category_id) : null;
-        return view('admin-views.product.product_gallery', compact('items', 'store', 'category', 'type'));
+
+        $moduleId = Config::get('module.current_module_id');
+        $brands = Brand::active()->when($moduleId, function ($q) use ($moduleId) {
+            return $q->where('module_id', $moduleId);
+        })->orderBy('name')->get();
+
+        $categories = Category::where(['position' => 0])->active()
+            ->when($moduleId, function ($q) use ($moduleId) {
+                return $q->where('module_id', $moduleId);
+            })->orderBy('priority', 'desc')->get();
+
+        return view('admin-views.product.product_gallery', compact('items', 'store', 'category', 'type', 'active_count', 'draft_count', 'oos_count', 'expiry_count', 'total_count', 'brands', 'categories', 'moduleId'));
+    }
+
+    public function bulk_action(Request $request, $action)
+    {
+        $id_list = $request->input('id');
+
+        if (empty($id_list)) {
+            return response()->json(['message' => translate('messages.no_items_selected')], 400);
+        }
+
+        switch ($action) {
+            case 'active':
+                Item::withoutGlobalScope(StoreScope::class)->whereIn('id', $id_list)->update(['status' => 1]);
+                $message = translate('messages.items_activated_successfully');
+                break;
+            case 'draft':
+                Item::withoutGlobalScope(StoreScope::class)->whereIn('id', $id_list)->update(['status' => 0]);
+                $message = translate('messages.items_deactivated_successfully');
+                break;
+            case 'delete':
+                foreach ($id_list as $id) {
+                    $product = Item::withoutGlobalScope(StoreScope::class)->withoutGlobalScope('translate')->find($id);
+                    if ($product) {
+                        $product?->translations()->delete();
+                        $product?->taxVats()->delete();
+                        $product->delete();
+                    }
+                }
+                $message = translate('messages.items_deleted_successfully');
+                break;
+            case 'discount':
+                $discount_type = $request->input('discount_type', 'percent');
+                $discount_amount = $request->input('discount_amount', 0);
+                $discount_expiry = $request->input('discount_expiry');  // optional date string
+                $update_payload = [
+                    'discount' => $discount_amount,
+                    'discount_type' => $discount_type,
+                    'discount_expires_at' => $discount_expiry ? \Carbon\Carbon::parse($discount_expiry)->endOfDay() : null,
+                ];
+                Item::withoutGlobalScope(StoreScope::class)->whereIn('id', $id_list)->update($update_payload);
+                $message = translate('messages.discount_applied_successfully');
+                break;
+            default:
+                return response()->json(['message' => translate('messages.invalid_action')], 400);
+        }
+
+        return response()->json(['message' => $message]);
+    }
+
+    private function addOrUpdateMetaData(Request $request, $item_id)
+    {
+        $itemMetaData = ItemSeoData::updateOrCreate([
+            'item_id' => $item_id,
+        ]);
+
+        $imageFile = $request->hasFile('meta_image') ? $request->file('meta_image') : $itemMetaData?->image;
+        $originalExtension = $request->hasFile('meta_image') ? $imageFile->getClientOriginalExtension() : 'png';
+        if ($request->has('meta_image_deleted') && $request->meta_image_deleted == 1) {
+            Helpers::check_and_delete('item_meta_data/', $itemMetaData?->image);
+            $itemMetaData->image = null;
+        }
+
+        $itemMetaData->title = $request->meta_title;
+        $itemMetaData->description = $request->meta_description;
+        $itemMetaData->image = $request->file('meta_image') ? Helpers::upload(dir: 'item_meta_data/', format: $originalExtension, image: $imageFile) : $itemMetaData?->image;
+        $itemMetaData->meta_data = Helpers::formatMetaData($request->all(), $itemMetaData?->meta_data);
+
+        $itemMetaData?->save();
+
+        return true;
     }
 }

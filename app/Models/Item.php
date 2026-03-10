@@ -17,7 +17,7 @@ class Item extends Model
 {
     use HasFactory, ReportFilter;
     protected $guarded = ['id'];
-    protected $with = ['translations','storage'];
+    protected $with = ['translations', 'storage'];
     protected $casts = [
         'tax' => 'float',
         'price' => 'float',
@@ -44,6 +44,7 @@ class Item extends Model
         'rating_count' => 'integer',
         'unit_id' => 'integer',
         'is_halal' => 'integer',
+        'meta_data' => 'array',
     ];
 
     protected $appends = ['unit_type', 'image_full_url', 'images_full_url'];
@@ -350,7 +351,8 @@ class Item extends Model
         $slug = Str::slug($name);
         if ($max_slug = static::where('slug', 'like', "{$slug}%")->latest('id')->value('slug')) {
 
-            if ($max_slug == $slug) return "{$slug}-2";
+            if ($max_slug == $slug)
+                return "{$slug}-2";
 
             $max_slug = explode('-', $max_slug);
             $count = array_pop($max_slug);
@@ -365,5 +367,10 @@ class Item extends Model
     public function taxVats()
     {
         return $this->morphMany(Taxable::class, 'taxable');
+    }
+
+    public function seoData()
+    {
+        return $this->hasOne(ItemSeoData::class, 'item_id');
     }
 }

@@ -1,162 +1,132 @@
-
-@foreach($items as $key=>$item)
-    <div class="col-12">
-        <div class="card mb-3">
-            <!-- Body -->
-            <div class="card-body ml-2">
-                <div class="table-responsive">
-                    <div class="min-width-720">
-                    <div class="d-flex">
-                        <div>
-                            <img class="avatar avatar-xxl avatar-4by3 onerror-image aspect-ratio-1 h-unset"
-
-                            src="{{ $item['image_full_url'] ?? asset('public/assets/admin/img/160x160/img2.jpg') }}"
-                                data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
-                                alt="Image Description">
-                        </div>
-                        <div class="col-10">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <h4 class="mb-0 ml-4">{{ $item?->getRawOriginal('name') }} </h4>
-                                <div>
-                                    <a target="_blank" href="{{ route('admin.item.edit',['id' => $item->id , 'product_gellary' => true ]) }}" class="btn btn--sm btn-outline-primary">
-                                            {{ translate('messages.use_this_product_info') }}
-                                    </a>
-                                </div>
-                            </div>
-                            <table class="table table-borderless table-thead-bordered m-0">
-                                <tbody>
-                                    <tr>
-                                        <td class="px-4 max-w--220px product-gallery-info">
-                                            <h6 class="m-0 text-capitalize">{{ translate('General_Information') }}</h6>
-                                        </td>
-                                        <td class="px-4 product-gallery-info">
-                                            <h6 class="m-0 text-capitalize">{{ translate('Available_Variations') }}</h6>
-                                        </td>
-                                        <td>
-                                            <h6 class="m-0 text-capitalize">{{ translate('tags') }}</h6>
-                                        </td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-4 max-w--220px product-gallery-info">
-                                            <span class="d-block mb-1">
-                                                <span>{{ translate('messages.Category') }}</span>
-                                                <span>:</span>
-                                                <strong>{{ Str::limit(($item?->category?->parent ? $item?->category?->parent?->name : $item?->category?->name )  ?? translate('messages.uncategorize')
-                                                    , 20, '...') }}</strong>
-                                            </span>
-                                            <span class="d-block mb-1">
-                                                <span>{{ translate('messages.Sub_Category') }}</span>
-                                                <span>:</span>
-                                                <strong>{{ Str::limit(($item?->category?->name )  ?? translate('messages.uncategorize')
-                                                    , 20, '...') }}</strong>
-                                            </span>
-                                            @if ($item->module->module_type == 'grocery')
-                                            <span class="d-block mb-1">
-                                                <span>{{ translate('messages.Is_Organic') }}</span>
-                                                <span>:</span>
-                                                <strong> {{  $item->organic == 1 ?  translate('messages.yes') : translate('messages.no') }}</strong>
-                                            </span>
-                                            @endif
-                                            @if ($item->module->module_type == 'food')
-                                            <span class="d-block mb-1">
-                                                <span>{{ translate('messages.Item_type') }} : </span>
-                                                <span>:</span>
-                                                <strong> {{  $item->veg == 1 ?  translate('messages.veg') : translate('messages.non_veg') }}</strong>
-                                            </span>
-                                            @else
-                                                @if ($item?->unit)
-                                                <span class="d-block mb-1">
-                                                    <span>{{ translate('messages.Unit') }} : </span>
-                                                    <span>:</span>
-                                                    <strong> {{ $item?->unit?->unit  }}</strong>
-                                                </span>
-                                                @endif
-                                            @endif
-                                        </td>
-                                        <td class="px-4 product-gallery-info">
-                                            @if ($item->module->module_type == 'food')
-                                                @if ($item->food_variations && is_array(json_decode($item['food_variations'], true)))
-                                                    @foreach (json_decode($item->food_variations, true) as $variation)
-                                                        @if (isset($variation['price']))
-                                                            <span class="d-block mb-1 text-capitalize">
-                                                                <strong>
-                                                                    {{ translate('please_update_the_food_variations.') }}
-                                                                </strong>
-                                                            </span>
-                                                        @break
-
-                                                    @else
-                                                        <span class="d-block text-capitalize">
-                                                            <strong>
-                                                                {{ $variation['name'] }} -
-                                                            </strong>
-                                                            @if ($variation['type'] == 'multi')
-                                                                {{ translate('messages.multiple_select') }}
-                                                            @elseif($variation['type'] == 'single')
-                                                                {{ translate('messages.single_select') }}
-                                                            @endif
-                                                            @if ($variation['required'] == 'on')
-                                                                - ({{ translate('messages.required') }})
-                                                            @endif
-                                                        </span>
-
-                                                        @if ($variation['min'] != 0 && $variation['max'] != 0)
-                                                            ({{ translate('messages.Min_select') }}: {{ $variation['min'] }} -
-                                                            {{ translate('messages.Max_select') }}: {{ $variation['max'] }})
-                                                        @endif
-
-                                                        @if (isset($variation['values']))
-                                                            @foreach ($variation['values'] as $value)
-                                                                <span class="d-block text-capitalize">
-                                                                    <span>{{ $value['label'] }}</span> <span>:</span>
-                                                                    <strong>{{ \App\CentralLogics\Helpers::format_currency($value['optionPrice']) }}</strong>
-                                                                </span>
-                                                            @endforeach
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                        @else
-                                            @if ($item->variations && is_array(json_decode($item['variations'], true)))
-                                                @foreach (json_decode($item['variations'], true) as $variation)
-                                                    <span class="d-block mb-1 text-capitalize">
-                                                        <span>{{ $variation['type'] }} </span>
-                                                        <span>:</span>
-                                                        <strong>{{ \App\CentralLogics\Helpers::format_currency($variation['price']) }}</strong>
-                                                    </span>
-                                                @endforeach
-                                            @endif
-                                    </td>
-                                    @endif
-
-                                        <td>
-                                                @foreach($item->tags as $c) {{ $c->tag }}{{ !$loop->last ? ',' : '.'}} @endforeach
-                                        </td>
-
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                </tr>
-                            </tbody>
-                            </table>
-                        </div>
-                        </div>
-                        <div>
-                            <h6> {{ translate('description') }}:</h6>
-                            <P class="m-0"> {{ $item?->getRawOriginal('description') }}</P>
-                        </div>
-                    </div>
+@forelse($items as $key => $item)
+    <tr class="" id="row-{{ $item->id }}" data-id="{{ $item->id }}" data-cost="{{ $item->cost_price }}">
+        <td><input type="checkbox" class="row-check pc-check" value="{{ $item->id }}"
+                onchange="toggleRow({{ $item->id }}, this)"></td>
+        <td>
+            <div class="prod-cell">
+                <div class="prod-img">
+                    <img src="{{ $item['image_full_url'] ?? asset('public/assets/admin/img/160x160/img2.jpg') }}"
+                        onerror="this.src='{{ asset('public/assets/admin/img/160x160/img2.jpg') }}'" alt="">
                 </div>
-
-
+                <div>
+                    <div class="prod-name">{{ $item->name }}</div>
+                </div>
             </div>
-            <!-- End Body -->
-        </div>
-    </div>
-@endforeach
-<script src="{{asset('public/assets/admin')}}/js/view-pages/common.js"></script>
+        </td>
+        <td>
+            <div class="inline-val" onclick="editField({{ $item->id }}, 'sku', '{{ $item->sku }}', 'SKU')">
+                <span class="prod-sku">{{ $item->sku ? $item->sku : translate('messages.no_sku') }}</span>
+                <span class="inline-edit-icon">✏️</span>
+            </div>
+            <div class="inline-val" style="margin-top:2px; font-size:11px; color:var(--muted)"
+                onclick="editField({{ $item->id }}, 'ean', '{{ $item->ean }}', 'EAN')">
+                <span>{{ translate('EAN') }}: {{ $item->ean ? $item->ean : '—' }}</span>
+                <span class="inline-edit-icon" style="font-size:9px">✏️</span>
+            </div>
+        </td>
+        <td>
+            <div class="cat-crumb">
+                @if($item->category && isset($item->category->parent))
+                    {{ $item->category->parent->name }}
+                    <br><span>{{ $item->category->name }}</span>
+                @elseif($item->category)
+                    <span>{{ $item->category->name }}</span>
+                @else
+                    {{ translate('Uncategorized') }}
+                @endif
+            </div>
+        </td>
+        <td>
+            <div class="inline-val" onclick="editField({{ $item->id }}, 'price', {{ $item->price }}, 'Price (QAR)')">
+                {{ \App\CentralLogics\Helpers::format_currency($item->price) }}
+                <span class="inline-edit-icon">✏️</span>
+            </div>
+            <div class="cat-crumb" style="margin-top:2px">{{ translate('Cost') }}:
+                {{ \App\CentralLogics\Helpers::format_currency($item->cost_price) }}
+            </div>
+        </td>
+        <td>
+            @php
+                $margin = $item->price > 0 ? round((($item->price - $item->cost_price) / $item->price) * 100) : 0;
+                $marginClass = $margin >= 35 ? 'mp-good' : ($margin >= 20 ? 'mp-ok' : 'mp-bad');
+            @endphp
+            <div class="margin-pill {{ $marginClass }}"
+                onclick="editField({{ $item->id }}, 'cost_price', {{ $item->cost_price }}, 'Cost Price (QAR)')">
+                {{ $margin }}%
+            </div>
+        </td>
+        <td class="stock-cell">
+            <div class="inline-val" onclick="editField({{ $item->id }}, 'stock', {{ $item->stock }}, 'Stock Quantity')">
+                <span class="stock-num">{{ $item->stock }}</span>
+                <span class="inline-edit-icon">✏️</span>
+            </div>
+            @php
+                $stockPercent = min(100, max(0, ($item->stock / 500) * 100)); // Adjusted for demo visual
+                $stockFill = $item->stock == 0 ? 'sf-low' : ($item->stock < 20 ? 'sf-med' : 'sf-high');
+            @endphp
+            <div class="stock-bar-bg">
+                <div class="stock-bar-fill {{ $stockFill }}" style="width: {{ $stockPercent }}%"></div>
+            </div>
+        </td>
+        <td>
+            @php
+                $shelfLife = $item->expiry_days ?? 0;
+                $shelfClass = 'expiry-na';
+                $shelfLabel = '—';
+                if ($shelfLife > 0) {
+                    $shelfLabel = $shelfLife . ' ' . translate('Days');
+                    $shelfClass = $shelfLife <= 14 ? 'expiry-danger' : ($shelfLife <= 30 ? 'expiry-warn' : 'expiry-ok');
+                }
+            @endphp
+            <div class="inline-val {{ $shelfClass }}"
+                onclick="editField({{ $item->id }}, 'expiry_days', {{ $shelfLife }}, 'Min. Shelf Life (Days)')">
+                @if($shelfLife > 0 && $shelfLife <= 14) ⚠️ @elseif($shelfLife > 0 && $shelfLife <= 30) ⏰ @endif
+                {{ $shelfLabel }}
+                <span class="inline-edit-icon">✏️</span>
+            </div>
+        </td>
+        <td><span class="{{ $item->tax > 0 ? 'vat-active' : 'vat-zero' }}">{{ (float) $item->tax }}%</span></td>
+        <td>
+            @if($item->status == 1 && $item->stock > 0)
+                <span class="badge b-active"><span class="b-dot"></span> {{ translate('Active') }}</span>
+            @elseif($item->stock == 0)
+                <span class="badge b-oos"><span class="b-dot"></span> {{ translate('Out_of_Stock') }}</span>
+            @else
+                <span class="badge b-draft"><span class="b-dot"></span> {{ translate('Draft') }}</span>
+            @endif
+        </td>
+        <td>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <a title="{{translate('messages.use_this_product_info')}}"
+                    href="{{route('admin.item.edit', ['id' => $item['id'], 'product_gellary' => true])}}" class="ra-btn"
+                    style="background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600;white-space:nowrap">
+                    ✅ {{ translate('messages.use_this_product_info') }}
+                </a>
+                <a title="{{translate('messages.edit_product')}}" href="{{route('admin.item.edit', [$item['id']])}}"
+                    class="ra-btn">✏️ Edit</a>
+                <a title="{{translate('messages.view_product')}}" href="{{route('admin.item.view', [$item['id']])}}"
+                    class="ra-btn text-info" style="color:var(--slate)!important">👁️</a>
+                <a title="{{translate('messages.delete_product')}}" href="javascript:"
+                    onclick="form_alert('product-{{$item['id']}}','{{ translate('Want_to_delete_this_item') }}')"
+                    class="ra-btn del">🗑️</a>
+                <form action="{{route('admin.item.delete', [$item['id']])}}" method="post" id="product-{{$item['id']}}">
+                    @csrf @method('delete')
+                </form>
+            </div>
+        </td>
+    </tr>
+@empty
+    <tr>
+        <td colspan="10" class="text-center p-5">
+            <div class="empty-state">
+                <img src="{{asset('public/assets/admin/img/900x400/img1.jpg')}}"
+                    style="width:120px; opacity:0.5; margin-bottom:15px;">
+                <p style="color:var(--muted)">{{translate('messages.no_data_found')}}</p>
+                <a href="{{ route('admin.item.add-new', ['module_id' => Config::get('module.current_module_id')]) }}"
+                    class="btn btn-sm btn-primary">
+                    <i class="tio-add"></i> {{ translate('messages.add_new_product') }}
+                </a>
+            </div>
+        </td>
+    </tr>
+@endforelse

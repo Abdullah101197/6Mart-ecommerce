@@ -162,8 +162,8 @@
                                     </div>
                                     <div class="card-body">
                                         <div id="add_new_option">
-                                            @if (isset($product->food_variations) && count(json_decode($product->food_variations, true)) > 0)
-                                                @foreach (json_decode($product->food_variations, true) as $key_choice_options => $item)
+                                            @if (isset($product->food_variations) && count($product->food_variations) > 0)
+                                                @foreach ($product->food_variations as $key_choice_options => $item)
                                                     @if (isset($item['price']))
                                                         @break
 
@@ -181,7 +181,7 @@
                                         </div>
 
                                         <!-- Empty Variation -->
-                                        @if (!isset($product->food_variations) || count(json_decode($product->food_variations, true)) < 1)
+                                        @if (!isset($product->food_variations) || count($product->food_variations) < 1)
                                             <div id="empty-variation">
                                                 <div class="text-center">
                                                     <img src="{{ asset('/public/assets/admin/img/variation.png') }}"
@@ -239,7 +239,7 @@
                                                         class="form-control js-select2-custom" multiple="multiple">
                                                         @foreach (\App\Models\Attribute::orderBy('name')->get() as $attribute)
                                                             <option value="{{ $attribute['id'] }}"
-                                                                {{ in_array($attribute->id, json_decode($product['attributes'], true)) ? 'selected' : '' }}>
+                                                                {{ in_array($attribute->id, $product->attributes ?: []) ? 'selected' : '' }}>
                                                                 {{ $attribute['name'] }}</option>
                                                         @endforeach
                                                     </select>
@@ -251,10 +251,8 @@
                                                     <div class="customer_choice_options d-flex __gap-24px"
                                                         id="customer_choice_options">
                                                         @include('admin-views.product.partials._choices', [
-                                                            'choice_no' => json_decode($product['attributes']),
-                                                            'choice_options' => json_decode(
-                                                                $product['choice_options'],
-                                                                true),
+                                                            'choice_no' => $product->attributes,
+                                                            'choice_options' => $product->choice_options,
                                                         ])
                                                     </div>
                                                 </div>
@@ -264,9 +262,7 @@
                                                     @include(
                                                         'admin-views.product.partials._edit-combinations',
                                                         [
-                                                            'combinations' => json_decode(
-                                                                $product['variations'],
-                                                                true),
+                                                            'combinations' => $product->variations,
                                                             'stock' => config(
                                                                 'module.' . $product->module->module_type)['stock'],
                                                         ]
@@ -644,9 +640,9 @@
         });
 
         $(document).ready(function() {
-            @if (count(json_decode($product['add_ons'], true)) > 0)
+            @if (count($product->add_ons ?: []) > 0)
                 getStoreData(
-                    '{{ url('/') }}/admin/store/get-addons?@foreach (json_decode($product['add_ons'], true) as $addon)data[]={{ $addon }}& @endforeach store_id=',
+                    '{{ url('/') }}/admin/store/get-addons?@foreach ($product->add_ons ?: [] as $addon)data[]={{ $addon }}& @endforeach store_id=',
                     '{{ $product['store_id'] }}', 'add_on');
             @else
                 getStoreData('{{ url('/') }}/admin/store/get-addons?data[]=0&store_id=',

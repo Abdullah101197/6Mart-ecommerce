@@ -292,7 +292,7 @@
                                                     class="form-control js-select2-custom" multiple="multiple">
                                                     @foreach (\App\Models\Attribute::orderBy('name')->get() as $attribute)
                                                         <option value="{{ $attribute['id'] }}"
-                                                            {{ in_array($attribute->id, json_decode($product['attributes'], true)) ? 'selected' : '' }}>
+                                                            {{ in_array($attribute->id, $product->attributes ?: []) ? 'selected' : '' }}>
                                                             {{ $attribute['name'] }}</option>
                                                     @endforeach
                                                 </select>
@@ -301,10 +301,8 @@
                                         <div class="col-md-12">
                                             <div class="customer_choice_options" id="customer_choice_options">
                                                 @include('vendor-views.product.partials._choices', [
-                                                    'choice_no' => json_decode($product['attributes']),
-                                                    'choice_options' => json_decode(
-                                                        $product['choice_options'],
-                                                        true),
+                                                    'choice_no' => $product->attributes,
+                                                    'choice_options' => $product->choice_options,
                                                 ])
                                             </div>
                                         </div>
@@ -313,9 +311,7 @@
                                                 @include(
                                                     'vendor-views.product.partials._edit-combinations',
                                                     [
-                                                        'combinations' => json_decode(
-                                                            $product['variations'],
-                                                            true),
+                                                        'combinations' => $product->variations,
                                                         'stock' => $module_data['stock'],
                                                     ]
                                                 )
@@ -692,6 +688,31 @@
 
         $(function() {
             initImagePicker();
+            update_qty();
+        });
+
+        function update_qty() {
+            let total_qty = 0;
+            let qty_elements = $('input[name^="stock_"]');
+            for (let i = 0; i < qty_elements.length; i++) {
+                total_qty += parseInt(qty_elements.eq(i).val() || 0);
+            }
+            if (qty_elements.length > 0) {
+
+                $('input[name="current_stock"]').attr("readonly", true);
+                $('input[name="current_stock"]').val(total_qty);
+            } else {
+                $('input[name="current_stock"]').attr("readonly", false);
+            }
+        }
+
+        $(document).on('keyup', 'input[name^="stock_"]', function() {
+            let total_qty = 0;
+            let qty_elements = $('input[name^="stock_"]');
+            for (let i = 0; i < qty_elements.length; i++) {
+                total_qty += parseInt(qty_elements.eq(i).val() || 0);
+            }
+            $('input[name="current_stock"]').val(total_qty);
         });
 
         // $('#product_form').on('keydown', function(e) {

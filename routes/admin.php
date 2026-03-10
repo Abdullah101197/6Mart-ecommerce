@@ -112,6 +112,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('product_denied', 'ItemController@deny')->name('deny');
             Route::get('requested/item/view/{id}', 'ItemController@requested_item_view')->name('requested_item_view');
             Route::get('product-gallery', 'ItemController@product_gallery')->name('product_gallery');
+            Route::post('bulk/action/{action}', 'ItemController@bulk_action')->name('bulk-action');
 
             //ajax request
             Route::get('get-categories', 'ItemController@get_categories')->name('get-categories');
@@ -359,8 +360,10 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::post('review-section/update/{id}', 'BusinessSettingsController@review_update')->name('review-update');
             Route::delete('review/delete/{review}', 'BusinessSettingsController@review_destroy')->name('review-delete');
             Route::get('pages/react-landing-page-settings/{tab?}', 'BusinessSettingsController@react_landing_page_settings')->name('react-landing-page-settings');
-            Route::POST('pages/react-landing-page-settings/{tab?}',
-                'BusinessSettingsController@update_react_landing_page_settings')->name('react-landing-page-settings');
+            Route::POST(
+                'pages/react-landing-page-settings/{tab?}',
+                'BusinessSettingsController@update_react_landing_page_settings'
+            )->name('react-landing-page-settings');
             Route::DELETE('react-landing-page-settings/{tab}/{key}', 'BusinessSettingsController@delete_react_landing_page_settings')->name('react-landing-page-settings-delete');
             Route::get('review-react-status/{id}/{status}', 'BusinessSettingsController@review_react_status')->name('review-react-status');
             Route::get('pages/react-landing-page-settings/testimonials/review-react-list/edit/{id}', 'BusinessSettingsController@review_react_edit')->name('review-react-edit');
@@ -547,6 +550,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::put('automated-message/update', 'AutomatedMessageController@update')->name('automated_message.update');
             Route::get('automated-message/status/{id}/{status}', 'AutomatedMessageController@status')->name('automated_message.status');
             Route::delete('automated-message/destroy/{id}', 'AutomatedMessageController@destroy')->name('automated_message.destroy');
+            Route::get('automated-message/edit/{id}', 'AutomatedMessageController@edit')->name('automated_message.edit');
 
             Route::group(['namespace' => 'System', 'prefix' => 'system-addon', 'as' => 'system-addon.', 'middleware' => ['module:user_management']], function () {
                 Route::get('/', 'AddonController@index')->name('index');

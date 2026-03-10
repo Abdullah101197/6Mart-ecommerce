@@ -298,7 +298,7 @@
                                 @endif
                                 @if ($order->order_attachment)
                                     @php
-                                        $order_images = json_decode($order->order_attachment,true);
+                                        $order_images = json_decode($order->order_attachment,true) ?? [];
                                     @endphp
                                     <h5 class="text-dark">
                                         <span>{{ translate('messages.prescription') }}</span> <span>:</span>
@@ -1254,8 +1254,7 @@
                                                         href="javascript:">{{ translate('messages.confirmed') }}</a>
                                                         @if ($order->order_type != 'parcel')
                                                             @if ($order->store && $order->store->module->module_type == 'food')
-                                                                <a class="dropdown-item {{ $order['order_status'] == 'processing' ? 'active' : '' }} order_status_change_alert" data-url="{{ route('admin.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}" data-message="{{ translate('Change status to cooking ?') }}" data-processing={{ $max_processing_time }}
-                                                                href="javascript:">{{ translate('messages.processing') }}</a>
+                                                                <a href="javascript:" class="dropdown-item {{ $order['order_status'] == 'processing' ? 'active' : '' }} order_status_change_alert" data-url="{{ route('admin.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}" data-message="{{ translate('Change status to cooking ?') }}" data-processing="{{ $order->processing_time ?? 30 }}">{{ translate('messages.processing') }}</a>
                                                             @else
                                                                 <a class="dropdown-item {{ $order['order_status'] == 'processing' ? 'active' : '' }} route-alert"
                                                                 data-url="{{ route('admin.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}" data-message="{{ translate('Change status to processing ?') }}"
@@ -1271,7 +1270,7 @@
                                                         <a class="dropdown-item {{ $order['order_status'] == 'delivered' ? 'active' : '' }} route-alert"
                                                         data-url="{{ route('admin.order.status', ['id' => $order['id'], 'order_status' => 'delivered']) }}" data-message="{{ translate('Change status to delivered (payment status will be paid if not)?') }}"
                                                         href="javascript:">{{ translate('messages.delivered') }}</a>
-                                                        <a class="dropdown-item {{ $order['order_status'] == 'canceled' ? 'active' : '' }} canceled-status">{{ translate('messages.canceled') }}</a>
+                                                        <a class="dropdown-item {{ $order['order_status'] == 'canceled' ? 'active' : '' }}" data-toggle="modal" data-target="#offline_payment_cancel_orders">{{ translate('messages.canceled') }}</a>
                                                     </div>
 
                                                 </div>

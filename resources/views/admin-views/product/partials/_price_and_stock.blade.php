@@ -130,6 +130,36 @@
                         @endif
 
 
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="form-group mb-0 error-wrapper">
+                                <label class="input-label" for="sku">{{ translate('messages.sku') }}</label>
+                                <input type="text" class="form-control" name="sku" value="{{ $product?->sku ?? old('sku') }}" id="sku" placeholder="{{ translate('Ex: SKU-123') }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="form-group mb-0 error-wrapper">
+                                <label class="input-label" for="ean">{{ translate('messages.ean') }}</label>
+                                <input type="text" class="form-control" name="ean" value="{{ $product?->ean ?? old('ean') }}" id="ean" placeholder="{{ translate('Ex: 1234567890123') }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="form-group mb-0 error-wrapper">
+                                <label class="input-label" for="cost_price">{{ translate('messages.cost_price') }}</label>
+                                <input type="number" step="0.01" class="form-control" name="cost_price" value="{{ $product?->cost_price ?? old('cost_price', 0) }}" id="cost_price" placeholder="{{ translate('Ex: 80') }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="form-group mb-0 error-wrapper">
+                                <label class="input-label" for="expiry_days">{{ translate('messages.expiry_days') }}</label>
+                                <input type="number" class="form-control" name="expiry_days" value="{{ $product?->expiry_days ?? old('expiry_days') }}" id="expiry_days" placeholder="{{ translate('Ex: 365') }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-3">
+                            <div class="form-group mb-0 error-wrapper">
+                                <label class="input-label" for="discount_expires_at">{{ translate('messages.discount_expires_at') }}</label>
+                                <input type="datetime-local" class="form-control" name="discount_expires_at" value="{{ isset($product->discount_expires_at) ? \Carbon\Carbon::parse($product->discount_expires_at)->format('Y-m-d\TH:i') : old('discount_expires_at') }}" id="discount_expires_at">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

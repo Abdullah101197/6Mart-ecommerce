@@ -331,15 +331,16 @@ class Helpers
                 }
                 $item['recommended'] = (int) $item->recommended;
                 $categories = [];
-                foreach (json_decode($item['category_ids']) as $value) {
-                    $category_name = Category::where('id', $value->id)->pluck('name');
-                    $categories[] = ['id' => (string) $value->id, 'position' => $value->position, 'name' => data_get($category_name, '0', 'NA')];
+                foreach (($item['category_ids'] ?: []) as $value) {
+                    $value = (array) $value;
+                    $category_name = Category::where('id', $value['id'])->pluck('name');
+                    $categories[] = ['id' => (string) $value['id'], 'position' => $value['position'], 'name' => data_get($category_name, '0', 'NA')];
                 }
                 $item['category_ids'] = $categories;
-                $item['attributes'] = json_decode($item['attributes']);
-                $item['choice_options'] = json_decode($item['choice_options']);
-                $item['add_ons'] = self::addon_data_formatting(AddOn::whereIn('id', json_decode($item['add_ons'], true))->active()->get(), true, $trans, $local);
-                foreach (json_decode($item['variations'], true) ?? [] as $var) {
+                $item['attributes'] = $item['attributes'] ?: [];
+                $item['choice_options'] = $item['choice_options'] ?: [];
+                $item['add_ons'] = self::addon_data_formatting(AddOn::whereIn('id', $item['add_ons'] ?: [])->active()->get(), true, $trans, $local);
+                foreach (($item['variations'] ?: []) as $var) {
                     array_push($variations, [
                         'type' => $var['type'],
                         'price' => (float) $var['price'],
@@ -370,7 +371,7 @@ class Helpers
                 $item['tax'] = 0;
                 $item['unit'] = $item->unit;
                 $item['rating_count'] = (int) ($item->rating ? array_sum(json_decode($item->rating, true)) : 0);
-                $item['avg_rating'] = (float) ($item->avg_rating ? $item->avg_rating : 0);
+                $item['avg_rating'] = (float) ($item->avg_rating ?: 0);
                 $item['recommended'] = (int) $item->recommended;
                 $item['min_delivery_time'] = (int) explode('-', $item?->store?->delivery_time)[0] ?? 0;
                 $item['max_delivery_time'] = (int) explode('-', $item?->store?->delivery_time)[1] ?? 0;
@@ -390,6 +391,14 @@ class Helpers
                 $item['tax_data'] = $item?->taxVats ? $item?->taxVats()->pluck('tax_id')->toArray() : [];
 
                 $item['tax_data'] = \Modules\TaxModule\Entities\Tax::whereIn('id', $item['tax_data'])->get(['id', 'name', 'tax_rate']);
+
+                if($item->module->module_type == 'ecommerce') {
+                    $item['meta_title'] = $item?->seoData?->title;
+                    $item['meta_description'] = $item?->seoData?->description;
+                    $item['meta_image'] = $item?->seoData?->imageFullUrl;
+                    $item['meta_data'] = $item?->seoData?->meta_data;
+                }
+
                 unset($item['taxVats']);
 
 
@@ -442,7 +451,7 @@ class Helpers
                 unset($data['end_date']);
             }
             $data['variations'] = $variations;
-            $data['food_variations'] = $data['food_variations'] ? json_decode($data['food_variations'], true) : '';
+            $data['food_variations'] = $data['food_variations'] ?: '';
             $data['store_name'] = $data->store->name;
             $data['is_campaign'] = $data->store?->campaigns_count > 0 ? 1 : 0;
             $data['module_type'] = $data->module->module_type;
@@ -2122,16 +2131,16 @@ class Helpers
                     $image = $image->encode(new WebpEncoder(quality: 80));
                     $format = 'webp';
                 }
-                $imageName = \Carbon\Carbon::now()->toDateString().'-'.uniqid().'.'.$format;
+                $imageName = \Carbon\Carbon::now()->toDateString() . '-' . uniqid() . '.' . $format;
 
-                if (! Storage::disk(self::getDisk())->exists($dir)) {
+                if (!Storage::disk(self::getDisk())->exists($dir)) {
                     Storage::disk(self::getDisk())->makeDirectory($dir);
                 }
 
                 if ($image instanceof UploadedFile) {
                     Storage::disk(self::getDisk())->putFileAs($dir, $image, $imageName);
                 } else {
-                    Storage::disk(self::getDisk())->put($dir.'/'.$imageName, $image->toString());
+                    Storage::disk(self::getDisk())->put($dir . '/' . $imageName, $image->toString());
                 }
 
             } else {
@@ -4731,61 +4740,61 @@ class Helpers
 
     public static function validateFile($image)
     {
-        if (! $image instanceof UploadedFile) {
+        if (!$image instanceof UploadedFile) {
             throw new InvalidUploadException('Invalid file upload.');
         }
 
         if ($image->getSize() > MAX_FILE_SIZE * 1024 * 1024) {
-            throw new InvalidUploadException('File size exceeds the limit of '.MAX_FILE_SIZE.'MB');
+            throw new InvalidUploadException('File size exceeds the limit of ' . MAX_FILE_SIZE . 'MB');
         }
 
-        $allowedExtensions = explode(',', IMAGE_EXTENSION.','.VIDEO_EXTENSION.','.DOCUMENT_EXTENSION.','.AUDIO_EXTENSION.','.FILE_EXTENSION);
+        $allowedExtensions = explode(',', IMAGE_EXTENSION . ',' . VIDEO_EXTENSION . ',' . DOCUMENT_EXTENSION . ',' . AUDIO_EXTENSION . ',' . FILE_EXTENSION);
         $allowedExtensions = array_map(function ($ext) {
             return str_replace('.', '', trim($ext));
         }, $allowedExtensions);
 
         $extension = strtolower($image->getClientOriginalExtension());
 
-        if(!$extension || $extension == '') {
-            $extension= self::extensionFromMimeType($image->getMimeType());
+        if (!$extension || $extension == '') {
+            $extension = self::extensionFromMimeType($image->getMimeType());
         }
 
-        if (! in_array($extension, $allowedExtensions)) {
+        if (!in_array($extension, $allowedExtensions)) {
             throw new InvalidUploadException('File type not allowed.');
         }
     }
 
-   public static function extensionFromMimeType(string $mimeType): string
+    public static function extensionFromMimeType(string $mimeType): string
     {
         $mimeType = strtolower($mimeType);
 
         $map = [
-        // images
-        'image/jpeg' => 'jpg',   // jpeg / jpg
-        'image/png'  => 'png',
-        'image/gif'  => 'gif',
-        'image/webp' => 'webp',
+            // images
+            'image/jpeg' => 'jpg',   // jpeg / jpg
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
 
-        // video
-        'video/mp4'  => 'mp4',
-        'video/webm' => 'webm',
-        'video/ogg'  => 'ogg',
+            // video
+            'video/mp4' => 'mp4',
+            'video/webm' => 'webm',
+            'video/ogg' => 'ogg',
 
-        // audio
-        'audio/mpeg' => 'mp3',
-        'audio/wav'  => 'wav',
-        'audio/ogg'  => 'ogg',
+            // audio
+            'audio/mpeg' => 'mp3',
+            'audio/wav' => 'wav',
+            'audio/ogg' => 'ogg',
 
-        // documents
-        'application/pdf' => 'pdf',
-        'application/msword' => 'doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-        'application/vnd.ms-excel' => 'excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'excel',
+            // documents
+            'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'application/vnd.ms-excel' => 'excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'excel',
 
-        // archive / misc
-        'application/zip' => 'zip',
-        'application/octet-stream' => 'p8',
+            // archive / misc
+            'application/zip' => 'zip',
+            'application/octet-stream' => 'p8',
         ];
 
         if (isset($map[$mimeType])) {
@@ -4795,6 +4804,122 @@ class Helpers
         return explode('/', $mimeType)[1] ?? '';
     }
 
+    public static function seoPageList()
+    {
+        return [
+            'home_page', 'top_offers_page', 'brands_page', 'search_page', 'vehicle_search_page', 'about_us_page', 'contact_us_page', 'store_join_page', 'deliveryman_join_page', 'terms_and_conditions_page', 'privacy_policy_page', 'refund_policy_page', 'cancellation_policy_page', 'shipping_policy_page', 'latest_store_page', 'flash_sales', 'popular_store_page',
+        ];
+    }
+
+    public static function formatMetaData(array $input, $oldMeta = [])
+    {
+        $meta = $oldMeta ?? [];
+        $meta['meta_index'] = ($input['meta_index'] ?? 1);
+        $meta['meta_no_follow'] = $input['meta_no_follow'] ?? null;
+        $meta['meta_no_image_index'] = $input['meta_no_image_index'] ?? null;
+        $meta['meta_no_archive'] = $input['meta_no_archive'] ?? null;
+        $meta['meta_no_snippet'] = $input['meta_no_snippet'] ?? null;
+        $meta['meta_max_snippet'] = (int) ($input['meta_max_snippet'] ?? 0);
+        $meta['meta_max_snippet_value'] = isset($input['meta_max_snippet_value']) ? (int) $input['meta_max_snippet_value'] : null;
+        $meta['meta_max_video_preview'] = (int) ($input['meta_max_video_preview'] ?? 0);
+        $meta['meta_max_video_preview_value'] = isset($input['meta_max_video_preview_value']) ? (int) $input['meta_max_video_preview_value'] : null;
+        $meta['meta_max_image_preview'] = (int) ($input['meta_max_image_preview'] ?? 0);
+        $meta['meta_max_image_preview_value'] = $input['meta_max_image_preview_value'] ?? null;
+
+        return $meta;
+    }
+
+    public static function getDecimalPlaces()
+    {
+        $decimalPlaces = (int) config('round_up_to_digit');
+        return number_format(pow(10, -$decimalPlaces), $decimalPlaces, '.', '');
+
+    }
+
+    public static function getLanguages()
+    {
+        return LANGUAGES;
+    }
+
+    public static function getCountries()
+    {
+        return COUNTIRES;
+    }
+
+    public static function setZoneIds($request)
+    {
+
+        if (!$request->hasHeader('zoneId') || empty($request->header('zoneId'))) {
+            $zone = \App\Models\Zone::where('status', 1)->where('is_default', 1)->first() ?? \App\Models\Zone::first();
+
+            if (!$zone) {
+                throw new \App\Exceptions\ZoneModuleException(translate('No zone is available'));
+            }
+
+            if ($request->hasHeader('moduleId')) {
+                $moduleId = getModuleId($request->header('moduleId'));
+                if (!in_array($moduleId, $zone->modules()?->pluck('module_id')?->toArray())) {
+                    throw new \App\Exceptions\ZoneModuleException(translate('Currently this module is available'));
+                }
+            }
+            $request->headers->set('zoneId', json_encode([$zone->id]));
+        }
+
+        return true;
+    }
+
+
+    public static function addPreviousParcelReturnFees()
+    {
+        if (\App\Models\ParcelReturnFees::query()->doesntExist()) {
+            \App\Models\ParcelCancellation::where('return_fee_payment_status', 'paid')
+                ->where('return_fee', '>', 0)
+                ->with('order:id,delivery_man_id,user_id')
+                ->chunk(500, function ($cancellations) {
+
+                    foreach ($cancellations as $cancellation) {
+
+                        $returnFeeLog = \App\Models\ParcelReturnFees::create([
+                            'order_id'        => $cancellation->order_id,
+                            'delivery_man_id' => $cancellation->order->delivery_man_id ?? null,
+                            'user_id'         => $cancellation->order->user_id,
+                            'amount'      => $cancellation->return_fee,
+                        ]);
+
+                        $returnFeeLog->update([
+                            'transaction_id' => self::generate_transaction_id($returnFeeLog)
+                        ]);
+                    }
+                });
+        }
+    }
+    public static function maxUploadSizeMb(): int
+    {
+        try {
+            $serverLimit = self::sizeToMb(ini_get('post_max_size'));
+            return min(MAX_FILE_SIZE, $serverLimit);
+        } catch (\Throwable $e) {
+            return MAX_FILE_SIZE;
+        }
+    }
+
+    public static function sizeToMb($value): int
+    {
+        $value = trim((string) $value);
+        $unit = strtolower(substr($value, -1));
+        $num = (int) $value;
+
+        switch ($unit) {
+            case 'g':
+                return $num * 1024;
+            case 'm':
+                return $num;
+            case 'k':
+                return (int) ceil($num / 1024);
+            default:
+                return $num;
+        }
+    }
 }
 
 

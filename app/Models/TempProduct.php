@@ -28,38 +28,47 @@ class TempProduct extends Model
         'organic' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'veg'=>'integer',
-        'images'=>'array',
-        'module_id'=>'integer',
-        'item_id'=>'integer',
-        'is_rejected'=>'integer',
-        'stock'=>'integer',
+        'veg' => 'integer',
+        'images' => 'array',
+        'module_id' => 'integer',
+        'item_id' => 'integer',
+        'is_rejected' => 'integer',
+        'stock' => 'integer',
+        'choice_options' => 'array',
+        'variations' => 'array',
+        'add_ons' => 'array',
+        'attributes' => 'array',
+        'food_variations' => 'array',
+        'category_ids' => 'array',
+        'rating' => 'array',
     ];
     protected $guarded = ['id'];
-    protected $appends = ['image_full_url','images_full_url'];
-    public function getImageFullUrlAttribute(){
+    protected $appends = ['image_full_url', 'images_full_url'];
+    public function getImageFullUrlAttribute()
+    {
         $value = $this->image;
         if (count($this->storage) > 0) {
             foreach ($this->storage as $storage) {
                 if ($storage['key'] == 'image') {
-                    return Helpers::get_full_url('product',$value,$storage['value']);
+                    return Helpers::get_full_url('product', $value, $storage['value']);
                 }
             }
         }
 
-        return Helpers::get_full_url('product',$value,'public');
+        return Helpers::get_full_url('product', $value, 'public');
     }
-    public function getImagesFullUrlAttribute(){
+    public function getImagesFullUrlAttribute()
+    {
         $images = [];
         $value = is_array($this->images)
             ? $this->images
             : ($this->images && is_string($this->images) && $this->isValidJson($this->images)
                 ? json_decode($this->images, true)
                 : []);
-        if ($value){
-            foreach ($value as $item){
-                $item = is_array($item)?$item:(is_object($item) && get_class($item) == 'stdClass' ? json_decode(json_encode($item), true):['img' => $item, 'storage' => 'public']);
-                $images[] = Helpers::get_full_url('product',$item['img'],$item['storage']);
+        if ($value) {
+            foreach ($value as $item) {
+                $item = is_array($item) ? $item : (is_object($item) && get_class($item) == 'stdClass' ? json_decode(json_encode($item), true) : ['img' => $item, 'storage' => 'public']);
+                $images[] = Helpers::get_full_url('product', $item['img'], $item['storage']);
             }
         }
 
@@ -85,14 +94,17 @@ class TempProduct extends Model
     {
         return $this->morphMany(Translation::class, 'translationable');
     }
-    public function item(){
-        return $this->belongsTo(Item::class,'item_id');
+    public function item()
+    {
+        return $this->belongsTo(Item::class, 'item_id');
     }
-    public function common_condition(){
-        return $this->belongsTo(CommonCondition::class,'common_condition_id');
+    public function common_condition()
+    {
+        return $this->belongsTo(CommonCondition::class, 'common_condition_id');
     }
-    public function brand(){
-        return $this->belongsTo(Brand::class,'brand_id');
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function pharmacy_item_details()
@@ -106,12 +118,9 @@ class TempProduct extends Model
 
     public function scopeType($query, $type)
     {
-        if($type == 'veg')
-        {
+        if ($type == 'veg') {
             return $query->where('veg', true);
-        }
-        else if($type == 'non_veg')
-        {
+        } else if ($type == 'non_veg') {
             return $query->where('veg', false);
         }
 
@@ -119,12 +128,12 @@ class TempProduct extends Model
     }
     public function unit()
     {
-        return $this->belongsTo(Unit::class,'unit_id');
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 
     public function module()
     {
-        return $this->belongsTo(Module::class,'module_id');
+        return $this->belongsTo(Module::class, 'module_id');
     }
     public function store()
     {
@@ -143,20 +152,21 @@ class TempProduct extends Model
 
     protected static function booted()
     {
-        if(auth('vendor')->check() || auth('vendor_employee')->check())
-        {
+        if (auth('vendor')->check() || auth('vendor_employee')->check()) {
             static::addGlobalScope(new StoreScope);
         }
         static::addGlobalScope(new ZoneScope);
-        static::addGlobalScope('storage', function ($builder) {
-            $builder->with('storage');
+        static::addGlobalScope('translate', function (Builder $builder) {
+            $builder->with(['translations' => function ($query) {
+                return $query->where('locale', app()->getLocale());
+            }]);
         });
     }
     protected static function boot()
     {
         parent::boot();
         static::saved(function ($model) {
-            if($model->isDirty('image')){
+            if ($model->isDirty('image')) {
                 $value = Helpers::getDisk();
 
                 DB::table('storages')->updateOrInsert([
@@ -169,7 +179,7 @@ class TempProduct extends Model
                     'updated_at' => now(),
                 ]);
             }
-            if($model->isDirty('images')){
+            if ($model->isDirty('images')) {
                 $value = Helpers::getDisk();
 
                 DB::table('storages')->updateOrInsert([
@@ -185,8 +195,13 @@ class TempProduct extends Model
         });
 
     }
-       public function taxVats()
+    public function taxVats()
     {
         return $this->morphMany(Taxable::class, 'taxable');
+    }
+
+    public function seoData()
+    {
+        return $this->hasOne(ItemSeoData::class, 'temp_item_id');
     }
 }
