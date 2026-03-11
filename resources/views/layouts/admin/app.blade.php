@@ -37,6 +37,7 @@ $countryCode= strtolower($country?$country:'auto');
 
     <script src="{{asset('assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')}}"></script>
     <link rel="stylesheet" href="{{asset('assets/admin/css/toastr.css')}}">
+    <script src="{{asset('assets/admin')}}/js/vendor.min.js"></script>
 </head>
 
 <body class="footer-offset">
@@ -302,7 +303,6 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
 @stack('script')
 <!-- JS Front -->
 
-<script src="{{asset('assets/admin')}}/js/vendor.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/jquery.validate.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/theme.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/sweet_alert.js"></script>

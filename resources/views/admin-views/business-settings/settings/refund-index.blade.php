@@ -172,9 +172,7 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$reason->id}}">
-                                                <input type="checkbox" data-url="{{route('admin.refund.reason_status',[$reason['id'],$reason->status?0:1])}}" class="toggle-switch-input redirect-url" id="stocksCheckbox{{$reason->id}}" {{$reason->status?'checked':''}}>
-                                                    <span class="toggle-switch-label">
+                                                <input type="checkbox" data-url="{{route('admin.refund.reason-status',[$reason['id'],$reason->status?0:1])}}" class="toggle-switch-input redirect-url" id="stocksCheckbox{{$reason->id}}" {{$reason->status?'checked':''}}>
                                                         <span class="toggle-switch-indicator"></span>
                                                     </span>
                                                 </label>
@@ -197,8 +195,7 @@
 
                                                 title="{{translate('messages.delete')}}">
                                                 <i class="tio-delete-outlined"></i>
-                                            </a>
-                                                    <form action="{{route('admin.refund.reason_delete',[$reason['id']])}}"
+                                                    <form action="{{route('admin.refund.reason-delete',[$reason['id']])}}"
                                                     method="post" id="refund_reason-{{$reason['id']}}">
                                                 @csrf @method('delete')
                                             </form>

@@ -318,9 +318,9 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('settings', 'OrderController@refund_settings')->name('refund_settings');
             Route::get('refund_mode', 'OrderController@refund_mode')->name('refund_mode');
             Route::post('refund_reason', 'OrderController@refund_reason')->name('refund_reason');
-            Route::get('/status/{id}/{status}', 'OrderController@reason_status')->name('reason_status');
-            Route::put('reason_edit/', 'OrderController@reason_edit')->name('reason_edit');
-            Route::delete('reason_delete/{id}', 'OrderController@reason_delete')->name('reason_delete');
+            Route::get('/status/{id}/{status}', 'OrderController@reason_status')->name('reason-status');
+            Route::put('reason_edit/', 'OrderController@reason_edit')->name('reason-edit');
+            Route::delete('reason_delete/{id}', 'OrderController@reason_delete')->name('reason-delete');
             Route::put('order_refund_rejection/', 'OrderController@order_refund_rejection')->name('order_refund_rejection');
             Route::get('/{status}', 'OrderController@list')->name('refund_attr');
         });
@@ -339,6 +339,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::post('update-store', 'BusinessSettingsController@update_store')->name('update-store');
             Route::post('update-order', 'BusinessSettingsController@update_order')->name('update-order');
             Route::post('update-priority', 'BusinessSettingsController@update_priority')->name('update-priority');
+            Route::post('update-payment-setup', 'BusinessSettingsController@updatePaymentSetup')->name('update-payment-setup');
             Route::get('app-settings', 'BusinessSettingsController@app_settings')->name('app-settings');
             Route::POST('app-settings', 'BusinessSettingsController@update_app_settings')->name('app-settings');
             Route::get('pages/admin-landing-page-settings/{tab?}', 'BusinessSettingsController@admin_landing_page_settings')->name('admin-landing-page-settings');
@@ -428,6 +429,14 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
             Route::get('toggle-settings/{key}/{value}', 'BusinessSettingsController@toggle_settings')->name('toggle-settings');
             Route::get('site_direction', 'BusinessSettingsController@site_direction')->name('site_direction');
+
+            Route::group(['as' => 'seo-settings.'], function () {
+                Route::get('page-meta-data', 'BusinessSettingsController@pageMetaData')->name('pageMetaData');
+                Route::post('page-meta-data-update', 'BusinessSettingsController@pageMetaDataUpdate')->name('pageMetaDataUpdate');
+            });
+
+            Route::get('websocket', 'BusinessSettingsController@websocket')->name('websocket');
+            Route::post('update-websocket', 'BusinessSettingsController@update_websocket')->name('update-websocket');
 
 
             Route::get('fcm-index', 'BusinessSettingsController@fcm_index')->name('fcm-index');

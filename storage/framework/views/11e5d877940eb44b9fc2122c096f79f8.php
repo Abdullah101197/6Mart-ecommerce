@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title',translate('Withdraw Request')); ?>
 
 <?php $__env->startPush('css_or_js'); ?>
@@ -10,7 +12,7 @@
         <div class="page-header">
             <h1 class="page-header-title mr-3 mb-md-0">
                 <span class="page-header-icon">
-                    <img src="<?php echo e(asset('public/assets/admin/img/icons/wallet.png')); ?>" class="w--26" alt="">
+                    <img src="<?php echo e(asset('assets/admin/img/icons/wallet.png')); ?>" class="w--26" alt="">
                 </span>
                 <span>
                     <?php echo e(translate('messages.store_withdraw_transaction')); ?>
@@ -82,14 +84,14 @@
                             <span class="dropdown-header"><?php echo e(translate('messages.download_options')); ?></span>
                             <a id="export-excel" class="dropdown-item" href="<?php echo e(route('admin.transactions.store.withdraw_export', ['type'=>'excel',request()->getQueryString()])); ?>">
                                 <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                    src="<?php echo e(asset('public/assets/admin')); ?>/svg/components/excel.svg"
+                                    src="<?php echo e(asset('assets/admin')); ?>/svg/components/excel.svg"
                                     alt="Image Description">
                                 <?php echo e(translate('messages.excel')); ?>
 
                             </a>
                             <a id="export-csv" class="dropdown-item" href="<?php echo e(route('admin.transactions.store.withdraw_export', ['type'=>'csv',request()->getQueryString()])); ?>">
                                 <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                    src="<?php echo e(asset('public/assets/admin')); ?>/svg/components/placeholder-csv-format.svg"
+                                    src="<?php echo e(asset('assets/admin')); ?>/svg/components/placeholder-csv-format.svg"
                                     alt="Image Description">
                                 .<?php echo e(translate('messages.csv')); ?>
 
@@ -166,7 +168,7 @@
             </div>
             <?php if(count($withdraw_req) === 0): ?>
             <div class="empty--data">
-                <img src="<?php echo e(asset('/public/assets/admin/svg/illustrations/sorry.svg')); ?>" alt="public">
+                <img src="<?php echo e(asset('/assets/admin/svg/illustrations/sorry.svg')); ?>" alt="public">
                 <h5>
                     <?php echo e(translate('no_data_found')); ?>
 

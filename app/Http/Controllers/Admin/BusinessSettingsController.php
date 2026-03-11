@@ -64,7 +64,7 @@ class BusinessSettingsController extends Controller
             'delivery_boy_assign_message','delivery_boy_start_message','delivery_boy_delivered_message','customer_verification','order_handover_message',
             'order_cancled_message','order_refunded_message'];
 
-    BusinessSetting::whereIn('key',$keys)->delete();
+// BusinessSetting::whereIn('key',$keys)->delete();
 
     $language = getWebConfig('language');
     $type = $request->input('type');
@@ -118,7 +118,7 @@ class BusinessSettingsController extends Controller
                     true
                 )
             )['status'] ?? null;
-            $offline_payment_status = BusinessSetting::where('key', 'offline_payment_status')->first()->value;
+            $offline_payment_status = BusinessSetting::where('key', 'offline_payment_status')->first()?->value;
             return view('admin-views.business-settings.settings.payment-index', compact('digital_payment_methods_count', 'offline_payment_methods_count', 'cash_on_delivery_status', 'digital_payment_status', 'offline_payment_status'));
 
         case 'deliveryman':

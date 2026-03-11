@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title',translate('low_stock_list')); ?>
 <?php $__env->startSection('low_stock_list'); ?>
 active
@@ -9,7 +11,7 @@ active
     <div class="page-header">
         <h1 class="page-header-title">
             <span class="page-header-icon">
-                <img src="<?php echo e(asset('public/assets/admin/img/report.png')); ?>" class="w--22" alt="">
+                <img src="<?php echo e(asset('assets/admin/img/report.png')); ?>" class="w--22" alt="">
             </span>
             <span>
                 <?php echo e(translate('low_stock_list')); ?>
@@ -68,14 +70,14 @@ active
                         <span class="dropdown-header"><?php echo e(translate('messages.download_options')); ?></span>
                         <a id="export-excel" class="dropdown-item" href="<?php echo e(route('admin.transactions.report.stock-wise-report-export', ['type'=>'excel',request()->getQueryString()])); ?>">
                             <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                src="<?php echo e(asset('public/assets/admin')); ?>/svg/components/excel.svg"
+                                src="<?php echo e(asset('assets/admin')); ?>/svg/components/excel.svg"
                                 alt="Image Description">
                             <?php echo e(translate('messages.excel')); ?>
 
                         </a>
                         <a id="export-csv" class="dropdown-item" href="<?php echo e(route('admin.transactions.report.stock-wise-report-export', ['type'=>'csv',request()->getQueryString()])); ?>">
                             <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                src="<?php echo e(asset('public/assets/admin')); ?>/svg/components/placeholder-csv-format.svg"
+                                src="<?php echo e(asset('assets/admin')); ?>/svg/components/placeholder-csv-format.svg"
                                 alt="Image Description">
                             .<?php echo e(translate('messages.csv')); ?>
 
@@ -127,8 +129,8 @@ active
                             <a class="media align-items-center" href="<?php echo e(route('admin.item.view',[$item['id'],'module_id'=>$item['module_id']])); ?>">
                                 <img class="avatar avatar-lg mr-3 onerror-image"
 
-                                src="<?php echo e($item['image_full_url'] ?? asset('public/assets/admin/img/160x160/img2.jpg')); ?>"
-                                 data-onerror-image="<?php echo e(asset('public/assets/admin/img/160x160/img2.jpg')); ?>" alt="<?php echo e($item->name); ?> image">
+                                src="<?php echo e($item['image_full_url'] ?? asset('assets/admin/img/160x160/img2.jpg')); ?>"
+                                 data-onerror-image="<?php echo e(asset('assets/admin/img/160x160/img2.jpg')); ?>" alt="<?php echo e($item->name); ?> image">
                                 <div class="media-body">
                                     <h5 class="text-hover-primary mb-0 max-width-200px word-break line--limit-2"><?php echo e($item['name']); ?></h5>
                                 </div>
@@ -174,7 +176,7 @@ active
             </div>
             <?php if(count($items) === 0): ?>
             <div class="empty--data">
-                <img src="<?php echo e(asset('/public/assets/admin/svg/illustrations/sorry.svg')); ?>" alt="public">
+                <img src="<?php echo e(asset('/assets/admin/svg/illustrations/sorry.svg')); ?>" alt="public">
                 <h5>
                     <?php echo e(translate('no_data_found')); ?>
 
@@ -215,9 +217,9 @@ active
 
 <?php $__env->startPush('script_2'); ?>
 
-<script src="<?php echo e(asset('public/assets/admin')); ?>/vendor/chart.js/dist/Chart.min.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/vendor/chartjs-chart-matrix/dist/chartjs-chart-matrix.min.js"></script>
-<script src="<?php echo e(asset('public/assets/admin')); ?>/js/hs.chartjs-matrix.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/vendor/chartjs-chart-matrix/dist/chartjs-chart-matrix.min.js"></script>
+<script src="<?php echo e(asset('assets/admin')); ?>/js/hs.chartjs-matrix.js"></script>
 
 <script>
     "use strict";

@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('title',translate('Campaign List')); ?>
 
 
@@ -8,7 +10,7 @@
             <div class="d-flex flex-wrap justify-content-between align-items-center">
                 <h1 class="page-header-title">
                     <span class="page-header-icon">
-                        <img src="<?php echo e(asset('public/assets/admin/img/campaign.png')); ?>" class="w--26" alt="">
+                        <img src="<?php echo e(asset('assets/admin/img/campaign.png')); ?>" class="w--26" alt="">
                     </span>
                     <span>
                         <?php echo e(translate('messages.campaign')); ?>
@@ -64,7 +66,7 @@
 
                                 ">
                                 <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                    src="<?php echo e(asset('public/assets/admin')); ?>/svg/components/excel.svg"
+                                    src="<?php echo e(asset('assets/admin')); ?>/svg/components/excel.svg"
                                     alt="Image Description">
                                 <?php echo e(translate('messages.excel')); ?>
 
@@ -72,7 +74,7 @@
                             <a id="export-csv" class="dropdown-item" href="
                             <?php echo e(route('admin.campaign.basic_campaign_export', ['type' => 'csv', request()->getQueryString()])); ?>">
                                 <img class="avatar avatar-xss avatar-4by3 mr-2"
-                                    src="<?php echo e(asset('public/assets/admin')); ?>/svg/components/placeholder-csv-format.svg"
+                                    src="<?php echo e(asset('assets/admin')); ?>/svg/components/placeholder-csv-format.svg"
                                     alt="Image Description">
                                 .<?php echo e(translate('messages.csv')); ?>
 
@@ -120,8 +122,8 @@
                                     <input type="checkbox" data-url=""
                                     data-id="stocksCheckbox<?php echo e($campaign->id); ?>"
                                     data-type="status"
-                                    data-image-on="<?php echo e(asset('/public/assets/admin/img/modal/basic_campaign_on.png')); ?>"
-                                    data-image-off="<?php echo e(asset('/public/assets/admin/img/modal/basic_campaign_off.png')); ?>"
+                                    data-image-on="<?php echo e(asset('/assets/admin/img/modal/basic_campaign_on.png')); ?>"
+                                    data-image-off="<?php echo e(asset('/assets/admin/img/modal/basic_campaign_off.png')); ?>"
                                     data-title-on="<?php echo e(translate('By_Turning_ON_Campaign!')); ?>"
                                     data-title-off="<?php echo e(translate('By_Turning_OFF_Campaign!')); ?>"
                                     data-text-on="<p><?php echo e(translate('If_you_turn_on_this_status,_it_will_show_on_user_website_and_app.')); ?></p>"
@@ -163,7 +165,7 @@
                 </div>
                 <?php if(count($campaigns) === 0): ?>
                 <div class="empty--data">
-                    <img src="<?php echo e(asset('/public/assets/admin/svg/illustrations/sorry.svg')); ?>" alt="public">
+                    <img src="<?php echo e(asset('/assets/admin/svg/illustrations/sorry.svg')); ?>" alt="public">
                     <h5>
                         <?php echo e(translate('no_data_found')); ?>
 
