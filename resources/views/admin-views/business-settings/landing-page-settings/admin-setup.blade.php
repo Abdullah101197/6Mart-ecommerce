@@ -200,7 +200,7 @@
                                                 <div class="file-upload-parent">
                                                     <div class="custom-file-upload">
                                                         <input type="hidden" name="file_exist" value="{{ $custom_file ? 1 : 0 }}">
-                                                        <input type="file" accept=".zip" data-max-file-size="{{ $MAX_FILE_SIZE }}MB" name="file_upload" data-warning-message="{{ translate('messages.please_delete_the_existing_landing_page_first') }}">
+                                                        <input type="file" accept=".zip" data-max-file-size="{{ MAX_FILE_SIZE }}MB" name="file_upload" data-warning-message="{{ translate('messages.please_delete_the_existing_landing_page_first') }}">
                                                         <div class="text-center p-3 p-sm-4">
                                                             <div class="mb-20">
                                                                 <img width="48" height="48" class="svg" src="{{ asset('/assets/admin/img/svg/upload-cloud.svg') }}" alt="">
@@ -210,7 +210,7 @@
                                                                 <span class="font-semibold">{{ translate('messages. Drag & Drop') }} </span>
                                                                 {{ translate('messages.here') }}
                                                             </p>
-                                                            <div class="mb-0 fs-12">{{ translate('messages.PHP file size no more than '.$MAX_FILE_SIZE.'MB') }}</div>
+                                                            <div class="mb-0 fs-12">{{ translate('messages.PHP file size no more than '.MAX_FILE_SIZE.'MB') }}</div>
                                                             <div class="btn btn-outline-primary font-semibold mt-4 trigger_input_btn">
                                                                 {{ translate('messages.Select File') }}
                                                             </div>
@@ -475,7 +475,7 @@
             $('#index_page').submit();
         });
 
-        // const MAX_FILE_SIZE = {{ $MAX_FILE_SIZE ?? 2 }};
+        // const MAX_FILE_SIZE = {{ MAX_FILE_SIZE ?? 2 }};
 
 
         $('#reset_btn').click(function() {
@@ -490,7 +490,7 @@
             $('.file-upload-parent').html(`
                 <div class="custom-file-upload">
                     <input type="hidden" name="file_exist" value="{{ $custom_file ? 1 : 0 }}">
-                    <input type="file" accept=".zip" data-max-file-size="{{ $MAX_FILE_SIZE }}MB" name="file_upload" data-warning-message="{{ translate('messages.please_delete_the_existing_landing_page_first') }}">
+                    <input type="file" accept=".zip" data-max-file-size="{{ MAX_FILE_SIZE }}MB" name="file_upload" data-warning-message="{{ translate('messages.please_delete_the_existing_landing_page_first') }}">
                     <div class="text-center p-3 p-sm-4">
                         <div class="mb-20">
                             <img width="48" height="48" class="svg" src="{{ asset('/assets/admin/img/svg/upload-cloud.svg') }}" alt="">
@@ -501,7 +501,7 @@
                             {{ translate('messages.here') }}
                         </p>
                         <div class="mb-0 fs-12">
-                            {{ translate('messages.PHP file size no more than :size MB', ['size' => $MAX_FILE_SIZE]) }}
+                            {{ translate('messages.PHP file size no more than :size MB', ['size' => MAX_FILE_SIZE]) }}
                         </div>
                         <div class="btn btn-outline-primary font-semibold mt-4 trigger_input_btn">
                             {{ translate('messages.Select File') }}

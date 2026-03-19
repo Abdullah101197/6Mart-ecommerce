@@ -74,7 +74,7 @@ class PageSeoData extends Model
     protected static function booted()
     {
         static::created(function ($data) {
-            $data->slug = $data->generateSlug($data->name);
+            $data->slug = $data->generateSlug($data->page_name);
             $data->save();
         });
 
