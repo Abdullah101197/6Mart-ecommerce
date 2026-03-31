@@ -375,6 +375,11 @@ class ItemController extends Controller
         $item->images = $images;
         $item->is_halal = $request->is_halal ?? 0;
 // Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
+        if ($request->filled('custom_tabs_json')) {
+            $item->meta_data = array_merge($item->meta_data ?? [], [
+                'custom_tabs' => json_decode($request->custom_tabs_json, true),
+            ]);
+        }
         $item->status = $isDraftMode ? 0 : 1;
         $item->save();
         $item->tags()->sync($tag_ids);
@@ -904,6 +909,11 @@ class ItemController extends Controller
             }
         }
 // Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
+        if ($request->filled('custom_tabs_json')) {
+            $item->meta_data = array_merge($item->meta_data ?? [], [
+                'custom_tabs' => json_decode($request->custom_tabs_json, true),
+            ]);
+        }
         $item->save();
         $item->tags()->sync($tag_ids);
         $item->nutritions()->sync($nutrition_ids);

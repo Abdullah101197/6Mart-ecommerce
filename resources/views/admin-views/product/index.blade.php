@@ -14,6 +14,7 @@
     #npInstacartOptionModal { z-index: 2000; }
     #npItemTypeModal { z-index: 2000; }
     #npProductSelectOptionModal { z-index: 2000; }
+    #npCustomTabModal { z-index: 2000; }
     .modal-backdrop { z-index: 1990; }
   </style>
 @endpush
@@ -60,7 +61,9 @@
         Shipping</button>
       <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-reviews')">⭐ Reviews &amp;
         Analytics</button>
+      <button type="button" class="np-tab-btn" id="npAddTabBtn" onclick="npOpenCustomTabModal()">+ Add Tab</button>
     </div>
+    <input type="hidden" name="custom_tabs_json" id="custom_tabs_json" value="">
 
     {{-- ══════════════════════════════════════════════════ --}}
     {{-- TAB 1: GENERAL --}}
@@ -626,6 +629,9 @@
         </div>
       </div>
     </div>
+
+    {{-- Custom tabs get injected here --}}
+    <div id="npCustomTabsMount"></div>
     {{-- ══ TAB 2: ATTRIBUTES ══ --}}
     <div class="np-tab-panel" id="np-tab-attributes">
       <div class="np-grid">
@@ -1997,6 +2003,37 @@
       </div>
     </div>
   </div>
+
+  {{-- Custom tab modal --}}
+  <div class="modal fade" id="npCustomTabModal" tabindex="-1" role="dialog" aria-labelledby="npCustomTabModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="npCustomTabForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="npCustomTabModalLabel">Add New Tab</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="input-label">Tab title <small class="text-danger">*</small></label>
+              <input type="text" id="npCustomTabTitle" class="form-control" placeholder="e.g. Certifications" required>
+            </div>
+            <div class="form-group mb-0">
+              <label class="input-label">Icon (emoji) <small class="text-danger">*</small></label>
+              <input type="text" id="npCustomTabIcon" class="form-control" placeholder="e.g. 🏷️" required maxlength="4">
+              <small class="text-muted d-block mt-2">Tip: paste an emoji like 🧾, 🧊, 🏷️, 📦</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
+            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <span id="message-enter-choice-values" data-text="{{ translate('enter_choice_values') }}"></span>
@@ -2289,6 +2326,11 @@
       const form = document.getElementById('item_form');
       if (!form) return;
 
+      // Ensure custom tabs JSON is up-to-date before submit
+      if (typeof npSaveCustomTabsToInput === 'function') {
+        npSaveCustomTabsToInput();
+      }
+
       $('#draft_mode').val(publish ? '0' : '1');
 
       if (publish) {
@@ -2347,6 +2389,7 @@
 
           if (publish) {
             toastr.success(data.success || "{{ translate('messages.product_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+            try { localStorage.removeItem('np_custom_tabs_draft'); } catch (e) { }
             setTimeout(function () {
               location.href = "{{ route('admin.item.list') }}";
             }, 1000);
@@ -2943,6 +2986,282 @@
           }
         });
       });
+
+      // ── Custom tabs (builder) ────────────────────────────────────────────
+      let npCustomTabs = [];
+      const npCustomTabsDraftKey = 'np_custom_tabs_draft';
+
+      function npLoadCustomTabsFromInput() {
+        const raw = document.getElementById('custom_tabs_json')?.value || '';
+        if (raw) {
+          try { return JSON.parse(raw) || []; } catch { /* fallthrough */ }
+        }
+        // If creating a new item and nothing in hidden input yet, restore from local draft
+        const currentItemId = document.getElementById('item_id')?.value || '';
+        if (!currentItemId) {
+          try {
+            const draft = localStorage.getItem(npCustomTabsDraftKey);
+            return draft ? (JSON.parse(draft) || []) : [];
+          } catch { return []; }
+        }
+        return [];
+      }
+      function npSaveCustomTabsToInput() {
+        const el = document.getElementById('custom_tabs_json');
+        if (el) el.value = JSON.stringify(npCustomTabs || []);
+        // Keep a draft until the item is published/saved
+        const currentItemId = document.getElementById('item_id')?.value || '';
+        if (!currentItemId) {
+          try { localStorage.setItem(npCustomTabsDraftKey, el?.value || '[]'); } catch { /* ignore */ }
+        }
+      }
+      function npUid(prefix = 'ct') {
+        return `${prefix}_` + Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
+      }
+
+      function npFindTab(tabId) {
+        return (npCustomTabs || []).find(t => t.id === tabId);
+      }
+      function npFindSection(tab, sectionId) {
+        return (tab?.sections || []).find(s => s.id === sectionId);
+      }
+      function npFindField(section, fieldId) {
+        return (section?.fields || []).find(f => f.id === fieldId);
+      }
+
+      function npOpenCustomTabModal() {
+        const modal = $('#npCustomTabModal');
+        if (!modal.length) return;
+        if (!modal.parent().is('body')) modal.appendTo('body');
+        const form = document.getElementById('npCustomTabForm');
+        if (form) form.reset();
+        modal.modal('show');
+      }
+      window.npOpenCustomTabModal = npOpenCustomTabModal;
+
+      function npAddSection(tabId) {
+        const tab = npFindTab(tabId);
+        if (!tab) return;
+        const title = (prompt('Section title', 'New Section') || '').trim();
+        if (!title) return;
+        const icon = (prompt('Section icon (emoji)', '📌') || '').trim() || '📌';
+        tab.sections = tab.sections || [];
+        tab.sections.push({ id: npUid('sec'), title, icon, fields: [] });
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+      }
+      window.npAddSection = npAddSection;
+      function npAddField(tabId, sectionId) {
+        const tab = npFindTab(tabId);
+        const sec = npFindSection(tab, sectionId);
+        if (!sec) return;
+        const label = (prompt('Field label', 'New Field') || '').trim();
+        if (!label) return;
+        const type = (prompt('Field type: text / textarea / number / checkbox / select', 'text') || 'text').trim().toLowerCase();
+        const allowed = ['text', 'textarea', 'number', 'checkbox', 'select'];
+        if (!allowed.includes(type)) return;
+        const field = { id: npUid('fld'), label, type, value: (type === 'checkbox' ? false : '') };
+        if (type === 'select') {
+          const opts = (prompt('Select options (comma separated)', 'Option A, Option B') || '').split(',').map(s => s.trim()).filter(Boolean);
+          field.options = opts;
+          field.value = opts[0] || '';
+        }
+        sec.fields = sec.fields || [];
+        sec.fields.push(field);
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+      }
+      window.npAddField = npAddField;
+      function npDeleteSection(tabId, sectionId) {
+        const tab = npFindTab(tabId);
+        if (!tab) return;
+        if (!confirm('Delete this section?')) return;
+        tab.sections = (tab.sections || []).filter(s => s.id !== sectionId);
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+      }
+      window.npDeleteSection = npDeleteSection;
+      function npDeleteField(tabId, sectionId, fieldId) {
+        const tab = npFindTab(tabId);
+        const sec = npFindSection(tab, sectionId);
+        if (!sec) return;
+        if (!confirm('Delete this field?')) return;
+        sec.fields = (sec.fields || []).filter(f => f.id !== fieldId);
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+      }
+      window.npDeleteField = npDeleteField;
+      function npRenameSection(tabId, sectionId) {
+        const tab = npFindTab(tabId);
+        const sec = npFindSection(tab, sectionId);
+        if (!sec) return;
+        const t = prompt('New section title', sec.title || '');
+        if (t != null) sec.title = t;
+        const ic = prompt('New icon (emoji)', sec.icon || '');
+        if (ic != null) sec.icon = ic;
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+      }
+      window.npRenameSection = npRenameSection;
+
+      function npSetFieldValue(tabId, sectionId, fieldId, value) {
+        const tab = npFindTab(tabId);
+        const sec = npFindSection(tab, sectionId);
+        const fld = npFindField(sec, fieldId);
+        if (!fld) return;
+        fld.value = value;
+        npSaveCustomTabsToInput();
+      }
+      window.npSetFieldValue = npSetFieldValue;
+
+      function npRenderCustomTabs() {
+        // Remove old injected buttons/panels
+        document.querySelectorAll('[data-np-custom-tab-btn="1"]').forEach(el => el.remove());
+        const mount = document.getElementById('npCustomTabsMount');
+        if (!mount) return;
+        mount.innerHTML = '';
+
+        const nav = document.querySelector('.np-tab-nav');
+        const addBtn = document.getElementById('npAddTabBtn');
+
+        (npCustomTabs || []).forEach(tab => {
+          const panelId = `np-tab-custom-${tab.id}`;
+
+          // Tab button inserted before "+ Add Tab"
+          if (nav && addBtn) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'np-tab-btn';
+            btn.setAttribute('data-np-custom-tab-btn', '1');
+            btn.textContent = `${tab.icon || '🧩'} ${tab.title || 'Custom'}`;
+            btn.onclick = function () { npSwitchTab(btn, panelId); };
+            // Right-click actions
+            btn.oncontextmenu = function (e) {
+              e.preventDefault();
+              const action = prompt('Type: rename / delete', 'rename');
+              if (!action) return;
+              if (action.toLowerCase() === 'delete') {
+                if (confirm('Delete this tab?')) {
+                  npCustomTabs = npCustomTabs.filter(t => t.id !== tab.id);
+                  npSaveCustomTabsToInput();
+                  npRenderCustomTabs();
+                }
+              } else if (action.toLowerCase() === 'rename') {
+                const t = prompt('New tab title', tab.title || '');
+                if (t != null) tab.title = t;
+                const ic = prompt('New icon (emoji)', tab.icon || '');
+                if (ic != null) tab.icon = ic;
+                npSaveCustomTabsToInput();
+                npRenderCustomTabs();
+              }
+            };
+            nav.insertBefore(btn, addBtn);
+          }
+
+          // Panel
+          const panel = document.createElement('div');
+          panel.className = 'np-tab-panel';
+          panel.id = panelId;
+          const sections = (tab.sections || []);
+          const sectionHtml = sections.map(sec => {
+            const fields = (sec.fields || []);
+            const fieldsHtml = fields.map(f => {
+              const safeLabel = String(f.label || '').replace(/</g, '&lt;');
+              const actions = `
+                <div style="display:flex;gap:6px;align-items:center">
+                  <button type="button" class="np-btn-tiny" onclick="npRenameSection('${tab.id}','${sec.id}')">Edit</button>
+                  <button type="button" class="np-btn-tiny del" onclick="npDeleteField('${tab.id}','${sec.id}','${f.id}')">Del</button>
+                </div>
+              `;
+              let input = '';
+              if (f.type === 'textarea') {
+                input = `<textarea class="np-textarea" rows="3" oninput="npSetFieldValue('${tab.id}','${sec.id}','${f.id}', this.value)">${String(f.value ?? '').replace(/</g,'&lt;')}</textarea>`;
+              } else if (f.type === 'number') {
+                input = `<input type="number" class="np-input" value="${String(f.value ?? '').replace(/"/g,'&quot;')}" oninput="npSetFieldValue('${tab.id}','${sec.id}','${f.id}', this.value)">`;
+              } else if (f.type === 'checkbox') {
+                const checked = f.value ? 'checked' : '';
+                input = `<label class="np-tog"><input type="checkbox" ${checked} onchange="npSetFieldValue('${tab.id}','${sec.id}','${f.id}', this.checked)"><span class="np-tog-track"></span></label>`;
+              } else if (f.type === 'select') {
+                const opts = (f.options || []).map(o => {
+                  const sel = (String(o) === String(f.value)) ? 'selected' : '';
+                  return `<option ${sel} value="${String(o).replace(/"/g,'&quot;')}">${String(o).replace(/</g,'&lt;')}</option>`;
+                }).join('');
+                input = `<select class="np-select" onchange="npSetFieldValue('${tab.id}','${sec.id}','${f.id}', this.value)">${opts}</select>`;
+              } else {
+                input = `<input type="text" class="np-input" value="${String(f.value ?? '').replace(/"/g,'&quot;')}" oninput="npSetFieldValue('${tab.id}','${sec.id}','${f.id}', this.value)">`;
+              }
+
+              return `
+                <div class="np-form-group">
+                  <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+                    <label class="np-label" style="margin:0">${safeLabel}</label>
+                    ${actions}
+                  </div>
+                  ${input}
+                </div>
+              `;
+            }).join('');
+
+            return `
+              <div class="np-card" style="margin-top:12px">
+                <div class="np-card-header">
+                  <span class="np-card-icon">${sec.icon || '📌'}</span>
+                  <span class="np-card-title">${String(sec.title || 'Section').replace(/</g,'&lt;')}</span>
+                  <span class="np-card-subtitle">Custom section</span>
+                </div>
+                <div class="np-card-body">
+                  <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                    <button type="button" class="np-btn-tiny" onclick="npAddField('${tab.id}','${sec.id}')">+ Add Field</button>
+                    <button type="button" class="np-btn-tiny" onclick="npRenameSection('${tab.id}','${sec.id}')">Rename</button>
+                    <button type="button" class="np-btn-tiny del" onclick="npDeleteSection('${tab.id}','${sec.id}')">Delete Section</button>
+                  </div>
+                  ${fieldsHtml || '<div class="np-hint">No fields yet. Click “+ Add Field”.</div>'}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          panel.innerHTML = `
+            <div class="np-grid">
+              <div>
+                <div class="np-card">
+                  <div class="np-card-header">
+                    <span class="np-card-icon">${tab.icon || '🧩'}</span>
+                    <span class="np-card-title">${String(tab.title || 'Custom Tab').replace(/</g,'&lt;')}</span>
+                    <span class="np-card-subtitle">Builder</span>
+                  </div>
+                  <div class="np-card-body">
+                    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                      <button type="button" class="np-btn-tiny" onclick="npAddSection('${tab.id}')">+ Add Section</button>
+                      <div class="np-hint" style="margin:0">Right-click tab name to rename/delete.</div>
+                    </div>
+                    ${sectionHtml || '<div class="np-hint">No sections yet. Click “+ Add Section”.</div>'}
+                  </div>
+                </div>
+              </div>
+              <div></div>
+            </div>
+          `;
+          mount.appendChild(panel);
+        });
+      }
+
+      $('#npCustomTabForm').on('submit', function (e) {
+        e.preventDefault();
+        const title = (document.getElementById('npCustomTabTitle')?.value || '').trim();
+        const icon = (document.getElementById('npCustomTabIcon')?.value || '').trim();
+        if (!title || !icon) return;
+        npCustomTabs.push({ id: npUid('tab'), title, icon, sections: [] });
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+        $('#npCustomTabModal').modal('hide');
+      });
+
+      // Initialize from hidden input (edit mode can prefill this)
+      npCustomTabs = npLoadCustomTabsFromInput();
+      // Ensure hidden input reflects restored draft so it gets submitted on save
+      npSaveCustomTabsToInput();
+      npRenderCustomTabs();
 
     </script>
 @endpush
