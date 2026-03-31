@@ -37,7 +37,12 @@ $countryCode= strtolower($country?$country:'auto');
 
     <script src="<?php echo e(asset('assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')); ?>"></script>
     <link rel="stylesheet" href="<?php echo e(asset('assets/admin/css/toastr.css')); ?>">
-    <script src="<?php echo e(asset('assets/admin')); ?>/js/vendor.min.js"></script>
+    <script src="<?php echo e(asset('assets/admin/js/vendor.min.js')); ?>"></script>
+    <script>
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="https://code.jquery.com/jquery-3.5.1.min.js"><\/script>');
+        }
+    </script>
 </head>
 
 <body class="footer-offset">
@@ -306,9 +311,9 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
 <?php echo $__env->yieldPushContent('script'); ?>
 <!-- JS Front -->
 
-<script src="<?php echo e(asset('assets/admin')); ?>/js/jquery.validate.min.js"></script>
-<script src="<?php echo e(asset('assets/admin')); ?>/js/theme.min.js"></script>
-<script src="<?php echo e(asset('assets/admin')); ?>/js/sweet_alert.js"></script>
+<script src="<?php echo e(asset('assets/admin/js/jquery.validate.min.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/theme.min.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/admin/js/sweet_alert.js')); ?>"></script>
 <script src="<?php echo e(asset('assets/admin')); ?>/js/bootstrap-tour-standalone.min.js"></script>
 <script src="<?php echo e(asset('assets/admin/js/owl.min.js')); ?>"></script>
 <script src="<?php echo e(asset('assets/admin')); ?>/js/emogi-area.js"></script>
@@ -555,10 +560,14 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
         appId: "<?php echo e(isset($fcm_credentials['appId']) ? $fcm_credentials['appId'] : ''); ?>",
         measurementId: "<?php echo e(isset($fcm_credentials['measurementId']) ? $fcm_credentials['measurementId'] : ''); ?>"
     };
+    let messaging = null;
+    <?php if(isset($fcm_credentials['projectId']) && $fcm_credentials['projectId']): ?>
     firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
+    messaging = firebase.messaging();
+    <?php endif; ?>
 
     function startFCM() {
+        if (!messaging) return;
         messaging
             .requestPermission()
             .then(function() {
@@ -652,6 +661,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
     let admin_role_id=null;
 
     <?php ($order_notification_type = \App\CentralLogics\Helpers::get_business_settings('order_notification_type') ??'manual'); ?>
+    <?php if(isset($fcm_credentials['projectId']) && $fcm_credentials['projectId']): ?>
     messaging.onMessage(function(payload) {
         console.log(payload.data)
         if(payload.data.order_id && payload.data.type == "order_request"){
@@ -662,7 +672,10 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
                 admin_zone_id = '<?php echo auth()->guard('admin')->user()->zone_id ;?>';
                 admin_role_id = '<?php echo auth()->guard('admin')->user()->role_id ;?>';
                 if(new_order_type === 'trip'){
-                    document.querySelector('.update_notification_text').textContent = "<?php echo e(translate('messages.You have new trip, Check Please.')); ?>";
+                    let updateNotificationText = document.querySelector('.update_notification_text');
+                    if (updateNotificationText) {
+                        updateNotificationText.textContent = "<?php echo e(translate('messages.You have new trip, Check Please.')); ?>";
+                    }
                 }
                 if(admin_role_id === '1'){
                     playAudio();
@@ -696,6 +709,7 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
             }
         }
     });
+    <?php endif; ?>
 
     <?php if(\App\CentralLogics\Helpers::module_permission_check('order') && $order_notification_type == 'manual'): ?>
         <?php ($admin_order_notification=\App\CentralLogics\Helpers::get_business_settings('admin_order_notification') ?? 0); ?>
@@ -709,7 +723,10 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
                         new_order_type = data.type;
                         new_module_id = data.module_id;
                         if(new_order_type === 'trip'){
-                            document.querySelector('.update_notification_text').textContent = "<?php echo e(translate('messages.You have new trip, Check Please.')); ?>";
+                            let updateNotificationText = document.querySelector('.update_notification_text');
+                            if (updateNotificationText) {
+                                updateNotificationText.textContent = "<?php echo e(translate('messages.You have new trip, Check Please.')); ?>";
+                            }
                         }
                         if (data.new_order > 0) {
                             playAudio();
@@ -738,7 +755,9 @@ if(in_array(config('module.current_module_type'),config('module.module_type') ))
         }
     });
 
+    <?php if(isset($fcm_credentials['projectId']) && $fcm_credentials['projectId']): ?>
     startFCM();
+    <?php endif; ?>
     conversationList();
     if(getUrlParameter('conversation')){
         conversationView();
@@ -1008,11 +1027,13 @@ $(document).on('keyup', 'input[type="tel"]', function () {
         });
 
         const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('search', function() {
-            if (!this.value.trim()) {
-                $('#searchResults').html('<div class="text-center text-muted py-5"></div>');
-            }
-        });
+        if (searchInput) {
+            searchInput.addEventListener('search', function() {
+                if (!this.value.trim()) {
+                    $('#searchResults').html('<div class="text-center text-muted py-5"></div>');
+                }
+            });
+        }
 
         $('#searchForm').submit(function (event) {
             event.preventDefault();
@@ -1060,19 +1081,27 @@ $(document).on('keyup', 'input[type="tel"]', function () {
                 btnNextWrap.style.display = 'none';
             }
         }
-        document.querySelector('.btn-click-prev')?.addEventListener('click', () => {
-            const itemWidth = item?.offsetWidth || 100;
-            container.scrollBy({ left: -itemWidth, behavior: 'smooth' });
-        });
-        document.querySelector('.btn-click-next')?.addEventListener('click', () => {
-            const itemWidth = item?.offsetWidth || 100;
-            container.scrollBy({ left: itemWidth, behavior: 'smooth' });
-        });
+        const btnPrev = document.querySelector('.btn-click-prev');
+        if (btnPrev) {
+            btnPrev.addEventListener('click', () => {
+                const itemWidth = item ? item.offsetWidth : 100;
+                container.scrollBy({ left: -itemWidth, behavior: 'smooth' });
+            });
+        }
+        
+        const btnNext = document.querySelector('.btn-click-next');
+        if (btnNext) {
+            btnNext.addEventListener('click', () => {
+                const itemWidth = item ? item.offsetWidth : 100;
+                container.scrollBy({ left: itemWidth, behavior: 'smooth' });
+            });
+        }
 
-        container.addEventListener('scroll', updateArrows);
-        ['load', 'resize'].forEach(evt => window.addEventListener(evt, updateArrows));
-        new MutationObserver(updateArrows).observe(container, { childList: true, subtree: true });
-        new ResizeObserver(updateArrows).observe(container);
+        if (container) {
+            container.addEventListener('scroll', updateArrows);
+            new MutationObserver(updateArrows).observe(container, { childList: true, subtree: true });
+            new ResizeObserver(updateArrows).observe(container);
+        }
 
         // Initial update
         updateArrows();

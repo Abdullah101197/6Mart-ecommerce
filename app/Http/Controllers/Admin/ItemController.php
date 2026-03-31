@@ -233,8 +233,21 @@ class ItemController extends Controller
                 'position' => 3,
             ]);
         }
+        if ($request->sub_sub_sub_category_id != null) {
+            array_push($category, [
+                'id' => $request->sub_sub_sub_category_id,
+                'position' => 4,
+            ]);
+        }
+        if ($request->sub_sub_sub_category_id != null) {
+            array_push($category, [
+                'id' => $request->sub_sub_sub_category_id,
+                'position' => 4,
+            ]);
+        }
         $item->category_ids = json_encode($category);
-        $item->category_id = $request->sub_category_id ? $request->sub_category_id : $request->category_id;
+        $item->category_id = $request->sub_sub_sub_category_id
+            ?? ($request->sub_sub_category_id ?? ($request->sub_category_id ?? $request->category_id));
         $item->description = $request->description[array_search('default', $request->lang)];
 
         $choice_options = [];
@@ -600,7 +613,8 @@ class ItemController extends Controller
         }
 
 
-        $item->category_id = $request->sub_category_id ? $request->sub_category_id : $request->category_id;
+        $item->category_id = $request->sub_sub_sub_category_id
+            ?? ($request->sub_sub_category_id ?? ($request->sub_category_id ?? $request->category_id));
         $item->category_ids = json_encode($category);
         $item->description = $request->description[array_search('default', $request->lang)];
 

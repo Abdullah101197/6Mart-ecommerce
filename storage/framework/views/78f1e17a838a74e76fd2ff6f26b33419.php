@@ -1,11 +1,11 @@
-@extends('layouts.admin.app')
-@section('title', translate('messages.add_new_item'))
 
-@push('css_or_js')
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <link href="{{ asset('assets/admin/css/tags-input.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('assets/admin/css/AI/animation/product/ai-sidebar.css') }}" rel="stylesheet">
-  <link href="{{ asset('assets/admin/css/new-product.css') }}" rel="stylesheet">
+<?php $__env->startSection('title', translate('messages.add_new_item')); ?>
+
+<?php $__env->startPush('css_or_js'); ?>
+  <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+  <link href="<?php echo e(asset('assets/admin/css/tags-input.min.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/AI/animation/product/ai-sidebar.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/new-product.css')); ?>" rel="stylesheet">
   <style>
     /* Ensure Bootstrap modal overlays custom layout */
     #npBrandModal { z-index: 2000; }
@@ -16,38 +16,38 @@
     #npProductSelectOptionModal { z-index: 2000; }
     .modal-backdrop { z-index: 1990; }
   </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
   $openai_config = \App\CentralLogics\Helpers::get_business_settings('openai_config');
-@endphp
+?>
 <div class="content container-fluid">
 
-  {{-- Page Header --}}
+  
   <div class="page-header d-flex flex-wrap __gap-15px justify-content-between align-items-center mb-3">
     <h1 class="page-header-title">
       <span class="page-header-icon">
-        <img src="{{ asset('assets/admin/img/items.png') }}" class="w--22" alt="">
+        <img src="<?php echo e(asset('assets/admin/img/items.png')); ?>" class="w--22" alt="">
       </span>
-      <span>{{ translate('messages.add_new_item') }}</span>
+      <span><?php echo e(translate('messages.add_new_item')); ?></span>
     </h1>
     <div class="d-flex align-items-end">
-      <a href="{{ route('admin.item.product_gallery') }}"
+      <a href="<?php echo e(route('admin.item.product_gallery')); ?>"
         class="btn btn-outline-primary btn--primary d-flex align-items-center bg-not-hover-primary-ash rounded-8 gap-2">
-        <img src="{{ asset('assets/admin/img/product-gallery.png') }}" class="w--22" alt="">
-        <span>{{ translate('Add Info From Gallery') }}</span>
+        <img src="<?php echo e(asset('assets/admin/img/product-gallery.png')); ?>" class="w--22" alt="">
+        <span><?php echo e(translate('Add Info From Gallery')); ?></span>
       </a>
     </div>
   </div>
 
   <form id="item_form" enctype="multipart/form-data" class="custom-validation new-product-form" data-ajax="true">
     <input type="hidden" id="request_type" value="admin">
-    <input type="hidden" id="module_type" value="{{ Config::get('module.current_module_type') }}">
+    <input type="hidden" id="module_type" value="<?php echo e(Config::get('module.current_module_type')); ?>">
     <input type="hidden" id="item_id" name="item_id" value="">
     <input type="hidden" id="draft_mode" name="draft_mode" value="0">
 
-    {{-- ═══ TAB NAVIGATION ═══ --}}
+    
     <div class="np-tab-nav">
       <button type="button" class="np-tab-btn active" onclick="npSwitchTab(this,'np-tab-general')">📝 General</button>
       <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-attributes')">🔧 Attributes</button>
@@ -62,14 +62,14 @@
         Analytics</button>
     </div>
 
-    {{-- ══════════════════════════════════════════════════ --}}
-    {{-- TAB 1: GENERAL --}}
-    {{-- ══════════════════════════════════════════════════ --}}
+    
+    
+    
     <div class="np-tab-panel active" id="np-tab-general">
       <div class="np-grid">
-        {{-- LEFT --}}
+        
         <div>
-          {{-- Basic Information --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">📝</span>
@@ -77,39 +77,39 @@
             </div>
             <div class="np-card-body">
               <div class="np-form-group">
-                <label class="np-label">{{ translate('messages.item_name') }} (English)
+                <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (English)
                   <span class="np-req">*</span></label>
                 <input type="text" name="name[]" id="productNameEn" class="np-input"
                   placeholder="e.g. Kiri Spreadable Cream Cheese Squares 48 Portions 864g" required oninput="npUpdateQuality();npUpdateSEO()">
                 <input type="hidden" name="lang[]" value="default">
               </div>
 
-              @php
+              <?php
                 $langsLower = array_map('strtolower', $languages ?? []);
                 $optionalNameLocalesRendered = in_array('ar', $langsLower);
-              @endphp
-              @unless($optionalNameLocalesRendered)
+              ?>
+              <?php if (! ($optionalNameLocalesRendered)): ?>
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.item_name') }} (Arabic) <span
+                  <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (Arabic) <span
                       class="np-opt">(optional)</span></label>
                   <input type="text" name="name[]" id="productNameAr" class="np-input" placeholder="اسم المنتج بالعربي"
                     style="direction:rtl;text-align:right">
                   <input type="hidden" name="lang[]" value="ar">
                 </div>
-              @endunless
+              <?php endif; ?>
 
-              @foreach($languages as $lang)
-                @if($lang != 'en')
+              <?php $__currentLoopData = $languages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if($lang != 'en'): ?>
                   <div class="np-form-group">
-                    <label class="np-label">{{ translate('messages.item_name') }} ({{ strtoupper($lang) }}) <span
+                    <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (<?php echo e(strtoupper($lang)); ?>) <span
                         class="np-opt">(optional)</span></label>
                     <input type="text" name="name[]" class="np-input"
-                      placeholder="{{ translate('messages.item_name') }} in {{ strtoupper($lang) }}" @if($lang == 'ar')
-                      style="direction:rtl;text-align:right" @endif>
-                    <input type="hidden" name="lang[]" value="{{ $lang }}">
+                      placeholder="<?php echo e(translate('messages.item_name')); ?> in <?php echo e(strtoupper($lang)); ?>" <?php if($lang == 'ar'): ?>
+                      style="direction:rtl;text-align:right" <?php endif; ?>>
+                    <input type="hidden" name="lang[]" value="<?php echo e($lang); ?>">
                   </div>
-                @endif
-              @endforeach
+                <?php endif; ?>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
               <div class="np-form-group">
                 <label class="np-label">Short Description <span class="np-req">*</span></label>
@@ -134,15 +134,15 @@
                   <div class="d-flex align-items-center" style="gap:8px">
                     <select name="brand_id" id="npBrand" class="np-select" onchange="npUpdateQuality()">
                       <option value="">Select brand…</option>
-                      @foreach(\App\Models\Brand::where('status', 1)->get() as $brand)
-                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                      @endforeach
+                      <?php $__currentLoopData = \App\Models\Brand::where('status', 1)->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $brand): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($brand->id); ?>"><?php echo e($brand->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button"
                             class="btn btn-outline-primary"
                             style="min-width:40px;height:38px;display:flex;align-items:center;justify-content:center;padding:0"
                             onclick="npOpenBrandModal()"
-                            title="{{ translate('messages.add_new_brand') }}">+</button>
+                            title="<?php echo e(translate('messages.add_new_brand')); ?>">+</button>
                   </div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
@@ -154,7 +154,7 @@
             </div>
           </div>
 
-          {{-- Pricing --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">💰</span>
@@ -165,7 +165,7 @@
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Regular Price <span class="np-req">*</span></label>
                   <div class="np-iw">
-                    <span class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span>
+                    <span class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span>
                     <input type="number" name="price" id="npRegPrice" class="np-input" placeholder="0.00" step="0.01"
                       min="0" oninput="npUpdateDiscount();npUpdateQuality()">
                   </div>
@@ -173,7 +173,7 @@
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Sale / Discounted Price</label>
                   <div class="np-iw">
-                    <span class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span>
+                    <span class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span>
                     <input type="number" name="discount" id="npSalePrice" class="np-input" placeholder="0.00"
                       step="0.01" min="0" oninput="npUpdateDiscount()">
                   </div>
@@ -182,7 +182,7 @@
                   <label class="np-label">Discount Type</label>
                   <select name="discount_type" id="discount_type" class="np-select">
                     <option value="percent">Percent (%)</option>
-                    <option value="amount">Amount ({{ \App\CentralLogics\Helpers::currency_symbol() }})</option>
+                    <option value="amount">Amount (<?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?>)</option>
                   </select>
                 </div>
               </div>
@@ -200,7 +200,7 @@
             </div>
           </div>
 
-          {{-- About This Item --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">📋</span>
@@ -212,12 +212,12 @@
               </div>
               <div class="np-sec-head">Key Selling Points (up to 6)</div>
               <div id="npAboutRows">
-                @for($i = 1; $i <= 6; $i++)
+                <?php for($i = 1; $i <= 6; $i++): ?>
                   <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">
                     <span style="margin-top:10px;font-size:14px;flex-shrink:0">✅</span>
                     <input type="text" name="selling_point[]" class="np-input" placeholder="Add a key selling point…">
                   </div>
-                @endfor
+                <?php endfor; ?>
               </div>
               <button type="button" class="np-btn-add" onclick="npAddSellingPoint()">+ Add Selling Point</button>
 
@@ -236,7 +236,7 @@
             </div>
           </div>
 
-          {{-- Instacart Listing Details --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🛒</span>
@@ -252,13 +252,13 @@
                   <div class="np-inline-add">
                     <select name="meta_data[instacart_department]" id="npInstacartDepartment" class="np-select js-select2-custom">
                       <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
-                        @foreach(\App\Models\InstacartOption::where('type','department')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}">{{ $opt->name }}</option>
-                        @endforeach
-                      @else
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options')): ?>
+                        <?php $__currentLoopData = \App\Models\InstacartOption::where('type','department')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>"><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php else: ?>
                         <option value="" disabled>(Run migration to enable options)</option>
-                      @endif
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenInstacartOptionModal('department')">+</button>
                   </div>
@@ -275,11 +275,11 @@
                   <div class="np-inline-add">
                     <select name="meta_data[instacart_promo_label]" id="npInstacartPromoLabel" class="np-select js-select2-custom">
                       <option value="">None</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
-                        @foreach(\App\Models\InstacartOption::where('type','promo_label')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}">{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options')): ?>
+                        <?php $__currentLoopData = \App\Models\InstacartOption::where('type','promo_label')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>"><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenInstacartOptionModal('promo_label')">+</button>
                   </div>
@@ -289,11 +289,11 @@
                   <div class="np-inline-add">
                     <select name="meta_data[instacart_unit_pricing_display]" id="npInstacartUnitPricingDisplay" class="np-select js-select2-custom">
                       <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
-                        @foreach(\App\Models\InstacartOption::where('type','unit_pricing_display')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}">{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options')): ?>
+                        <?php $__currentLoopData = \App\Models\InstacartOption::where('type','unit_pricing_display')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>"><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenInstacartOptionModal('unit_pricing_display')">+</button>
                   </div>
@@ -308,7 +308,7 @@
             </div>
           </div>
 
-          {{-- Categories --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🗂️</span>
@@ -319,14 +319,14 @@
               <div class="np-info-box">🗂️ Select the deepest (leaf) category whenever possible. Leaf selection can auto-fill Amazon backend fields like Browse Node.</div>
               <div class="np-form-row">
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.store') }} <span class="np-req">*</span></label>
+                  <label class="np-label"><?php echo e(translate('messages.store')); ?> <span class="np-req">*</span></label>
                   <select name="store_id" id="store_id" class="np-select js-select2-custom" required>
-                    <option value="">{{ translate('messages.select_store') }}</option>
-                    @foreach(\App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
+                    <option value=""><?php echo e(translate('messages.select_store')); ?></option>
+                    <?php $__currentLoopData = \App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
                       $query->where('module_id', $moduleId);
-                    })->orderBy('name')->get(['id', 'name']) as $store)
-                      <option value="{{ $store->id }}">{{ $store->name }}</option>
-                    @endforeach
+                    })->orderBy('name')->get(['id', 'name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $store): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($store->id); ?>"><?php echo e($store->name); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </select>
                 </div>
                 <div class="np-form-group">
@@ -335,9 +335,9 @@
                     <select name="category_id" id="category_id" class="np-select js-select2-custom"
                       onchange="npUpdateQuality()">
                       <option value="">— Select Category —</option>
-                      @foreach(\App\Models\Category::where('position', 0)->where('status', 1)->where('module_id', Config::get('module.current_module_id'))->get() as $cat)
-                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                      @endforeach
+                      <?php $__currentLoopData = \App\Models\Category::where('position', 0)->where('status', 1)->where('module_id', Config::get('module.current_module_id'))->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($cat->id); ?>"><?php echo e($cat->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(0)">+</button>
                   </div>
@@ -374,13 +374,13 @@
                   </div>
                 </div>
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.unit') }}</label>
+                  <label class="np-label"><?php echo e(translate('messages.unit')); ?></label>
                   <div class="np-inline-add">
                     <select name="unit" id="unit" class="np-select js-select2-custom">
-                      <option value="">{{ translate('messages.select_unit') }}</option>
-                      @foreach(\App\Models\Unit::get(['id', 'unit']) as $unit)
-                        <option value="{{ $unit->id }}">{{ $unit->unit }}</option>
-                      @endforeach
+                      <option value=""><?php echo e(translate('messages.select_unit')); ?></option>
+                      <?php $__currentLoopData = \App\Models\Unit::get(['id', 'unit']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($unit->id); ?>"><?php echo e($unit->unit); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenUnitModal()">+</button>
                   </div>
@@ -401,21 +401,21 @@
               </div>
               <div class="np-form-row">
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.item_type') }}</label>
+                  <label class="np-label"><?php echo e(translate('messages.item_type')); ?></label>
                   <div class="np-inline-add">
                     <select id="npItemTypeSelect" class="np-select js-select2-custom">
                       <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('item_types'))
-                        @foreach(\App\Models\ItemType::where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','is_veg']) as $t)
-                          <option value="{{ $t->id }}" data-is-veg="{{ (int)$t->is_veg }}">{{ $t->name }}</option>
-                        @endforeach
-                      @else
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('item_types')): ?>
+                        <?php $__currentLoopData = \App\Models\ItemType::where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','is_veg']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($t->id); ?>" data-is-veg="<?php echo e((int)$t->is_veg); ?>"><?php echo e($t->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php else: ?>
                         <option value="" disabled>(Run migration to enable item types)</option>
-                      @endif
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenItemTypeModal()">+</button>
                   </div>
-                  {{-- Keep backend compatibility: ItemController expects veg=0/1 --}}
+                  
                   <input type="hidden" name="veg" id="veg" value="0">
                   <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="">
                   <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="">
@@ -430,9 +430,9 @@
           </div>
         </div>
 
-        {{-- RIGHT COLUMN --}}
+        
         <div>
-          {{-- Status --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🚦</span>
@@ -456,7 +456,7 @@
             </div>
           </div>
 
-          {{-- Origin & Seller --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🌍</span>
@@ -468,13 +468,13 @@
                 <div class="np-inline-add">
                   <select name="meta_data[country_of_origin]" id="npOriginCountry" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','origin_country')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}">{{ $opt->name }}</option>
-                      @endforeach
-                    @else
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','origin_country')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>"><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
                       <option value="" disabled>(Run migration to enable options)</option>
-                    @endif
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('origin_country')">+</button>
                 </div>
@@ -490,11 +490,11 @@
                 <div class="np-inline-add">
                   <select name="meta_data[seller]" id="npSeller" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','seller')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}">{{ $opt->name }}</option>
-                      @endforeach
-                    @endif
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','seller')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>"><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('seller')">+</button>
                 </div>
@@ -502,7 +502,7 @@
             </div>
           </div>
 
-          {{-- Visibility & Features --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">👁️</span>
@@ -544,7 +544,7 @@
             </div>
           </div>
 
-          {{-- Delivery Options --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🚚</span>
@@ -580,7 +580,7 @@
             </div>
           </div>
 
-          {{-- Inventory --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">📊</span>
@@ -597,7 +597,7 @@
                   <input type="number" name="current_stock" id="quantity" class="np-input" placeholder="0" min="0">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
-                  <label class="np-label">{{ translate('messages.Maximum_Purchase_Quantity_Limit') }}</label>
+                  <label class="np-label"><?php echo e(translate('messages.Maximum_Purchase_Quantity_Limit')); ?></label>
                   <input type="number" name="maximum_cart_quantity" id="cart_quantity" class="np-input" placeholder="10"
                     min="0">
                 </div>
@@ -605,7 +605,7 @@
             </div>
           </div>
 
-          {{-- Listing Quality --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">⭐</span>
@@ -626,7 +626,7 @@
         </div>
       </div>
     </div>
-    {{-- ══ TAB 2: ATTRIBUTES ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-attributes">
       <div class="np-grid">
         <div>
@@ -876,7 +876,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 3: NUTRITION & ALLERGENS ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-nutrition">
       <div class="np-grid">
         <div>
@@ -1082,15 +1082,15 @@
       </div>
     </div>
 
-    {{-- ══ TAB 4: VARIANTS ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-variants">
       <div class="np-grid">
         <div>
-          @if (Config::get('module.current_module_type') == 'food')
-            @includeif('admin-views.product.partials._food_variations')
-          @else
-            @includeif('admin-views.product.partials._other_variations')
-          @endif
+          <?php if(Config::get('module.current_module_type') == 'food'): ?>
+            <?php if ($__env->exists('admin-views.product.partials._food_variations')) echo $__env->make('admin-views.product.partials._food_variations', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+          <?php else: ?>
+            <?php if ($__env->exists('admin-views.product.partials._other_variations')) echo $__env->make('admin-views.product.partials._other_variations', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+          <?php endif; ?>
           <div class="np-card" style="margin-top:18px">
             <div class="np-card-header"><span class="np-card-icon">📊</span><span class="np-card-title">Variant SKU
                 Matrix</span><span class="np-card-subtitle">Per variant pricing &amp; stock</span></div>
@@ -1145,10 +1145,10 @@
                 </select></div>
               <div class="np-form-group"><label class="np-label">Colour Palette</label>
                 <div class="np-swatches">
-                  @foreach(['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey'] as $hex => $name)
-                    <div class="np-swatch" style="background:{{ $hex }}" title="{{ $name }}"
+                  <?php $__currentLoopData = ['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $hex => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <div class="np-swatch" style="background:<?php echo e($hex); ?>" title="<?php echo e($name); ?>"
                       onclick="this.classList.toggle('sel')"></div>
-                  @endforeach
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Custom Flavour / Colour
@@ -1196,7 +1196,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 5: SEO & META ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-seo">
       <div class="np-grid">
         <div>
@@ -1205,8 +1205,8 @@
                 Preview</span></div>
             <div class="np-card-body">
               <div class="np-seo-preview">
-                <div class="np-seo-url" id="npSeoUrl">https://{{ request()->getHost() }}/p/your-product-slug</div>
-                <div class="np-seo-title" id="npSeoTitle">Product Name — {{ config('app.name') }}</div>
+                <div class="np-seo-url" id="npSeoUrl">https://<?php echo e(request()->getHost()); ?>/p/your-product-slug</div>
+                <div class="np-seo-title" id="npSeoTitle">Product Name — <?php echo e(config('app.name')); ?></div>
                 <div class="np-seo-desc" id="npSeoDesc">Add a meta description to preview it here…</div>
               </div>
             </div>
@@ -1218,7 +1218,7 @@
               <div class="np-form-group">
                 <label class="np-label">SEO Title <span class="np-req">*</span></label>
                 <input type="text" name="meta_title" id="npSeoTitleInp" class="np-input"
-                  placeholder="e.g. Cream Cheese 864g — Buy Online | {{ config('app.name') }}" oninput="npUpdateSEO()">
+                  placeholder="e.g. Cream Cheese 864g — Buy Online | <?php echo e(config('app.name')); ?>" oninput="npUpdateSEO()">
                 <div style="display:flex;justify-content:space-between;margin-top:4px">
                   <span class="np-hint">Recommended: 50–60 characters</span>
                   <span id="npSeoTitleCC" class="np-cc np-cc-ok">0 chars</span>
@@ -1247,7 +1247,7 @@
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">OG Title</label><input type="text"
                   name="meta_data[og_title]" class="np-input"
-                  placeholder="e.g. Great Product — {{ config('app.name') }}"></div>
+                  placeholder="e.g. Great Product — <?php echo e(config('app.name')); ?>"></div>
               <div class="np-form-group"><label class="np-label">OG Description</label><textarea
                   name="meta_data[og_desc]" class="np-textarea" rows="2"
                   placeholder="Description for social media sharing…"></textarea></div>
@@ -1323,7 +1323,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 6: MEDIA ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-media">
       <div class="np-grid">
         <div>
@@ -1333,7 +1333,7 @@
             <div class="np-card-body">
               <label class="np-label">Main Thumbnail <span class="np-req">*</span></label>
               <label class="d-inline-block m-0 position-relative error-wrapper">
-                <img class="img--176 border" id="viewer" src="{{ asset('assets/admin/img/upload-img.png') }}"
+                <img class="img--176 border" id="viewer" src="<?php echo e(asset('assets/admin/img/upload-img.png')); ?>"
                   alt="thumbnail">
                 <div class="icon-file-group">
                   <div class="icon-file">
@@ -1363,7 +1363,7 @@
               </div>
               <div class="np-img-grid" id="npImagePreviews"></div>
 
-              {{-- Existing spartan multi-image picker for backend --}}
+              
               <div class="d-flex __gap-12px __new-coba overflow-x-auto pb-2 mt-3" id="coba"></div>
             </div>
           </div>
@@ -1442,7 +1442,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 7: LOGISTICS & SHIPPING ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-logistics">
       <div class="np-grid">
         <div>
@@ -1453,11 +1453,11 @@
               <div class="np-info-box">📌 Incoterms define who is responsible for shipping, insurance, and import duties
                 between seller and buyer.</div>
               <div class="np-inco-grid">
-                @foreach(['EXW' => 'Ex Works', 'FCA' => 'Free Carrier', 'CPT' => 'Carriage Paid To', 'CIP' => 'Carriage & Ins. Paid', 'FOB' => 'Free On Board', 'CFR' => 'Cost & Freight', 'CIF' => 'Cost, Ins. & Freight', 'DPU' => 'Delivered at Place Unloaded', 'DAP' => 'Delivered at Place', 'DDP' => 'Delivered Duty Paid', 'FAS' => 'Free Alongside Ship', 'DAT' => 'Delivered at Terminal'] as $code => $label)
-                  <div class="np-inco-pill" onclick="this.classList.toggle('sel')">{{ $code }}<span
-                      class="np-inco-sub">{{ $label }}</span><input type="hidden"
-                      name="meta_data[incoterm_{{ strtolower($code) }}]" value="0"></div>
-                @endforeach
+                <?php $__currentLoopData = ['EXW' => 'Ex Works', 'FCA' => 'Free Carrier', 'CPT' => 'Carriage Paid To', 'CIP' => 'Carriage & Ins. Paid', 'FOB' => 'Free On Board', 'CFR' => 'Cost & Freight', 'CIF' => 'Cost, Ins. & Freight', 'DPU' => 'Delivered at Place Unloaded', 'DAP' => 'Delivered at Place', 'DDP' => 'Delivered Duty Paid', 'FAS' => 'Free Alongside Ship', 'DAT' => 'Delivered at Terminal']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $code => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <div class="np-inco-pill" onclick="this.classList.toggle('sel')"><?php echo e($code); ?><span
+                      class="np-inco-sub"><?php echo e($label); ?></span><input type="hidden"
+                      name="meta_data[incoterm_<?php echo e(strtolower($code)); ?>]" value="0"></div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </div>
             </div>
           </div>
@@ -1501,25 +1501,25 @@
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Free Shipping Threshold</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[free_ship_threshold]" class="np-input" placeholder="150" step="0.01"></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Standard Shipping Fee</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[std_ship_fee]" class="np-input" placeholder="15.00" step="0.01"></div>
                 </div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Express Shipping Fee</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[exp_ship_fee]" class="np-input" placeholder="30.00" step="0.01"></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">International Shipping
                     Fee</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[intl_ship_fee]" class="np-input" placeholder="60.00" step="0.01"></div>
                 </div>
               </div>
@@ -1671,7 +1671,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 8: REVIEWS & ANALYTICS ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-reviews">
       <div class="np-stat-grid">
         <div class="np-stat-card">
@@ -1796,11 +1796,11 @@
       </div>
     </div>
 
-    {{-- ACTION BAR --}}
+    
     <div class="np-action-bar">
       <div class="np-action-info">Last saved: <strong id="npLastSaved">Never</strong></div>
       <div class="np-btn-row">
-        <a href="{{ route('admin.item.list') }}" class="np-btn np-btn-ghost">Cancel</a>
+        <a href="<?php echo e(route('admin.item.list')); ?>" class="np-btn np-btn-ghost">Cancel</a>
         <button type="button" class="np-btn np-btn-outline" onclick="npPrevTab()">Previous</button>
         <button type="button" class="np-btn np-btn-outline" onclick="npSaveDraft()">Save Draft</button>
         <button type="button" class="np-btn np-btn-outline" onclick="npNextTab()">Next</button>
@@ -1811,46 +1811,45 @@
 
   </form>
 
-  {{-- Brand modal must live OUTSIDE #item_form: global .custom-validation iterates ALL descendant inputs and calls .rules().
-       Inputs with form="npBrandForm" still matched .find() and broke jQuery Validate (element.form !== item_form). --}}
+  
   <div class="modal fade" id="npBrandModal" tabindex="-1" role="dialog" aria-labelledby="npBrandModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npBrandForm" enctype="multipart/form-data">
-          @csrf
+          <?php echo csrf_field(); ?>
           <div class="modal-header">
-            <h5 class="modal-title" id="npBrandModalLabel">{{ translate('messages.add_new_brand') }}</h5>
+            <h5 class="modal-title" id="npBrandModalLabel"><?php echo e(translate('messages.add_new_brand')); ?></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
-              <input type="text" name="name[]" class="form-control" placeholder="{{ translate('messages.new_brand') }}" required>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
+              <input type="text" name="name[]" class="form-control" placeholder="<?php echo e(translate('messages.new_brand')); ?>" required>
               <input type="hidden" name="lang[]" value="default">
             </div>
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.Brand Logo') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.Brand Logo')); ?> <small class="text-danger">*</small></label>
               <input type="file" name="image" class="form-control" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
             </div>
-            <small class="text-muted d-block mt-2">{{ translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)') }}</small>
+            <small class="text-muted d-block mt-2"><?php echo e(translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)')); ?></small>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Category modal (quick add) --}}
+  
   <div class="modal fade" id="npCategoryModal" tabindex="-1" role="dialog" aria-labelledby="npCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npCategoryForm" enctype="multipart/form-data">
-          @csrf
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="position" id="npCategoryPosition" value="0">
           <input type="hidden" name="parent_id" id="npCategoryParentId" value="">
           <div class="modal-header">
@@ -1861,59 +1860,59 @@
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name[]" class="form-control" placeholder="Category name" required>
               <input type="hidden" name="lang[]" value="default">
             </div>
             <div class="form-group mb-0" id="npCategoryImageWrap" style="display:none">
-              <label class="input-label">{{ translate('messages.image') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.image')); ?> <small class="text-danger">*</small></label>
               <input type="file" name="image" id="npCategoryImage" class="form-control" accept="image/*">
-              <small class="text-muted d-block mt-2">{{ translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)') }}</small>
+              <small class="text-muted d-block mt-2"><?php echo e(translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)')); ?></small>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Unit modal (quick add) --}}
+  
   <div class="modal fade" id="npUnitModal" tabindex="-1" role="dialog" aria-labelledby="npUnitModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npUnitForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <div class="modal-header">
-            <h5 class="modal-title" id="npUnitModalLabel">{{ translate('messages.add_new_unit') }}</h5>
+            <h5 class="modal-title" id="npUnitModalLabel"><?php echo e(translate('messages.add_new_unit')); ?></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.unit') }} <small class="text-danger">*</small></label>
-              <input type="text" name="unit[]" class="form-control" placeholder="{{ translate('messages.unit') }}" required>
+              <label class="input-label"><?php echo e(translate('messages.unit')); ?> <small class="text-danger">*</small></label>
+              <input type="text" name="unit[]" class="form-control" placeholder="<?php echo e(translate('messages.unit')); ?>" required>
               <input type="hidden" name="lang[]" value="default">
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Instacart option modal (quick add) --}}
+  
   <div class="modal fade" id="npInstacartOptionModal" tabindex="-1" role="dialog" aria-labelledby="npInstacartOptionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npInstacartOptionForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="type" id="npInstacartOptionType" value="">
           <div class="modal-header">
             <h5 class="modal-title" id="npInstacartOptionModalLabel">Add Option</h5>
@@ -1923,20 +1922,20 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name" class="form-control" placeholder="Option name" required>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Item type label modal (quick add) --}}
+  
   <div class="modal fade" id="npItemTypeModal" tabindex="-1" role="dialog" aria-labelledby="npItemTypeModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -1962,20 +1961,20 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Product select option modal (Origin & Seller quick add) --}}
+  
   <div class="modal fade" id="npProductSelectOptionModal" tabindex="-1" role="dialog" aria-labelledby="npProductSelectOptionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npProductSelectOptionForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="type" id="npProductSelectOptionType" value="">
           <div class="modal-header">
             <h5 class="modal-title" id="npProductSelectOptionModalLabel">Add Option</h5>
@@ -1985,13 +1984,13 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name" class="form-control" placeholder="Option name" required>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
@@ -1999,7 +1998,7 @@
   </div>
 </div>
 
-<span id="message-enter-choice-values" data-text="{{ translate('enter_choice_values') }}"></span>
+<span id="message-enter-choice-values" data-text="<?php echo e(translate('enter_choice_values')); ?>"></span>
 
 <div class="modal" id="food-modal">
   <div class="modal-dialog modal-xl">
@@ -2024,27 +2023,27 @@
   </div>
 </div>
 
-@includeif('admin-views.product.partials._ai_sidebar')
-@endsection
+<?php if ($__env->exists('admin-views.product.partials._ai_sidebar')) echo $__env->make('admin-views.product.partials._ai_sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
 
-@push('script_2')
-  <script src="{{ asset('assets/admin') }}/js/tags-input.min.js"></script>
-  <script src="{{ asset('assets/admin/js/spartan-multi-image-picker.js') }}"></script>
-  {{-- Disabled legacy script: it builds broken URLs like /admin/item/NaN1add_on and conflicts with this new-product UI --}}
-  {{-- <script src="{{ asset('assets/admin') }}/js/view-pages/product-index.js"></script> --}}
-  <script src="{{ asset('assets/admin/js/AI/products/product-title-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/product-description-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/general-setup-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/product-others-autofill.js') }}"></script>
-  @if (Config::get('module.current_module_type') == 'food')
-    <script src="{{ asset('assets/admin/js/AI/products/variation-setup-auto-fill.js') }}"></script>
-  @else
-    <script src="{{ asset('assets/admin/js/AI/products/other-variation-setup-auto-fill.js') }}"></script>
-  @endif
-  <script src="{{ asset('assets/admin/js/AI/products/seo-section-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/ai-sidebar.js') }}"></script>
-  <script src="{{ asset('/assets/admin/js/AI/products/compressor/image-compressor.js') }}"></script>
-  <script src="{{ asset('/assets/admin/js/AI/products/compressor/compressor.min.js') }}"></script>
+<?php $__env->startPush('script_2'); ?>
+  <script src="<?php echo e(asset('assets/admin')); ?>/js/tags-input.min.js"></script>
+  <script src="<?php echo e(asset('assets/admin/js/spartan-multi-image-picker.js')); ?>"></script>
+  
+  
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-title-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-description-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/general-setup-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-others-autofill.js')); ?>"></script>
+  <?php if(Config::get('module.current_module_type') == 'food'): ?>
+    <script src="<?php echo e(asset('assets/admin/js/AI/products/variation-setup-auto-fill.js')); ?>"></script>
+  <?php else: ?>
+    <script src="<?php echo e(asset('assets/admin/js/AI/products/other-variation-setup-auto-fill.js')); ?>"></script>
+  <?php endif; ?>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/seo-section-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/ai-sidebar.js')); ?>"></script>
+  <script src="<?php echo e(asset('/assets/admin/js/AI/products/compressor/image-compressor.js')); ?>"></script>
+  <script src="<?php echo e(asset('/assets/admin/js/AI/products/compressor/compressor.min.js')); ?>"></script>
 
   <script>
     "use strict";
@@ -2190,10 +2189,10 @@
       const ti = document.getElementById('npSeoTitleInp')?.value || '';
       const di = document.getElementById('npSeoDescInp')?.value || '';
       const sl = document.getElementById('npSeoSlug')?.value || '';
-      if (document.getElementById('npSeoTitle')) document.getElementById('npSeoTitle').textContent = (ti || (name || 'Product Name') + ' — {{ config("app.name") }}').substring(0, 70);
+      if (document.getElementById('npSeoTitle')) document.getElementById('npSeoTitle').textContent = (ti || (name || 'Product Name') + ' — <?php echo e(config("app.name")); ?>').substring(0, 70);
       if (document.getElementById('npSeoDesc')) document.getElementById('npSeoDesc').textContent = (di || document.getElementById('npShortDesc')?.value || 'Add a meta description…').substring(0, 200);
       const slug = sl || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'your-product-slug';
-      if (document.getElementById('npSeoUrl')) document.getElementById('npSeoUrl').textContent = '{{ url("/") }}/p/' + slug;
+      if (document.getElementById('npSeoUrl')) document.getElementById('npSeoUrl').textContent = '<?php echo e(url("/")); ?>/p/' + slug;
       if (document.getElementById('npSeoTitleCC')) { const tl = ti.length; const tc = document.getElementById('npSeoTitleCC'); tc.textContent = tl + ' chars'; tc.className = 'np-cc ' + (tl > 60 ? 'np-cc-over' : tl > 50 ? 'np-cc-warn' : 'np-cc-ok'); }
       if (document.getElementById('npSeoDescCC')) { const dl = di.length; const dc = document.getElementById('npSeoDescCC'); dc.textContent = dl + ' chars'; dc.className = 'np-cc ' + (dl > 160 ? 'np-cc-over' : dl > 150 ? 'np-cc-warn' : 'np-cc-ok'); }
     }
@@ -2310,7 +2309,7 @@
 
       const currentItemId = $('#item_id').val();
       const formData = new FormData(form);
-      const url = currentItemId ? ('{{ url("admin/item/update") }}/' + currentItemId) : '{{ route('admin.item.store') }}';
+      const url = currentItemId ? ('<?php echo e(url("admin/item/update")); ?>/' + currentItemId) : '<?php echo e(route('admin.item.store')); ?>';
 
       $.ajaxSetup({
         headers: {
@@ -2346,9 +2345,9 @@
           document.getElementById('npLastSaved').textContent = new Date().toLocaleTimeString();
 
           if (publish) {
-            toastr.success(data.success || "{{ translate('messages.product_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+            toastr.success(data.success || "<?php echo e(translate('messages.product_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
             setTimeout(function () {
-              location.href = "{{ route('admin.item.list') }}";
+              location.href = "<?php echo e(route('admin.item.list')); ?>";
             }, 1000);
             return;
           }
@@ -2368,7 +2367,7 @@
 
     $(document).on('change', '#discount_type', function () {
       var discountType = document.getElementById("discount_type");
-      if (discountType.value === 'amount') { $('#symble').text("({{ \App\CentralLogics\Helpers::currency_symbol() }})"); }
+      if (discountType.value === 'amount') { $('#symble').text("(<?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?>)"); }
       else { $('#symble').text("(%)"); }
     });
 
@@ -2393,15 +2392,15 @@
           groupClassName: 'spartan_item_wrapper min-w-176px max-w-176px',
           maxFileSize: 1024 * 1024 * 2,
           placeholderImage: {
-            image: "{{ asset('assets/admin/img/upload-img.png') }}",
+            image: "<?php echo e(asset('assets/admin/img/upload-img.png')); ?>",
             width: '176px'
           },
           dropFileLabel: "Drop Here",
           onExtensionErr: function () {
-            toastr.error("{{ translate('messages.please_only_input_png_or_jpg_type_file') }}", { CloseButton: true, ProgressBar: true });
+            toastr.error("<?php echo e(translate('messages.please_only_input_png_or_jpg_type_file')); ?>", { CloseButton: true, ProgressBar: true });
           },
           onSizeErr: function () {
-            toastr.error("{{ translate('messages.file_size_too_big') }}", { CloseButton: true, ProgressBar: true });
+            toastr.error("<?php echo e(translate('messages.file_size_too_big')); ?>", { CloseButton: true, ProgressBar: true });
           }
         });
       }
@@ -2409,9 +2408,9 @@
       initImagePicker();
 
       // Category cascade (DB-backed via admin.item.get-categories)
-      const npModuleId = "{{ Config::get('module.current_module_id') }}";
+      const npModuleId = "<?php echo e(Config::get('module.current_module_id')); ?>";
       function npFetchChildCategories(parentId) {
-        return $.get("{{ route('admin.item.get-categories') }}", {
+        return $.get("<?php echo e(route('admin.item.get-categories')); ?>", {
           parent_id: parentId,
           module_id: npModuleId,
           sub_category: 1
@@ -2487,7 +2486,7 @@
         $('#unit').val(null).trigger('change');
         $('#veg').val(0).trigger('change');
         $('#discount_type').val('percent').trigger('change');
-        $('#viewer').attr('src', "{{ asset('assets/admin/img/upload-img.png') }}");
+        $('#viewer').attr('src', "<?php echo e(asset('assets/admin/img/upload-img.png')); ?>");
         $('#customFileEg1').val(null).trigger('change');
         $("#coba").empty();
         initImagePicker();
@@ -2515,7 +2514,7 @@
         const fd = new FormData(form);
 
         $.ajax({
-          url: "{{ route('admin.brand.store') }}",
+          url: "<?php echo e(route('admin.brand.store')); ?>",
           method: "POST",
           data: fd,
           processData: false,
@@ -2525,12 +2524,12 @@
               const opt = new Option(res.name, res.id, true, true);
               document.getElementById('npBrand')?.appendChild(opt);
               $('#npBrand').val(String(res.id)).trigger('change');
-              toastr.success(res.message || "{{ translate('messages.brand_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+              toastr.success(res.message || "<?php echo e(translate('messages.brand_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
               $('#npBrandModal').modal('hide');
               npUpdateQuality();
               return;
             }
-            toastr.success("{{ translate('messages.brand_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+            toastr.success("<?php echo e(translate('messages.brand_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
             $('#npBrandModal').modal('hide');
           },
           error: function (xhr) {
@@ -2563,33 +2562,33 @@
         if (position === 1) {
           parentId = $('#category_id').val() || '';
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
         if (position === 2) {
           parentId = $('#sub_category_id').val() || '';
           if (!($('#category_id').val() || '')) {
-            toastr.warning("{{ translate('messages.select_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_sub_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
         if (position === 3) {
           parentId = $('#sub_sub_category_id').val() || '';
           if (!($('#category_id').val() || '')) {
-            toastr.warning("{{ translate('messages.select_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
           if (!($('#sub_category_id').val() || '')) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_sub_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_sub_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
@@ -2623,7 +2622,7 @@
 
         // Use item-module category store to avoid module:category middleware
         $.ajax({
-          url: "{{ route('admin.item.category.store') }}/" + encodeURIComponent(position),
+          url: "<?php echo e(route('admin.item.category.store')); ?>/" + encodeURIComponent(position),
           method: "POST",
           dataType: "json",
           data: fd,
@@ -2697,7 +2696,7 @@
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
 
         $.ajax({
-          url: "{{ route('admin.item.unit.store') }}",
+          url: "<?php echo e(route('admin.item.unit.store')); ?>",
           method: "POST",
           dataType: "json",
           data: fd,
@@ -2710,7 +2709,7 @@
               $sel.val(String(res.id));
               if ($sel.hasClass('select2-hidden-accessible')) $sel.trigger('change.select2');
               else $sel.trigger('change');
-              toastr.success(res.message || "{{ translate('messages.unit_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+              toastr.success(res.message || "<?php echo e(translate('messages.unit_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
               $('#npUnitModal').modal('hide');
               return;
             }
@@ -2764,7 +2763,7 @@
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
 
         $.ajax({
-          url: "{{ route('admin.item.instacart.options.store') }}",
+          url: "<?php echo e(route('admin.item.instacart.options.store')); ?>",
           method: "POST",
           dataType: "json",
           data: $(form).serialize(),
@@ -2839,7 +2838,7 @@
         if (!name) return;
 
         $.ajax({
-          url: "{{ route('admin.item.item-types.store') }}",
+          url: "<?php echo e(route('admin.item.item-types.store')); ?>",
           method: "POST",
           dataType: "json",
           data: {
@@ -2904,7 +2903,7 @@
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
 
         $.ajax({
-          url: "{{ route('admin.item.product-select-options.store') }}",
+          url: "<?php echo e(route('admin.item.product-select-options.store')); ?>",
           method: "POST",
           dataType: "json",
           data: $(form).serialize(),
@@ -2945,4 +2944,6 @@
       });
 
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.admin.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\6MartAdminpanel\resources\views/admin-views/product/index.blade.php ENDPATH**/ ?>

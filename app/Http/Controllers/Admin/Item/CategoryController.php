@@ -72,9 +72,12 @@ class CategoryController extends BaseController
         return view($this->categoryService->getViewByPosition($request['position'] ?? 0), compact('categories', 'language', 'mainCategories', 'categoryWiseTax', 'taxVats'));
     }
 
-    public function add(CategoryAddRequest $request): RedirectResponse
+    public function add(CategoryAddRequest $request): RedirectResponse|JsonResponse
     {
-        $parentCategory = $this->categoryRepo->getFirstWhere(params: ['id' => $request['parent_id']]);
+        $parentCategory = null;
+        if (filled($request['parent_id']) && (int) $request['parent_id'] > 0) {
+            $parentCategory = $this->categoryRepo->getFirstWhere(params: ['id' => $request['parent_id']]);
+        }
         $category = $this->categoryRepo->add(
             data: $this->categoryService->getAddData(
                 request: $request,
@@ -102,6 +105,17 @@ class CategoryController extends BaseController
         }
 
         Toastr::success($request['position'] == 0 ? translate('messages.category_added_successfully') : translate('messages.Sub_category_added_successfully'));
+
+        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'id' => $category->id,
+                'name' => $category->name,
+                'position' => $category->position,
+                'parent_id' => $category->parent_id,
+                'message' => $request['position'] == 0 ? translate('messages.category_added_successfully') : translate('messages.Sub_category_added_successfully'),
+            ]);
+        }
+
         return back();
     }
 

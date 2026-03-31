@@ -50,11 +50,21 @@ class BrandController extends BaseController
         return view(BrandViewPath::INDEX[VIEW], compact('brands','language','defaultLang'));
     }
 
-    public function add(BrandAddRequest $request): RedirectResponse
+    public function add(BrandAddRequest $request): RedirectResponse|JsonResponse
     {
         $brand = $this->brandRepo->add(data: $this->brandService->getAddData(request: $request));
         $this->translationRepo->addByModel(request: $request, model: $brand, modelPath: 'App\Models\Brand', attribute: 'name');
-        Toastr::success(translate('messages.brand_added_successfully'));
+        $message = translate('messages.brand_added_successfully');
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json([
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'message' => $message,
+            ]);
+        }
+
+        Toastr::success($message);
         return back();
     }
 

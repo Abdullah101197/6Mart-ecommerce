@@ -41,7 +41,8 @@
   <div class="content">
 
     <!-- ══════════════════ TAB 1: GENERAL ══════════════════ -->
-    <div class="tab-panel active" id="tab-general">
+    @include('admin-views.product.partials._general_task2')
+    {{-- <div class="tab-panel active" id="tab-general">
       <div class="grid">
         <div>
 
@@ -478,7 +479,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> --}}
 
     <!-- ══════════════════ TAB 2: ATTRIBUTES ══════════════════ -->
     <div class="tab-panel" id="tab-attributes">
@@ -2215,7 +2216,150 @@
             btn.classList.add('active');
             document.getElementById(panelId).classList.add('active');
         }
-        
-        // Include the rest of task2.html JS or a custom submit handler later
+
+        // ==============================
+        // GENERAL TAB (task2.html parity)
+        // ==============================
+
+        let imgs = window.imgs || [];
+
+        function rmTag(el) {
+            if (el && el.parentElement) el.parentElement.remove();
+        }
+
+        // Minimal tag adder used by General/Instacart tag inputs
+        function addTag(e, wrapperId, inputId, cls) {
+            if (!e || e.key !== 'Enter') return;
+            e.preventDefault();
+            const inp = document.getElementById(inputId);
+            if (!inp) return;
+            const v = (inp.value || '').trim();
+            if (!v) return;
+
+            const wrap = document.getElementById(wrapperId);
+            if (!wrap) return;
+
+            const t = document.createElement('span');
+            t.className = 'tag ' + (cls || '');
+            t.innerHTML = `${v} <span class="tag-rm" onclick="rmTag(this)">×</span>`;
+            wrap.insertBefore(t, inp);
+            inp.value = '';
+        }
+
+        function updateDiscount() {
+            const rEl = document.getElementById('regPrice');
+            const sEl = document.getElementById('salePrice');
+            const outEl = document.getElementById('discountPct');
+            if (!rEl || !sEl || !outEl) return;
+            const r = parseFloat(rEl.value);
+            const s = parseFloat(sEl.value);
+            outEl.value = (r > 0 && s > 0 && s < r) ? Math.round((1 - s / r) * 100) + '% OFF' : '—';
+        }
+
+        function updateDescCount() {
+            const el = document.getElementById('shortDesc');
+            const cc = document.getElementById('descCount');
+            if (!el || !cc) return;
+            const len = (el.value || '').length;
+            cc.textContent = len + '/160';
+            cc.className = 'cc ' + (len > 160 ? 'cc-over' : len > 130 ? 'cc-warn' : 'cc-ok');
+        }
+
+        function selStatus(el, isDraft, isOut) {
+            // task2 expects pills to toggle these classes
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('sel', 'out', 'draft'));
+            if (el) el.classList.add('sel');
+            if (el && isOut) el.classList.add('out');
+            if (el && isDraft) el.classList.add('draft');
+        }
+
+        function updateSEO() {
+            // Guard: SEO tab fields may not be present in every state
+            const seoTitle = document.getElementById('seoTitle');
+            const seoDesc = document.getElementById('seoDesc');
+            if (!seoTitle && !seoDesc) return;
+
+            const name = document.getElementById('productName')?.value || '';
+            const ti = document.getElementById('seoTitleInp')?.value || '';
+            const di = document.getElementById('seoDescInp')?.value || '';
+            const sl = document.getElementById('seoSlug')?.value || '';
+
+            if (seoTitle) {
+                seoTitle.textContent = (ti || (name ? name + ' — Carrefour Qatar' : 'Product Name — Carrefour Qatar')).substring(0, 70);
+            }
+            if (seoDesc) {
+                const shortDesc = document.getElementById('shortDesc')?.value || '';
+                seoDesc.textContent = (di || shortDesc || 'Add a meta description to preview it here…').substring(0, 200);
+            }
+        }
+
+        function updateQuality() {
+            // Minimal quality score for General tab
+            const productNameOk = !!(document.getElementById('productName')?.value || '').trim();
+            const brandOk = !!(document.getElementById('brand')?.value || '');
+            const weightOk = !!(document.getElementById('weight')?.value || '').trim();
+            const catOk = !!(document.getElementById('mainCat')?.value || '');
+            const hasImgs = Array.isArray(imgs) ? imgs.length > 0 : false;
+            const priceOk = !!document.getElementById('regPrice')?.value;
+            const descOk = !!(document.getElementById('shortDesc')?.value || '').trim();
+
+            const c = [productNameOk, brandOk, weightOk, catOk, hasImgs, hasImgs && imgs.length >= 3, priceOk, descOk];
+            const s = Math.round(c.filter(Boolean).length / c.length * 100);
+
+            const fill = document.getElementById('qualityFill');
+            const pct = document.getElementById('qualityPct');
+            const tips = document.getElementById('qualityTips');
+            if (fill) fill.style.width = s + '%';
+            if (pct) pct.textContent = s + '%';
+
+            if (tips) {
+                const t = [];
+                if (!productNameOk) t.push('• Add product name');
+                if (!brandOk) t.push('• Select a brand');
+                if (!descOk) t.push('• Add short description');
+                if (!hasImgs) t.push('• Upload at least one image');
+                if (!catOk) t.push('• Choose a category');
+                if (!priceOk) t.push('• Set a price');
+                tips.innerHTML = t.length ? t.join('<br>') : '✅ Excellent listing quality!';
+            }
+        }
+
+        // Category tree stubs (prevents ReferenceErrors; can be enhanced later)
+        function updateSubCat() {
+            const s1 = document.getElementById('subCat');
+            const s2 = document.getElementById('subCat2');
+            const s3 = document.getElementById('subCat3');
+            if (s1) s1.innerHTML = '<option value="">Select Level 2…</option>';
+            if (s2) s2.innerHTML = '<option value="">Select Level 2 first…</option>';
+            if (s3) s3.innerHTML = '<option value="">Select Level 3 first…</option>';
+            const wrap = document.getElementById('catPathWrap');
+            if (wrap) wrap.style.display = 'none';
+            updateQuality();
+        }
+
+        function updateSubCat2() {
+            const s2 = document.getElementById('subCat2');
+            const s3 = document.getElementById('subCat3');
+            if (s2) s2.innerHTML = s2.innerHTML || '<option value="">Select Level 3…</option>';
+            if (s3) s3.innerHTML = '<option value="">Select Level 3 first…</option>';
+            updateQuality();
+        }
+
+        function updateSubCat3() {
+            const s3 = document.getElementById('subCat3');
+            if (s3) s3.innerHTML = s3.innerHTML || '<option value="">Select Leaf Node…</option>';
+            updateQuality();
+        }
+
+        // ==============================
+        // STRUCTURE CRUD (dynamic fields)
+        // ==============================
+        // These are safe no-ops for now (prevents ReferenceError). Full modal wiring can be added safely later.
+        function openTabModal() {}
+        function deleteTab() {}
+        function openSectionModal() {}
+        function deleteSection() {}
+        function openFieldModal() {}
+        function deleteField() {}
     </script>
 @endpush

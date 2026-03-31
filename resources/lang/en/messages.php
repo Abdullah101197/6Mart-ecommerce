@@ -9120,4 +9120,7 @@ Smartly or Earn. ',
   'This feature allows the admin to configure how and when earnings are disbursed to vendors and delivery personnel. Proper setup ensures timely payouts, automated processing, and compliance with operational rules.' => 'This feature allows the admin to configure how and when earnings are disbursed to vendors and delivery personnel. Proper setup ensures timely payouts, automated processing, and compliance with operational rules.',
   'Create and manage predefined messages that customers can choose when reporting an issue. You can activate or deactivate each message as needed.' => 'Create and manage predefined messages that customers can choose when reporting an issue. You can activate or deactivate each message as needed.',
   'Ex:_reference,_Name' => 'Ex: reference, Name',
+  'Setup your account credentials' => 'Setup your account credentials',
+  'unit_added_successfully' => 'Unit added successfully',
+  'default_unit_is_required' => 'Default unit is required',
 );

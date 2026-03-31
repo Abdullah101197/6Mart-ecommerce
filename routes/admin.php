@@ -116,6 +116,17 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
             //ajax request
             Route::get('get-categories', 'ItemController@get_categories')->name('get-categories');
+            // Quick-add categories from item add/edit screens (avoid module:category middleware)
+            Route::post('category/store/{position?}', [\App\Http\Controllers\Admin\Item\CategoryController::class, 'add'])->name('category.store');
+            // Quick-add units from item add/edit screens (avoid module:unit middleware)
+            Route::post('unit/store', [\App\Http\Controllers\Admin\Item\UnitController::class, 'add'])->name('unit.store');
+            // Instacart options (DB-backed dropdowns + quick add)
+            Route::get('instacart/options', [\App\Http\Controllers\Admin\Item\InstacartOptionController::class, 'index'])->name('instacart.options.index');
+            Route::post('instacart/options', [\App\Http\Controllers\Admin\Item\InstacartOptionController::class, 'store'])->name('instacart.options.store');
+            // Product select options (Origin & Seller)
+            Route::post('product-select-options', [\App\Http\Controllers\Admin\Item\ProductSelectOptionController::class, 'store'])->name('product-select-options.store');
+            // Item types (DB-backed item type + quick add)
+            Route::post('item-types', [\App\Http\Controllers\Admin\Item\ItemTypeController::class, 'store'])->name('item-types.store');
             Route::get('get-items', 'ItemController@get_items')->name('getitems');
             Route::get('get-items-flashsale', 'ItemController@get_items_flashsale')->name('getitems-flashsale');
             Route::post('food-variation-generate', 'ItemController@food_variation_generator')->name('food-variation-generate');

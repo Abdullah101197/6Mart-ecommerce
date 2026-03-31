@@ -25,13 +25,21 @@ class CategoryService
 
     public function getAddData($request, string|null|Object $parentCategory): array
     {
+        $parentIdRaw = $request->input('parent_id');
+        $parentId = (filled($parentIdRaw) && (int) $parentIdRaw > 0) ? (int) $parentIdRaw : 0;
+
+        $moduleId = Config::get('module.current_module_id');
+        if ($parentId > 0 && $parentCategory) {
+            $moduleId = is_object($parentCategory) ? $parentCategory->module_id : $parentCategory['module_id'];
+        }
+
         return [
             'name' => $request->name[array_search('default', $request->lang)],
             'image' => $this->upload('category/', 'png', $request->file('image')),
-            'parent_id' => $request->parent_id == null ? 0 : $request->parent_id,
+            'parent_id' => $parentId,
             'position' => $request->position,
             'priority' => $request->priority??0,
-            'module_id' => isset($request->parent_id) ? $parentCategory['module_id'] : Config::get('module.current_module_id')
+            'module_id' => $moduleId,
         ];
     }
 

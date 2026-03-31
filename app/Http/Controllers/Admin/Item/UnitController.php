@@ -52,11 +52,20 @@ class UnitController extends BaseController
         return view(UnitViewPath::INDEX[VIEW], compact('units','language','defaultLang'));
     }
 
-    public function add(UnitAddRequest $request): RedirectResponse
+    public function add(UnitAddRequest $request): RedirectResponse|JsonResponse
     {
         $unit = $this->unitRepo->add(data: $this->unitService->getAddData(request: $request));
         $this->translationRepo->addByModel(request: $request, model: $unit, modelPath: 'App\Models\Unit', attribute: 'unit');
         Toastr::success(translate('messages.unit_added_successfully'));
+
+        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'id' => $unit->id,
+                'name' => $unit->unit,
+                'message' => translate('messages.unit_added_successfully'),
+            ]);
+        }
+
         return back();
     }
 
