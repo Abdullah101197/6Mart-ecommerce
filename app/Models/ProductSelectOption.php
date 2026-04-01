@@ -9,6 +9,7 @@ class ProductSelectOption extends Model
     protected $fillable = [
         'type',
         'name',
+        'value',
         'module_id',
     ];
 }

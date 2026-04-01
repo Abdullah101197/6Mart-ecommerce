@@ -14,6 +14,7 @@
     #npInstacartOptionModal { z-index: 2000; }
     #npItemTypeModal { z-index: 2000; }
     #npProductSelectOptionModal { z-index: 2000; }
+    #npAttributeModal { z-index: 2000; }
     #npCustomTabModal { z-index: 2000; }
     #npManageTabsModal { z-index: 2000; }
     #npManageSectionsModal { z-index: 2000; }
@@ -1350,15 +1351,31 @@
                   </select>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0;flex:1">
-                  <label class="np-label">Colour Palette</label>
+                  <label class="np-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <span>Colour Palette</span>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('variant_color')">+</button>
+                  </label>
                   <div class="np-swatches" id="npSwatchesWrap">
-                    @foreach(['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey'] as $hex => $name)
-                      <div class="np-swatch {{ in_array($hex,$npSwatches) ? 'sel' : '' }}"
-                        data-hex="{{ $hex }}"
-                        style="background:{{ $hex }}{{ $hex === '#f9fafb' ? ';border:1.5px solid #d1d5db' : '' }}"
-                        title="{{ $name }}"
-                        onclick="npToggleSwatch(this)"></div>
-                    @endforeach
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options') && \Illuminate\Support\Facades\Schema::hasColumn('product_select_options','value'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','variant_color')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','value']) as $opt)
+                        @php($hex = is_string($opt->value) ? trim($opt->value) : '')
+                        @if(filled($hex))
+                          <div class="np-swatch {{ in_array($hex,$npSwatches) ? 'sel' : '' }}"
+                            data-hex="{{ $hex }}"
+                            style="background:{{ $hex }}{{ strtolower($hex) === '#f9fafb' ? ';border:1.5px solid #d1d5db' : '' }}"
+                            title="{{ $opt->name }}"
+                            onclick="npToggleSwatch(this)"></div>
+                        @endif
+                      @endforeach
+                    @else
+                      @foreach(['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey'] as $hex => $name)
+                        <div class="np-swatch {{ in_array($hex,$npSwatches) ? 'sel' : '' }}"
+                          data-hex="{{ $hex }}"
+                          style="background:{{ $hex }}{{ $hex === '#f9fafb' ? ';border:1.5px solid #d1d5db' : '' }}"
+                          title="{{ $name }}"
+                          onclick="npToggleSwatch(this)"></div>
+                      @endforeach
+                    @endif
                   </div>
                 </div>
               </div>
@@ -1379,7 +1396,10 @@
 
               @if (Config::get('module.current_module_type') != 'food')
                 <div style="margin-top:16px">
-                  <div class="np-sec-head" style="margin:0 0 10px">Attribute</div>
+                  <div class="np-sec-head" style="margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <span>Attribute</span>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenAttributeQuickAdd()">+</button>
+                  </div>
                   <div id="npAttrEmbed">
                     @includeif('admin-views.product.partials._other_variations')
                   </div>
@@ -2312,6 +2332,41 @@
               <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
               <input type="text" name="name" class="form-control" placeholder="Option name" required>
             </div>
+            <div class="form-group mt-3 mb-0" id="npProductSelectOptionValueWrap" style="display:none">
+              <label class="input-label">Colour (Hex) <small class="text-danger">*</small></label>
+              <div class="d-flex align-items-center" style="gap:10px">
+                <input type="color" id="npProductSelectOptionColorPicker" class="form-control" style="max-width:72px;padding:3px" value="#2563eb">
+                <input type="text" name="value" id="npProductSelectOptionValue" class="form-control" placeholder="#2563eb">
+              </div>
+              <small class="text-muted d-block mt-2">Pick a colour or type a hex value like #ff0000.</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
+            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {{-- Attribute quick add modal --}}
+  <div class="modal fade" id="npAttributeModal" tabindex="-1" role="dialog" aria-labelledby="npAttributeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <form id="npAttributeForm">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title" id="npAttributeModalLabel">Add Attribute</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group mb-0">
+              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <input type="text" name="name" id="npAttributeName" class="form-control" placeholder="e.g. Size, Colour, Material" required>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
@@ -2738,15 +2793,10 @@
       document.getElementById('npVariantBody').appendChild(tr);
     }
 
-    // Swatch selection needs hidden inputs to submit
-    function npToggleSwatch(el) {
-      if (!el) return;
-      el.classList.toggle('sel');
+    function npSyncSwatchHiddenInputs() {
       const wrap = document.getElementById('npSwatchesWrap');
       if (!wrap) return;
-      // remove existing hidden inputs
       wrap.querySelectorAll('input[type="hidden"][name="meta_data[variant_swatches][]"]').forEach(n => n.remove());
-      // add for selected
       wrap.querySelectorAll('.np-swatch.sel').forEach(sw => {
         const hex = sw.getAttribute('data-hex') || '';
         if (!hex) return;
@@ -2756,6 +2806,13 @@
         hi.value = hex;
         wrap.appendChild(hi);
       });
+    }
+
+    // Swatch selection needs hidden inputs to submit
+    function npToggleSwatch(el) {
+      if (!el) return;
+      el.classList.toggle('sel');
+      npSyncSwatchHiddenInputs();
     }
 
     // ═══ DRAFT SAVE ═══
@@ -2925,6 +2982,76 @@
       try { data = JSON.parse(raw); } catch (e) { data = null; }
       if (!data || typeof data !== 'object') return;
 
+      // Rebuild dynamic UI pieces BEFORE applying field values
+      function npRebuildTagWrap(wrapId, inputId, cls, fname, values) {
+        try {
+          const wrap = document.getElementById(wrapId);
+          const inp = document.getElementById(inputId);
+          if (!wrap || !inp) return;
+          // remove existing tags (keep the input)
+          Array.from(wrap.querySelectorAll('.np-tag')).forEach(n => n.remove());
+          const arr = Array.isArray(values) ? values : [];
+          arr.map(v => (typeof v === 'string' ? v.trim() : String(v ?? '').trim()))
+            .filter(v => !!v)
+            .forEach(v => {
+              const t = document.createElement('span');
+              t.className = 'np-tag ' + cls;
+              t.innerHTML = `${v} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span>`;
+              const hi = document.createElement('input');
+              hi.type = 'hidden';
+              hi.name = fname;
+              hi.value = v;
+              t.appendChild(hi);
+              wrap.insertBefore(t, inp);
+            });
+        } catch (e) { }
+      }
+
+      function npEnsureVariantMatrixRows(rowCount) {
+        try {
+          const body = document.getElementById('npVariantBody');
+          if (!body) return;
+          const existing = body.querySelectorAll('tr').length;
+          const need = Math.max(Number(rowCount) || 0, 1);
+          for (let i = existing; i < need; i++) {
+            if (typeof npAddVariantRow === 'function') npAddVariantRow();
+          }
+        } catch (e) { }
+      }
+
+      try {
+        // Tags
+        npRebuildTagWrap('npFlavWrap', 'npFlavInput', 't-green', 'meta_data[flavor_names][]', data['meta_data[flavor_names][]']);
+        npRebuildTagWrap('npSizeWrap', 'npSizeInput', 't-purple', 'meta_data[size_variants][]', data['meta_data[size_variants][]']);
+
+        // Variant SKU matrix (ensure enough rows exist)
+        const vn = data['meta_data[var_name][]'];
+        const vs = data['meta_data[var_sku][]'];
+        const vp = data['meta_data[var_price][]'];
+        const vq = data['meta_data[var_stock][]'];
+        const vt = data['meta_data[var_status][]'];
+        const rows = Math.max(
+          Array.isArray(vn) ? vn.length : 0,
+          Array.isArray(vs) ? vs.length : 0,
+          Array.isArray(vp) ? vp.length : 0,
+          Array.isArray(vq) ? vq.length : 0,
+          Array.isArray(vt) ? vt.length : 0,
+          1
+        );
+        npEnsureVariantMatrixRows(rows);
+
+        // Swatches (selection + hidden inputs)
+        const savedSwatches = Array.isArray(data['meta_data[variant_swatches][]']) ? data['meta_data[variant_swatches][]'].map(s => String(s).toLowerCase()) : [];
+        if (savedSwatches.length && document.getElementById('npSwatchesWrap')) {
+          document.querySelectorAll('#npSwatchesWrap .np-swatch').forEach(sw => {
+            const hex = String(sw.getAttribute('data-hex') || '').toLowerCase();
+            if (!hex) return;
+            sw.classList.toggle('sel', savedSwatches.includes(hex));
+          });
+          if (typeof npSyncSwatchHiddenInputs === 'function') npSyncSwatchHiddenInputs();
+        }
+      } catch (e) { }
+
       // restore item_id first (if any)
       if (data.item_id && !$('#item_id').val()) {
         $('#item_id').val(data.item_id);
@@ -2937,6 +3064,12 @@
 
         const first = els[0];
         const val = data[name];
+
+        // Restore multi-select values (e.g. attribute_id[])
+        if (first.tagName === 'SELECT' && first.multiple) {
+          npApplyFieldValue(first, val);
+          return;
+        }
 
         if (first.type === 'radio') {
           Array.from(els).forEach(r => { r.checked = (r.value == val); });
@@ -3146,7 +3279,16 @@
           }
 
           if (data.item_id) {
+            const wasNew = !String(currentItemId || '').trim();
             $('#item_id').val(data.item_id);
+            // Switch to edit URL so refresh loads from DB (not localStorage-only draft)
+            if (wasNew) {
+              try {
+                const base = "{{ route('admin.item.edit', [0]) }}";
+                const editUrl = base.replace(/\/0$/, '/' + data.item_id);
+                window.history.replaceState({}, '', editUrl);
+              } catch (e) { }
+            }
           }
 
           document.getElementById('npLastSaved').textContent = new Date().toLocaleTimeString();
@@ -3220,8 +3362,8 @@
       try { npSyncDeliveryCardsFromInputs(); } catch (e) { }
       try { npSyncStatusPillsFromInputs(); } catch (e) { }
       try {
-        // Ensure saved swatches are submitted
-        document.querySelectorAll('#npSwatchesWrap .np-swatch.sel').forEach(sw => npToggleSwatch(sw));
+        // Ensure hidden inputs exist for already-selected swatches
+        npSyncSwatchHiddenInputs();
       } catch (e) { }
 
       // Bundle / Multipack toggle
@@ -3231,6 +3373,20 @@
         function syncBundleUI() { $f.toggle(!!$b.prop('checked')); }
         $b.off('change.npBundle').on('change.npBundle', syncBundleUI);
         syncBundleUI();
+      } catch (e) { }
+
+      // If user typed tag but didn't press Enter, persist it
+      try {
+        $('#npFlavInput').on('blur', function () {
+          const v = String(this.value || '').trim();
+          if (!v) return;
+          npAddTag({ key: 'Enter', preventDefault: function () { } }, 'npFlavWrap', 'npFlavInput', 't-green', 'meta_data[flavor_names][]');
+        });
+        $('#npSizeInput').on('blur', function () {
+          const v = String(this.value || '').trim();
+          if (!v) return;
+          npAddTag({ key: 'Enter', preventDefault: function () { } }, 'npSizeWrap', 'npSizeInput', 't-purple', 'meta_data[size_variants][]');
+        });
       } catch (e) { }
 
       $('#item_form').on('submit', function (e) {
@@ -3783,6 +3939,20 @@
         const form = document.getElementById('npProductSelectOptionForm');
         if (form) form.reset();
         $('#npProductSelectOptionType').val(String(type || ''));
+        const isColor = String(type || '') === 'variant_color';
+        try {
+          const wrap = document.getElementById('npProductSelectOptionValueWrap');
+          if (wrap) wrap.style.display = isColor ? '' : 'none';
+          if (isColor) {
+            const picker = document.getElementById('npProductSelectOptionColorPicker');
+            const valueInp = document.getElementById('npProductSelectOptionValue');
+            if (picker && valueInp) {
+              const start = valueInp.value || picker.value || '#2563eb';
+              picker.value = start;
+              valueInp.value = start;
+            }
+          }
+        } catch (e) { }
         const titleMap = {
           origin_country: 'Add Country of Origin',
           seller: 'Add Seller',
@@ -3795,11 +3965,74 @@
           warranty: 'Add Warranty Period',
           return_policy: 'Add Return Policy',
           product_type: 'Add Product Type',
+          variant_color: 'Add Colour',
         };
         document.getElementById('npProductSelectOptionModalLabel').textContent = titleMap[type] || 'Add Option';
         modal.modal('show');
       }
       window.npOpenProductSelectOptionModal = npOpenProductSelectOptionModal;
+
+      function npOpenAttributeQuickAdd() {
+        const modal = $('#npAttributeModal');
+        if (!modal.length) return;
+        if (!modal.parent().is('body')) modal.appendTo('body');
+        const form = document.getElementById('npAttributeForm');
+        if (form) form.reset();
+        modal.modal('show');
+        try { setTimeout(() => document.getElementById('npAttributeName')?.focus(), 150); } catch (e) { }
+      }
+      window.npOpenAttributeQuickAdd = npOpenAttributeQuickAdd;
+
+      // Keep colour picker and hex input in sync
+      try {
+        $('#npProductSelectOptionColorPicker').on('input', function () {
+          $('#npProductSelectOptionValue').val(String(this.value || '').trim());
+        });
+        $('#npProductSelectOptionValue').on('input', function () {
+          const v = String(this.value || '').trim();
+          if (/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(v)) $('#npProductSelectOptionColorPicker').val(v);
+        });
+      } catch (e) { }
+
+      $('#npAttributeForm').on('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+        if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
+        $.ajax({
+          url: "{{ route('admin.attribute.ajax-store') }}",
+          method: "POST",
+          dataType: "json",
+          data: $(form).serialize(),
+          success: function (res) {
+            if (!res || !res.id || !res.name) {
+              toastr.error('Failed to add attribute', { CloseButton: true, ProgressBar: true });
+              return;
+            }
+
+            const $sel = $('#choice_attributes');
+            if ($sel.length) {
+              const opt = new Option(res.name, String(res.id), true, true);
+              $sel.append(opt);
+              if ($sel.hasClass('select2-hidden-accessible')) $sel.trigger('change.select2');
+              else $sel.trigger('change');
+            }
+
+            toastr.success(res.message || 'Attribute added successfully', { CloseButton: true, ProgressBar: true });
+            $('#npAttributeModal').modal('hide');
+          },
+          error: function (xhr) {
+            const data = xhr.responseJSON || {};
+            if (data.errors) {
+              Object.keys(data.errors).forEach(function (k) {
+                const msg = Array.isArray(data.errors[k]) ? data.errors[k][0] : data.errors[k];
+                toastr.error(msg, { CloseButton: true, ProgressBar: true });
+              });
+              return;
+            }
+            toastr.error(data.message || 'Failed to add attribute', { CloseButton: true, ProgressBar: true });
+          }
+        });
+      });
 
       $('#npProductSelectOptionForm').on('submit', function (e) {
         e.preventDefault();
@@ -3837,6 +4070,23 @@
               $sel.val(String(res.name));
               if ($sel.hasClass('select2-hidden-accessible')) $sel.trigger('change.select2');
               else $sel.trigger('change');
+            }
+
+            // Variant colour palette: add new swatch and select it
+            if (res.type === 'variant_color' && res.value) {
+              const hex = String(res.value).trim();
+              if (hex && document.getElementById('npSwatchesWrap')) {
+                const wrap = document.getElementById('npSwatchesWrap');
+                const sw = document.createElement('div');
+                sw.className = 'np-swatch sel';
+                sw.setAttribute('data-hex', hex);
+                sw.setAttribute('title', res.name || hex);
+                sw.setAttribute('style', `background:${hex}${hex.toLowerCase() === '#f9fafb' ? ';border:1.5px solid #d1d5db' : ''}`);
+                sw.onclick = function () { npToggleSwatch(this); };
+                wrap.appendChild(sw);
+                // Ensure hidden input exists (don't toggle selection off)
+                try { npSyncSwatchHiddenInputs(); } catch (e) { }
+              }
             }
 
             toastr.success(res.message || 'Added successfully', { CloseButton: true, ProgressBar: true });

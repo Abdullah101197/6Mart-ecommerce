@@ -15,6 +15,7 @@ use App\Exports\AttributesExport;
 use App\Http\Requests\Admin\AttributeUpdateRequest;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -51,6 +52,25 @@ class AttributeController extends BaseController
         $this->translationRepo->addByModel(request: $request, model: $attribute, modelPath: 'App\Models\Attribute', attribute: 'name');
         Toastr::success(translate('messages.attribute_added_successfully'));
         return back();
+    }
+
+    public function ajaxStore(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:100|unique:attributes,name',
+        ]);
+
+        // NOTE: The legacy attribute add flow expects name[] + lang[] for translations.
+        // This AJAX endpoint is intentionally minimal: create a single attribute name only.
+        $attribute = $this->attributeRepo->add(data: [
+            'name' => trim((string) $request->name),
+        ]);
+
+        return response()->json([
+            'id' => $attribute->id,
+            'name' => $attribute->name,
+            'message' => translate('messages.attribute_added_successfully'),
+        ]);
     }
 
     public function getUpdateView(string|int $id): View

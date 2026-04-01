@@ -81,6 +81,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         Route::group(['prefix' => 'attribute', 'as' => 'attribute.', 'middleware' => ['module:attribute']], function () {
             Route::get(Attribute::INDEX[URI], [AttributeController::class, 'index'])->name('add-new');
             Route::post(Attribute::ADD[URI], [AttributeController::class, 'add'])->name('store');
+            Route::post('ajax-store', [AttributeController::class, 'ajaxStore'])->name('ajax-store');
             Route::get(Attribute::UPDATE[URI] . '/{id}', [AttributeController::class, 'getUpdateView'])->name('edit');
             Route::post(Attribute::UPDATE[URI] . '/{id}', [AttributeController::class, 'update'])->name('update');
             Route::delete(Attribute::DELETE[URI] . '/{id}', [AttributeController::class, 'delete'])->name('delete');
