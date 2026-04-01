@@ -62,20 +62,20 @@ class ItemController extends Controller
         $isDraftMode = $request->boolean('draft_mode');
 
         $validator = Validator::make($request->all(), [
-            'name.0' => 'required',
+            'name.0' => $isDraftMode ? 'nullable' : 'required',
             'name.*' => 'max:191',
-            'category_id' => 'required',
+            'category_id' => $isDraftMode ? 'nullable' : 'required',
             'image' => [
                 Rule::requiredIf(function () use ($request) {
                     return !$request->boolean('draft_mode')
                         && (Config::get('module.current_module_type') != 'food' && $request?->product_gellary == null);
                 })
             ],
-            'price' => 'required|numeric|between:.01,999999999999.99',
-            'discount' => 'required|numeric|min:0',
+            'price' => ($isDraftMode ? 'nullable' : 'required') . '|numeric|between:.01,999999999999.99',
+            'discount' => ($isDraftMode ? 'nullable' : 'required') . '|numeric|min:0',
             'store_id' => 'required',
             'description.*' => 'max:1000',
-            'description.0' => 'required',
+            'description.0' => $isDraftMode ? 'nullable' : 'required',
         ], [
             'description.*.max' => translate('messages.description_length_warning'),
             'name.0.required' => translate('messages.item_name_required'),
@@ -83,17 +83,22 @@ class ItemController extends Controller
             'image.required' => translate('messages.thumbnail image is required'),
             'description.0.required' => translate('default_description_is_required'),
         ]);
-        if ($request['discount_type'] == 'percent') {
-            $dis = ($request['price'] / 100) * $request['discount'];
-        } else {
-            $dis = $request['discount'];
+        if (!$isDraftMode) {
+            if ($request['discount_type'] == 'percent') {
+                $dis = ($request['price'] / 100) * $request['discount'];
+            } else {
+                $dis = $request['discount'];
+            }
+
+            if ($request['price'] <= $dis) {
+                $validator->getMessageBag()->add('unit_price', translate("Discount amount must be less than 100% or unit price"));
+            }
         }
 
-        if ($request['price'] <= $dis) {
-            $validator->getMessageBag()->add('unit_price', translate("Discount amount must be less than 100% or unit price"));
+        if ($validator->fails()) {
+            return response()->json(['errors' => Helpers::error_processor($validator)]);
         }
-
-        if ($request['price'] <= $dis || $validator->fails()) {
+        if (!$isDraftMode && isset($dis) && $request['price'] <= $dis) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
         }
 
@@ -381,6 +386,11 @@ class ItemController extends Controller
         if (is_array($requestMeta) && count($requestMeta) > 0) {
             $metaData = array_merge($metaData, $requestMeta);
         }
+        if ($request->filled('brand_id')) {
+            $metaData['brand_id'] = (int) $request->input('brand_id');
+        } else {
+            unset($metaData['brand_id']);
+        }
         // General tab fields that currently exist outside meta_data[]
         if ($request->filled('full_description')) {
             $metaData['full_description'] = $request->input('full_description');
@@ -421,7 +431,7 @@ class ItemController extends Controller
                 'custom_tabs_ui' => json_decode($request->custom_tabs_ui_json, true),
             ]);
         }
-        $item->status = $isDraftMode ? 0 : 1;
+        $item->status = $isDraftMode ? (int) ($request->input('status', 0)) : 1;
         $item->save();
         $item->tags()->sync($tag_ids);
         $item->nutritions()->sync($nutrition_ids);
@@ -486,10 +496,16 @@ class ItemController extends Controller
     {
         $temp_product = false;
         if ($request->temp_product) {
-            $product = TempProduct::withoutGlobalScope(StoreScope::class)->withoutGlobalScope('translate')->with('store', 'category', 'module')->findOrFail($id);
+            $product = TempProduct::withoutGlobalScope(StoreScope::class)
+                ->withoutGlobalScope('translate')
+                ->with('store', 'category', 'module', 'translations')
+                ->findOrFail($id);
             $temp_product = true;
         } else {
-            $product = Item::withoutGlobalScope(StoreScope::class)->withoutGlobalScope('translate')->with('store', 'category', 'module')->findOrFail($id);
+            $product = Item::withoutGlobalScope(StoreScope::class)
+                ->withoutGlobalScope('translate')
+                ->with('store', 'category', 'module', 'translations')
+                ->findOrFail($id);
         }
         if (!$product) {
             Toastr::error(translate('messages.item_not_found'));
@@ -545,16 +561,15 @@ class ItemController extends Controller
         $isDraftMode = $request->boolean('draft_mode');
         $validator = Validator::make($request->all(), [
             'name' => 'array',
-            'name.0' => 'required',
+            'name.0' => $isDraftMode ? 'nullable' : 'required',
             'name.*' => 'max:191',
-            'category_id' => 'required',
-            'price' => 'required|numeric|between:.01,999999999999.99',
+            'category_id' => $isDraftMode ? 'nullable' : 'required',
+            'price' => ($isDraftMode ? 'nullable' : 'required') . '|numeric|between:.01,999999999999.99',
             'store_id' => 'required',
             'description' => 'array',
             'description.*' => 'max:1000',
-            'discount' => 'required|numeric|min:0',
-            'name.0' => 'required',
-            'description.0' => 'required',
+            'discount' => ($isDraftMode ? 'nullable' : 'required') . '|numeric|min:0',
+            'description.0' => $isDraftMode ? 'nullable' : 'required',
             'image' => [
                 Rule::requiredIf(function () use ($request, $item) {
                     return !$request->boolean('draft_mode')
@@ -571,17 +586,22 @@ class ItemController extends Controller
             'image.required' => translate('messages.thumbnail image is required'),
         ]);
 
-        if ($request['discount_type'] == 'percent') {
-            $dis = ($request['price'] / 100) * $request['discount'];
-        } else {
-            $dis = $request['discount'];
+        if (!$isDraftMode) {
+            if ($request['discount_type'] == 'percent') {
+                $dis = ($request['price'] / 100) * $request['discount'];
+            } else {
+                $dis = $request['discount'];
+            }
+
+            if ($request['price'] <= $dis) {
+                $validator->getMessageBag()->add('unit_price', translate("Discount amount must be less than 100% or unit price"));
+            }
         }
 
-        if ($request['price'] <= $dis) {
-            $validator->getMessageBag()->add('unit_price', translate("Discount amount must be less than 100% or unit price"));
+        if ($validator->fails()) {
+            return response()->json(['errors' => Helpers::error_processor($validator)]);
         }
-
-        if ($request['price'] <= $dis || $validator->fails()) {
+        if (!$isDraftMode && isset($dis) && $request['price'] <= $dis) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
         }
 
@@ -792,7 +812,7 @@ class ItemController extends Controller
         $item->organic = $request->organic ?? 0;
         $item->veg = $request->veg ?? 0;
         $item->images = $images;
-        $item->status = $isDraftMode ? 0 : 1;
+        $item->status = $isDraftMode ? (int) ($request->input('status', $item->status ?? 0)) : 1;
         if (Helpers::get_mail_status('product_approval') && $request?->temp_product) {
 
 
@@ -971,6 +991,11 @@ class ItemController extends Controller
         $requestMeta = $request->input('meta_data', []);
         if (is_array($requestMeta) && count($requestMeta) > 0) {
             $metaData = array_merge($metaData, $requestMeta);
+        }
+        if ($request->filled('brand_id')) {
+            $metaData['brand_id'] = (int) $request->input('brand_id');
+        } else {
+            unset($metaData['brand_id']);
         }
         // General tab fields that currently exist outside meta_data[]
         if ($request->filled('full_description')) {
@@ -1214,7 +1239,10 @@ class ItemController extends Controller
     {
         $key = explode(' ', $request['q']);
         $cat = Category::when(isset($request->module_id), function ($query) use ($request) {
-            $query->where('module_id', $request->module_id);
+            // Some installs have categories with NULL module_id. Include those too.
+            $query->where(function ($q) use ($request) {
+                $q->whereNull('module_id')->orWhere('module_id', $request->module_id);
+            });
         })
             ->when($request->sub_category, function ($query) {
                 $query->where('position', '>', '0');

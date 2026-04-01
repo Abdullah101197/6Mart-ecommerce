@@ -49,6 +49,34 @@
   $npMeta = is_array($product?->meta_data) ? $product->meta_data : [];
   $npSellingPoints = data_get($npMeta, 'selling_points', []);
   if (!is_array($npSellingPoints)) { $npSellingPoints = []; }
+  $npCatIds = [];
+  try { $npCatIds = $isEdit ? (json_decode($product?->category_ids ?? '[]', true) ?: []) : []; } catch (\Throwable $e) { $npCatIds = []; }
+  $npCatPos1 = collect($npCatIds)->firstWhere('position', 1)['id'] ?? null;
+  $npCatPos2 = collect($npCatIds)->firstWhere('position', 2)['id'] ?? null;
+  $npCatPos3 = collect($npCatIds)->firstWhere('position', 3)['id'] ?? null;
+  $npCatPos4 = collect($npCatIds)->firstWhere('position', 4)['id'] ?? null;
+  // Fallback: derive chain from saved deepest category_id (older items may not have category_ids for all levels)
+  if ($isEdit && (!$npCatPos1 || !$npCatPos2 || !$npCatPos3) && filled($product?->category_id)) {
+    $leaf = \App\Models\Category::find($product->category_id);
+    $chain = [];
+    $guard = 0;
+    while ($leaf && $guard < 10) {
+      $chain[] = $leaf;
+      $leaf = $leaf->parent_id ? \App\Models\Category::find($leaf->parent_id) : null;
+      $guard++;
+    }
+    $chain = array_reverse($chain);
+    $npCatPos1 = $npCatPos1 ?? ($chain[0]->id ?? null);
+    $npCatPos2 = $npCatPos2 ?? ($chain[1]->id ?? null);
+    $npCatPos3 = $npCatPos3 ?? ($chain[2]->id ?? null);
+    $npCatPos4 = $npCatPos4 ?? ($chain[3]->id ?? null);
+  }
+  $npStatus = old('status', $product?->status ?? 1);
+  $npBrandId = old('brand_id', data_get($npMeta,'brand_id',''));
+  $npNameAr = '';
+  if ($isEdit) {
+    $npNameAr = optional(optional($product?->translations)->where('key','name')->where('locale','ar')->first())->value ?? '';
+  }
 ?>
 <div class="content container-fluid">
 
@@ -85,16 +113,16 @@
 
     
     <div class="np-tab-nav">
-      <button type="button" class="np-tab-btn active" onclick="npSwitchTab(this,'np-tab-general')">📝 General</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-attributes')">🔧 Attributes</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-nutrition')">🧪 Nutrition &amp;
+      <button type="button" class="np-tab-btn active" data-tab="np-tab-general" onclick="npSwitchTab(this,'np-tab-general')">📝 General</button>
+      <button type="button" class="np-tab-btn" data-tab="np-tab-attributes" onclick="npSwitchTab(this,'np-tab-attributes')">🔧 Attributes</button>
+      <button type="button" class="np-tab-btn" data-tab="np-tab-nutrition" onclick="npSwitchTab(this,'np-tab-nutrition')">🧪 Nutrition &amp;
         Allergens</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-variants')">🎨 Variants</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-seo')">🔍 SEO &amp; Meta</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-media')">🖼️ Media</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-logistics')">✈️ Logistics &amp;
+      <button type="button" class="np-tab-btn" data-tab="np-tab-variants" onclick="npSwitchTab(this,'np-tab-variants')">🎨 Variants</button>
+      <button type="button" class="np-tab-btn" data-tab="np-tab-seo" onclick="npSwitchTab(this,'np-tab-seo')">🔍 SEO &amp; Meta</button>
+      <button type="button" class="np-tab-btn" data-tab="np-tab-media" onclick="npSwitchTab(this,'np-tab-media')">🖼️ Media</button>
+      <button type="button" class="np-tab-btn" data-tab="np-tab-logistics" onclick="npSwitchTab(this,'np-tab-logistics')">✈️ Logistics &amp;
         Shipping</button>
-      <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-reviews')">⭐ Reviews &amp;
+      <button type="button" class="np-tab-btn" data-tab="np-tab-reviews" onclick="npSwitchTab(this,'np-tab-reviews')">⭐ Reviews &amp;
         Analytics</button>
       <button type="button" class="np-tab-btn" id="npManageTabsBtn" onclick="npOpenManageTabsModal()">⚙️ Manage Tabs</button>
       <button type="button" class="np-tab-btn" id="npAddTabBtn" onclick="npOpenCustomTabModal()">+ Add Tab</button>
@@ -120,7 +148,7 @@
                 <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (English)
                   <span class="np-req">*</span></label>
                 <input type="text" name="name[]" id="productNameEn" class="np-input"
-                  placeholder="e.g. Kiri Spreadable Cream Cheese Squares 48 Portions 864g" required oninput="npUpdateQuality();npUpdateSEO()">
+                  placeholder="e.g. Kiri Spreadable Cream Cheese Squares 48 Portions 864g" required oninput="npUpdateQuality();npUpdateSEO()" value="<?php echo e(old('name.0', $product?->name ?? '')); ?>">
                 <input type="hidden" name="lang[]" value="default">
               </div>
 
@@ -133,7 +161,7 @@
                   <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (Arabic) <span
                       class="np-opt">(optional)</span></label>
                   <input type="text" name="name[]" id="productNameAr" class="np-input" placeholder="اسم المنتج بالعربي"
-                    style="direction:rtl;text-align:right">
+                    style="direction:rtl;text-align:right" value="<?php echo e(old('name.1', $npNameAr)); ?>">
                   <input type="hidden" name="lang[]" value="ar">
                 </div>
               <?php endif; ?>
@@ -175,7 +203,7 @@
                     <select name="brand_id" id="npBrand" class="np-select" onchange="npUpdateQuality()">
                       <option value="">Select brand…</option>
                       <?php $__currentLoopData = \App\Models\Brand::where('status', 1)->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $brand): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($brand->id); ?>" <?php if(old('brand_id', data_get($product,'brand_id','')) == $brand->id): echo 'selected'; endif; ?>><?php echo e($brand->name); ?></option>
+                        <option value="<?php echo e($brand->id); ?>" <?php if($npBrandId == $brand->id): echo 'selected'; endif; ?>><?php echo e($brand->name); ?></option>
                       <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button"
@@ -365,7 +393,7 @@
                     <?php $__currentLoopData = \App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
                       $query->where('module_id', $moduleId);
                     })->orderBy('name')->get(['id', 'name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $store): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                      <option value="<?php echo e($store->id); ?>"><?php echo e($store->name); ?></option>
+                      <option value="<?php echo e($store->id); ?>" <?php if(old('store_id', $product?->store_id ?? '') == $store->id): echo 'selected'; endif; ?>><?php echo e($store->name); ?></option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </select>
                 </div>
@@ -375,8 +403,8 @@
                     <select name="category_id" id="category_id" class="np-select js-select2-custom"
                       onchange="npUpdateQuality()">
                       <option value="">— Select Category —</option>
-                      <?php $__currentLoopData = \App\Models\Category::where('position', 0)->where('status', 1)->where('module_id', Config::get('module.current_module_id'))->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($cat->id); ?>"><?php echo e($cat->name); ?></option>
+                      <?php $__currentLoopData = \App\Models\Category::where('position', 0)->where('status', 1)->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', Config::get('module.current_module_id')); })->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($cat->id); ?>" <?php if(old('category_id', $npCatPos1 ?? '') == $cat->id): echo 'selected'; endif; ?>><?php echo e($cat->name); ?></option>
                       <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(0)">+</button>
@@ -387,7 +415,8 @@
                 <div class="np-form-group">
                   <label class="np-label">Sub Category (Level 2)</label>
                   <div class="np-inline-add">
-                    <select name="sub_category_id" id="sub_category_id" class="np-select js-select2-custom">
+                    <select name="sub_category_id" id="sub_category_id" class="np-select js-select2-custom"
+                      data-selected="<?php echo e(old('sub_category_id', $npCatPos2 ?? '')); ?>">
                       <option value="">Select main first…</option>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(1)">+</button>
@@ -396,7 +425,8 @@
                 <div class="np-form-group">
                   <label class="np-label">Sub-Sub Category (Level 3)</label>
                   <div class="np-inline-add">
-                    <select name="sub_sub_category_id" id="sub_sub_category_id" class="np-select js-select2-custom">
+                    <select name="sub_sub_category_id" id="sub_sub_category_id" class="np-select js-select2-custom"
+                      data-selected="<?php echo e(old('sub_sub_category_id', $npCatPos3 ?? '')); ?>">
                       <option value="">Select Level 2 first…</option>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(2)">+</button>
@@ -407,7 +437,8 @@
                 <div class="np-form-group">
                   <label class="np-label">Level 4 (Leaf Node)</label>
                   <div class="np-inline-add">
-                    <select name="sub_sub_sub_category_id" id="sub_sub_sub_category_id" class="np-select js-select2-custom">
+                    <select name="sub_sub_sub_category_id" id="sub_sub_sub_category_id" class="np-select js-select2-custom"
+                      data-selected="<?php echo e(old('sub_sub_sub_category_id', $npCatPos4 ?? '')); ?>">
                       <option value="">Select Level 3 first…</option>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(3)">+</button>
@@ -419,7 +450,7 @@
                     <select name="unit" id="unit" class="np-select js-select2-custom">
                       <option value=""><?php echo e(translate('messages.select_unit')); ?></option>
                       <?php $__currentLoopData = \App\Models\Unit::get(['id', 'unit']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($unit->id); ?>"><?php echo e($unit->unit); ?></option>
+                        <option value="<?php echo e($unit->id); ?>" <?php if(old('unit', $product?->unit_id ?? '') == $unit->id): echo 'selected'; endif; ?>><?php echo e($unit->unit); ?></option>
                       <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenUnitModal()">+</button>
@@ -456,9 +487,9 @@
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenItemTypeModal()">+</button>
                   </div>
                   
-                  <input type="hidden" name="veg" id="veg" value="0">
-                  <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="">
-                  <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="">
+                  <input type="hidden" name="veg" id="veg" value="<?php echo e(old('veg', $product?->veg ?? 0)); ?>">
+                  <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="<?php echo e(old('meta_data.item_type_id', data_get($npMeta,'item_type_id',''))); ?>">
+                  <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="<?php echo e(old('meta_data.item_type_name', data_get($npMeta,'item_type_name',''))); ?>">
                 </div>
                 <div class="np-form-group">
                   <label class="np-label">Tags</label>
@@ -480,17 +511,17 @@
             </div>
             <div class="np-card-body">
               <div class="np-pill-row">
-                <div class="np-pill sel" onclick="npSelStatus(this,'active')">
+                <div class="np-pill <?php echo e((int)$npStatus === 1 ? 'sel' : ''); ?>" onclick="npSelStatus(this,'active')">
                   <span class="np-sdot"></span>Active
-                  <input type="radio" name="status" value="1" checked style="display:none">
+                  <input type="radio" name="status" value="1" <?php if((int)$npStatus === 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-pill" onclick="npSelStatus(this,'out')">
+                <div class="np-pill <?php echo e((int)$npStatus === 0 ? 'sel out' : ''); ?>" onclick="npSelStatus(this,'out')">
                   <span class="np-sdot"></span>Out of Stock
-                  <input type="radio" name="status" value="0" style="display:none">
+                  <input type="radio" name="status" value="0" <?php if((int)$npStatus === 0): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-pill" onclick="npSelStatus(this,'draft')">
+                <div class="np-pill <?php echo e((int)$npStatus === 2 ? 'sel draft' : ''); ?>" onclick="npSelStatus(this,'draft')">
                   <span class="np-sdot"></span>Draft
-                  <input type="radio" name="status" value="2" style="display:none">
+                  <input type="radio" name="status" value="2" <?php if((int)$npStatus === 2): echo 'checked'; endif; ?> style="display:none">
                 </div>
               </div>
             </div>
@@ -592,25 +623,25 @@
             </div>
             <div class="np-card-body">
               <div class="np-dlv-grid">
-                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) ? 'sel' : ''); ?>" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">📅</div>
                   <div class="np-dlv-name">Scheduled</div>
                   <div class="np-dlv-time">Next day</div>
                   <input type="checkbox" name="meta_data[delivery_scheduled]" value="1" <?php if(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) ? 'sel' : ''); ?>" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">⚡</div>
                   <div class="np-dlv-name">Express</div>
                   <div class="np-dlv-time">60–120 mins</div>
                   <input type="checkbox" name="meta_data[delivery_express]" value="1" <?php if(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) ? 'sel' : ''); ?>" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">🏎️</div>
                   <div class="np-dlv-name">Rapid</div>
                   <div class="np-dlv-time">35 mins</div>
                   <input type="checkbox" name="meta_data[delivery_rapid]" value="1" <?php if(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) ? 'sel' : ''); ?>" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">🏬</div>
                   <div class="np-dlv-name">Click &amp; Collect</div>
                   <div class="np-dlv-time">In-store</div>
@@ -2203,12 +2234,12 @@
     }
 
     function npSetActionButtons() {
-      const ids = npVisibleTabIds();
-      const idx = npCurrentTabIndex();
+      const activeTabId = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
+      const idx = Math.max(npTabIds.indexOf(activeTabId), 0);
       const prevBtn = document.querySelector('.np-btn-row button[onclick="npPrevTab()"]');
       const nextBtn = document.querySelector('.np-btn-row button[onclick="npNextTab()"]');
       if (prevBtn) prevBtn.disabled = idx === 0;
-      if (nextBtn) nextBtn.style.display = idx === ids.length - 1 ? 'none' : '';
+      if (nextBtn) nextBtn.style.display = idx === npTabIds.length - 1 ? 'none' : '';
     }
 
     // ═══ TABS ═══
@@ -2225,17 +2256,44 @@
       const targetIndex = Math.max(0, Math.min(index, ids.length - 1));
       const id = ids[targetIndex];
       if (!id) return;
-      const btn = Array.from(document.querySelectorAll('.np-tab-btn')).find(b => (b.getAttribute('onclick') || '').includes(`'${id}'`));
-      if (btn) npSwitchTab(btn, id);
+      const btn = document.querySelector(`.np-tab-btn[data-tab="${id}"]`)
+        || Array.from(document.querySelectorAll('.np-tab-btn')).find(b => (b.getAttribute('onclick') || '').includes(`'${id}'`));
+
+      // Hard fallback: activate by id even if button lookup fails
+      if (!btn) {
+        document.querySelectorAll('.np-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.np-tab-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(id);
+        if (panel) panel.classList.add('active');
+        const btn2 = document.querySelector(`.np-tab-btn[data-tab="${id}"]`);
+        if (btn2) btn2.classList.add('active');
+        npSetActionButtons();
+        return;
+      }
+
+      npSwitchTab(btn, id);
     }
 
     function npPrevTab() {
-      npOpenTabByIndex(npCurrentTabIndex() - 1);
+      const activeTabId = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
+      const idx = Math.max(npTabIds.indexOf(activeTabId), 0);
+      const prevId = npTabIds[idx - 1] || '';
+      if (!prevId) return;
+
+      // Force-activate previous tab by id (robust even if tabs are "hidden" in UI overrides)
+      document.querySelectorAll('.np-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.np-tab-panel').forEach(p => p.classList.remove('active'));
+      const panel = document.getElementById(prevId);
+      if (panel) panel.classList.add('active');
+      const btn = document.querySelector(`.np-tab-btn[data-tab="${prevId}"]`);
+      if (btn) btn.classList.add('active');
+      npSetActionButtons();
     }
 
     function npNextTab() {
       // Next should behave like a step wizard: validate current tab first
       if (!npValidateCurrentTab()) return;
+      if (window.__npWizardSaving) return;
       npPersistWizardStep({ publish: false, moveNext: true });
     }
 
@@ -2286,6 +2344,33 @@
     function npTogChk(el) {
       el.classList.toggle('on');
       el.querySelector('input').checked = el.classList.contains('on');
+    }
+
+    function npToggleDeliveryCard(cardEl) {
+      if (!cardEl) return;
+      cardEl.classList.toggle('sel');
+      const cb = cardEl.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = cardEl.classList.contains('sel');
+    }
+
+    function npSyncDeliveryCardsFromInputs() {
+      document.querySelectorAll('.np-dlv-card').forEach(card => {
+        const cb = card.querySelector('input[type="checkbox"]');
+        if (!cb) return;
+        card.classList.toggle('sel', !!cb.checked);
+      });
+    }
+
+    function npSyncStatusPillsFromInputs() {
+      const checked = document.querySelector('input[name="status"]:checked');
+      if (!checked) return;
+      const val = String(checked.value);
+      document.querySelectorAll('.np-pill').forEach(p => p.classList.remove('sel', 'out', 'draft'));
+      const pill = Array.from(document.querySelectorAll('.np-pill')).find(p => p.querySelector('input[name="status"]')?.value === val);
+      if (!pill) return;
+      pill.classList.add('sel');
+      if (val === '0') pill.classList.add('out');
+      if (val === '2') pill.classList.add('draft');
     }
 
     // ═══ TAG INPUT ═══
@@ -2497,6 +2582,12 @@
           return;
         }
 
+        // Array inputs like name[] / selling_point[] should persist all values
+        if (name.endsWith('[]') && first.type !== 'checkbox') {
+          data[name] = group.map(x => x.value);
+          return;
+        }
+
         data[name] = first.value;
       });
 
@@ -2589,8 +2680,26 @@
           return;
         }
 
+        // Restore array text inputs like name[] / selling_point[] in order
+        if (name.endsWith('[]') && Array.isArray(val) && first.type !== 'checkbox' && first.type !== 'radio') {
+          Array.from(els).forEach((el, idx) => {
+            npApplyFieldValue(el, val[idx] ?? '');
+          });
+          return;
+        }
+
         npApplyFieldValue(first, val);
       });
+
+      // Persist restored category ids for cascade init (selects may not have options yet)
+      try {
+        const l2 = (data['sub_category_id'] ?? '').toString();
+        const l3 = (data['sub_sub_category_id'] ?? '').toString();
+        const l4 = (data['sub_sub_sub_category_id'] ?? '').toString();
+        if (l2) $('#sub_category_id').attr('data-selected', l2);
+        if (l3) $('#sub_sub_category_id').attr('data-selected', l3);
+        if (l4) $('#sub_sub_sub_category_id').attr('data-selected', l4);
+      } catch (e) { }
 
       // restore active tab if it exists
       if (data.__active_tab_id) {
@@ -2699,7 +2808,11 @@
       if (!form) return;
 
       npClearFieldErrors();
-      const startTabIndex = npCurrentTabIndex();
+      const activeTabIdAtStart = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
+      const startTabIndex = Math.max(npTabIds.indexOf(activeTabIdAtStart), 0);
+      const nextTabIdAtStart = moveNext ? (npTabIds[startTabIndex + 1] || '') : '';
+      window.__npWizardSaving = true;
+      try { document.querySelector('.np-btn-row button[onclick="npNextTab()"]')?.setAttribute('disabled', 'disabled'); } catch (e) { }
 
       // Ensure custom tabs JSON is up-to-date before submit
       if (typeof npSaveCustomTabsToInput === 'function') {
@@ -2713,9 +2826,8 @@
 
       if (publish) {
         let $form = $('#item_form');
-        if ($form.length && typeof $form.valid === 'function' && !$form.valid()) {
-          return false;
-        }
+        // Don't let jQuery Validate block publish due to hidden/other-tab required fields.
+        // Server-side validation + field highlighting will handle any missing required inputs.
 
         if (!validateImageSize('#customFileEg1', "Item image")) {
           return;
@@ -2752,6 +2864,8 @@
         success: function (data) {
           $('#loading').hide();
           $('#submitButton').attr('disabled', false);
+          window.__npWizardSaving = false;
+          try { document.querySelector('.np-btn-row button[onclick="npNextTab()"]')?.removeAttribute('disabled'); } catch (e) { }
           if (data.errors) {
             npShowFieldErrors(data.errors);
             for (let i = 0; i < data.errors.length; i++) {
@@ -2782,12 +2896,27 @@
           toastr.success('Draft saved', { CloseButton: true, ProgressBar: true });
           try { npSaveFormDraft(); } catch (e) { }
           if (moveNext) {
-            npOpenTabByIndex(startTabIndex + 1);
+            setTimeout(function () {
+              if (nextTabIdAtStart) {
+                // Force-activate by id (no index recompute)
+                document.querySelectorAll('.np-tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.np-tab-panel').forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById(nextTabIdAtStart);
+                if (panel) panel.classList.add('active');
+                const btn = document.querySelector(`.np-tab-btn[data-tab="${nextTabIdAtStart}"]`);
+                if (btn) btn.classList.add('active');
+                npSetActionButtons();
+              } else {
+                npOpenTabByIndex(startTabIndex + 1);
+              }
+            }, 0);
           }
         },
         error: function (xhr) {
           $('#loading').hide();
           $('#submitButton').attr('disabled', false);
+          window.__npWizardSaving = false;
+          try { document.querySelector('.np-btn-row button[onclick="npNextTab()"]')?.removeAttribute('disabled'); } catch (e) { }
           if (xhr?.responseJSON?.errors) {
             npShowFieldErrors(xhr.responseJSON.errors);
           }
@@ -2807,6 +2936,18 @@
       // Restore saved draft (add-new only) before select2 init
       try { npLoadFormDraft(); } catch (e) { }
       $('.js-select2-custom').each(function () { if ($.HSCore && $.HSCore.components && $.HSCore.components.HSSelect2) $.HSCore.components.HSSelect2.init($(this)); });
+
+      // Prefill item type select from hidden meta_data[item_type_id]
+      try {
+        const savedTypeId = (document.getElementById('npItemTypeId')?.value || '').toString().trim();
+        if (savedTypeId) {
+          $('#npItemTypeSelect').val(savedTypeId).trigger('change.select2').trigger('change');
+        }
+      } catch (e) { }
+
+      // Ensure delivery cards reflect saved checkbox values after any restore
+      try { npSyncDeliveryCardsFromInputs(); } catch (e) { }
+      try { npSyncStatusPillsFromInputs(); } catch (e) { }
 
       $('#item_form').on('submit', function (e) {
         e.preventDefault();
@@ -2868,6 +3009,43 @@
           toastr.error('Failed to load sub-categories', { CloseButton: true, ProgressBar: true });
         });
       });
+
+      function npInitCategoryCascade(mainId, l2Id, l3Id, l4Id) {
+        if (!mainId) return;
+        // Main -> L2
+        $('#category_id').val(String(mainId)).trigger('change.select2').trigger('change');
+        npFetchChildCategories(mainId).done(function (data) {
+          let opts = '<option value="">Select sub-category…</option>';
+          $.each(data || [], function (i, v) { opts += `<option value="${v.id}">${v.text}</option>`; });
+          npReplaceCategorySelectOptions($('#sub_category_id'), opts);
+          if (l2Id) $('#sub_category_id').val(String(l2Id)).trigger('change.select2').trigger('change');
+
+          if (!l2Id) return;
+          // L2 -> L3
+          npFetchChildCategories(l2Id).done(function (data2) {
+            let opts2 = '<option value="">Select sub-sub-category…</option>';
+            $.each(data2 || [], function (i, v) { opts2 += `<option value="${v.id}">${v.text}</option>`; });
+            npReplaceCategorySelectOptions($('#sub_sub_category_id'), opts2);
+            if (l3Id) $('#sub_sub_category_id').val(String(l3Id)).trigger('change.select2').trigger('change');
+
+            if (!l3Id) return;
+            // L3 -> L4
+            npFetchChildCategories(l3Id).done(function (data3) {
+              let opts3 = '<option value="">Select level 4…</option>';
+              $.each(data3 || [], function (i, v) { opts3 += `<option value="${v.id}">${v.text}</option>`; });
+              npReplaceCategorySelectOptions($('#sub_sub_sub_category_id'), opts3);
+              if (l4Id) $('#sub_sub_sub_category_id').val(String(l4Id)).trigger('change.select2').trigger('change');
+            });
+          });
+        });
+      }
+
+      // Prefill cascade (edit + restored draft)
+      const npInitMain = ($('#category_id').val() || '').toString();
+      const npInitL2 = ($('#sub_category_id').attr('data-selected') || '').toString();
+      const npInitL3 = ($('#sub_sub_category_id').attr('data-selected') || '').toString();
+      const npInitL4 = ($('#sub_sub_sub_category_id').attr('data-selected') || '').toString();
+      if (npInitMain) npInitCategoryCascade(npInitMain, npInitL2, npInitL3, npInitL4);
       $('#sub_category_id').on('change', function () {
         const id = $(this).val();
         if (!id) {

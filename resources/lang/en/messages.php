@@ -9125,4 +9125,5 @@ Smartly or Earn. ',
   'default_unit_is_required' => 'Default unit is required',
   'Category required' => 'Category required',
   'Item name required' => 'Item name required',
+  'Thumbnail image is required' => 'Thumbnail image is required',
 );
