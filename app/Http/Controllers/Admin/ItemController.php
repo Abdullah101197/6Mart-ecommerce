@@ -386,6 +386,30 @@ class ItemController extends Controller
         if (is_array($requestMeta) && count($requestMeta) > 0) {
             $metaData = array_merge($metaData, $requestMeta);
         }
+        // Normalize custom attributes rows (keep only filled rows)
+        $attrNames = $request->input('meta_data.custom_attr_name', []);
+        $attrVals = $request->input('meta_data.custom_attr_val', []);
+        if (is_array($attrNames) || is_array($attrVals)) {
+            $attrNames = is_array($attrNames) ? $attrNames : [];
+            $attrVals = is_array($attrVals) ? $attrVals : [];
+            $rows = max(count($attrNames), count($attrVals));
+            $cleanNames = [];
+            $cleanVals = [];
+            for ($i = 0; $i < $rows; $i++) {
+                $n = isset($attrNames[$i]) && is_string($attrNames[$i]) ? trim($attrNames[$i]) : ($attrNames[$i] ?? '');
+                $v = isset($attrVals[$i]) && is_string($attrVals[$i]) ? trim($attrVals[$i]) : ($attrVals[$i] ?? '');
+                if (filled($n) || filled($v)) {
+                    $cleanNames[] = $n;
+                    $cleanVals[] = $v;
+                }
+            }
+            if (count($cleanNames) > 0) {
+                $metaData['custom_attr_name'] = $cleanNames;
+                $metaData['custom_attr_val'] = $cleanVals;
+            } else {
+                unset($metaData['custom_attr_name'], $metaData['custom_attr_val']);
+            }
+        }
         if ($request->filled('brand_id')) {
             $metaData['brand_id'] = (int) $request->input('brand_id');
         } else {
@@ -991,6 +1015,30 @@ class ItemController extends Controller
         $requestMeta = $request->input('meta_data', []);
         if (is_array($requestMeta) && count($requestMeta) > 0) {
             $metaData = array_merge($metaData, $requestMeta);
+        }
+        // Normalize custom attributes rows (keep only filled rows)
+        $attrNames = $request->input('meta_data.custom_attr_name', []);
+        $attrVals = $request->input('meta_data.custom_attr_val', []);
+        if (is_array($attrNames) || is_array($attrVals)) {
+            $attrNames = is_array($attrNames) ? $attrNames : [];
+            $attrVals = is_array($attrVals) ? $attrVals : [];
+            $rows = max(count($attrNames), count($attrVals));
+            $cleanNames = [];
+            $cleanVals = [];
+            for ($i = 0; $i < $rows; $i++) {
+                $n = isset($attrNames[$i]) && is_string($attrNames[$i]) ? trim($attrNames[$i]) : ($attrNames[$i] ?? '');
+                $v = isset($attrVals[$i]) && is_string($attrVals[$i]) ? trim($attrVals[$i]) : ($attrVals[$i] ?? '');
+                if (filled($n) || filled($v)) {
+                    $cleanNames[] = $n;
+                    $cleanVals[] = $v;
+                }
+            }
+            if (count($cleanNames) > 0) {
+                $metaData['custom_attr_name'] = $cleanNames;
+                $metaData['custom_attr_val'] = $cleanVals;
+            } else {
+                unset($metaData['custom_attr_name'], $metaData['custom_attr_val']);
+            }
         }
         if ($request->filled('brand_id')) {
             $metaData['brand_id'] = (int) $request->input('brand_id');

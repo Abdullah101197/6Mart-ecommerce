@@ -38,6 +38,13 @@
       box-shadow: 0 0 0 0.15rem rgba(234, 84, 85, .18) !important;
       background-color: #fff6f6 !important;
     }
+
+    /* Embed legacy attribute UI into new-product card */
+    #npAttrEmbed #attribute_section { margin: 0 !important; padding: 0 !important; }
+    #npAttrEmbed #attribute_section > .card { border: 0 !important; box-shadow: none !important; }
+    #npAttrEmbed #attribute_section > .card > .card-header { display: none !important; }
+    #npAttrEmbed #attribute_section > .card > .card-body { padding: 0 !important; }
+    #npAttrEmbed .customer_choice_options { flex-wrap: wrap; }
   </style>
 @endpush
 
@@ -49,6 +56,22 @@
   $npMeta = is_array($product?->meta_data) ? $product->meta_data : [];
   $npSellingPoints = data_get($npMeta, 'selling_points', []);
   if (!is_array($npSellingPoints)) { $npSellingPoints = []; }
+  $npCert = data_get($npMeta, 'cert', []);
+  if (!is_array($npCert)) { $npCert = []; }
+  $npAllergen = data_get($npMeta, 'allergen', []);
+  if (!is_array($npAllergen)) { $npAllergen = []; }
+  $npDietary = data_get($npMeta, 'dietary', []);
+  if (!is_array($npDietary)) { $npDietary = []; }
+  $npMayContain = data_get($npMeta, 'may_contain', []);
+  if (!is_array($npMayContain)) { $npMayContain = []; }
+  $npENumbers = data_get($npMeta, 'e_numbers', []);
+  if (!is_array($npENumbers)) { $npENumbers = []; }
+  $npFlavorNames = data_get($npMeta, 'flavor_names', []);
+  if (!is_array($npFlavorNames)) { $npFlavorNames = []; }
+  $npSizeVariants = data_get($npMeta, 'size_variants', []);
+  if (!is_array($npSizeVariants)) { $npSizeVariants = []; }
+  $npSwatches = data_get($npMeta, 'variant_swatches', []);
+  if (!is_array($npSwatches)) { $npSwatches = []; }
   $npCatIds = [];
   try { $npCatIds = $isEdit ? (json_decode($product?->category_ids ?? '[]', true) ?: []) : []; } catch (\Throwable $e) { $npCatIds = []; }
   $npCatPos1 = collect($npCatIds)->firstWhere('position', 1)['id'] ?? null;
@@ -712,26 +735,26 @@
               <div class="np-form-row-3">
                 <div class="np-form-group"><label class="np-label">Length</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[length]" class="np-input"
-                      placeholder="0.0" step="0.1"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" step="0.1" value="{{ old('meta_data.length', data_get($npMeta,'length','')) }}"><span class="np-isfx">cm</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Width</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[width]" class="np-input" placeholder="0.0"
-                      step="0.1"><span class="np-isfx">cm</span></div>
+                      step="0.1" value="{{ old('meta_data.width', data_get($npMeta,'width','')) }}"><span class="np-isfx">cm</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Height</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[height]" class="np-input"
-                      placeholder="0.0" step="0.1"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" step="0.1" value="{{ old('meta_data.height', data_get($npMeta,'height','')) }}"><span class="np-isfx">cm</span></div>
                 </div>
               </div>
               <div class="np-sec-head">Weight</div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Net Weight</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[net_weight]" class="np-input"
-                      placeholder="0.00" step="0.01"><span class="np-isfx">g</span></div>
+                      placeholder="0.00" step="0.01" value="{{ old('meta_data.net_weight', data_get($npMeta,'net_weight','')) }}"><span class="np-isfx">g</span></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Gross Weight</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[gross_weight]" class="np-input"
-                      placeholder="0.00" step="0.01"><span class="np-isfx">g</span></div>
+                      placeholder="0.00" step="0.01" value="{{ old('meta_data.gross_weight', data_get($npMeta,'gross_weight','')) }}"><span class="np-isfx">g</span></div>
                 </div>
               </div>
             </div>
@@ -742,23 +765,34 @@
             <div class="np-card-body">
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">EAN / GTIN Barcode</label><input type="text"
-                    name="meta_data[ean]" class="np-input np-mono" placeholder="e.g. 3073781039180"></div>
+                    name="meta_data[ean]" class="np-input np-mono" placeholder="e.g. 3073781039180" value="{{ old('meta_data.ean', data_get($npMeta,'ean','')) }}"></div>
                 <div class="np-form-group"><label class="np-label">Internal SKU</label><input type="text"
-                    name="meta_data[internal_sku]" class="np-input np-mono" placeholder="e.g. PRD-001"></div>
+                    name="meta_data[internal_sku]" class="np-input np-mono" placeholder="e.g. PRD-001" value="{{ old('meta_data.internal_sku', data_get($npMeta,'internal_sku','')) }}"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Manufacturer Part No.</label><input type="text"
-                    name="meta_data[mpn]" class="np-input np-mono" placeholder="e.g. MPN-001"></div>
+                    name="meta_data[mpn]" class="np-input np-mono" placeholder="e.g. MPN-001" value="{{ old('meta_data.mpn', data_get($npMeta,'mpn','')) }}"></div>
                 <div class="np-form-group"><label class="np-label">Model / Item Number</label><input type="text"
-                    name="meta_data[model_no]" class="np-input" placeholder="e.g. MDL-2024-V1"></div>
+                    name="meta_data[model_no]" class="np-input" placeholder="e.g. MDL-2024-V1" value="{{ old('meta_data.model_no', data_get($npMeta,'model_no','')) }}"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">HS Code
                     (Customs)</label><input type="text" name="meta_data[hs_code]" class="np-input np-mono"
-                    placeholder="e.g. 0406.10"></div>
+                    placeholder="e.g. 0406.10" value="{{ old('meta_data.hs_code', data_get($npMeta,'hs_code','')) }}"></div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Country of
-                    Manufacture</label><input type="text" name="meta_data[country_of_manufacture]" class="np-input"
-                    placeholder="e.g. Poland"></div>
+                    Manufacture</label>
+                  <div class="np-inline-add">
+                    <select name="meta_data[country_of_manufacture]" id="npCountryOfManufacture" class="np-select js-select2-custom">
+                      <option value="">Select…</option>
+                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                        @foreach(\App\Models\ProductSelectOption::where('type','country_of_manufacture')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.country_of_manufacture', data_get($npMeta,'country_of_manufacture','')) == $opt->name)>{{ $opt->name }}</option>
+                        @endforeach
+                      @endif
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('country_of_manufacture')">+</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -767,32 +801,50 @@
                 Specifications</span></div>
             <div class="np-card-body">
               <div class="np-form-row">
-                <div class="np-form-group"><label class="np-label">Packaging Type</label><select
-                    name="meta_data[packaging_type]" class="np-select">
-                    <option value="">Select…</option>
-                    <option>Cardboard Box</option>
-                    <option>Plastic Tray</option>
-                    <option>Vacuum Pack</option>
-                    <option>Glass Jar</option>
-                    <option>Tin Can</option>
-                    <option>Pouch / Sachet</option>
-                    <option>Bottle</option>
-                    <option>Blister Pack</option>
-                    <option>Resealable Bag</option>
-                  </select></div>
+                <div class="np-form-group">
+                  <label class="np-label">Packaging Type</label>
+                  <div class="np-inline-add">
+                    <select name="meta_data[packaging_type]" id="npPackagingType" class="np-select js-select2-custom">
+                      <option value="">Select…</option>
+                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                        @foreach(\App\Models\ProductSelectOption::where('type','packaging_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.packaging_type', data_get($npMeta,'packaging_type','')) == $opt->name)>{{ $opt->name }}</option>
+                        @endforeach
+                      @endif
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('packaging_type')">+</button>
+                  </div>
+                </div>
                 <div class="np-form-group"><label class="np-label">Units per Pack</label><input type="number"
-                    name="meta_data[units_per_pack]" class="np-input" placeholder="e.g. 24"></div>
+                    name="meta_data[units_per_pack]" class="np-input" placeholder="e.g. 24" value="{{ old('meta_data.units_per_pack', data_get($npMeta,'units_per_pack','')) }}"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Packs per Carton</label><input type="number"
-                    name="meta_data[packs_per_carton]" class="np-input" placeholder="e.g. 12"></div>
-                <div class="np-form-group"><label class="np-label">Recyclable Packaging</label><select
-                    name="meta_data[recyclable]" class="np-select">
-                    <option>Select…</option>
-                    <option>Yes — Fully Recyclable</option>
-                    <option>Partially Recyclable</option>
-                    <option>No</option>
-                  </select></div>
+                    name="meta_data[packs_per_carton]" class="np-input" placeholder="e.g. 12" value="{{ old('meta_data.packs_per_carton', data_get($npMeta,'packs_per_carton','')) }}"></div>
+                <div class="np-form-group">
+                  <label class="np-label">Recyclable Packaging</label>
+                  <div class="np-inline-add">
+                    <select name="meta_data[recyclable]" id="npRecyclable" class="np-select js-select2-custom">
+                      <option value="">Select…</option>
+                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                        @foreach(\App\Models\ProductSelectOption::where('type','recyclable')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.recyclable', data_get($npMeta,'recyclable','')) == $opt->name)>{{ $opt->name }}</option>
+                        @endforeach
+                      @endif
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('recyclable')">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="np-form-row">
+                <div class="np-form-group" style="margin-bottom:0">
+                  <label class="np-label">Package Material</label>
+                  <input type="text" name="meta_data[package_material]" class="np-input" placeholder="e.g. Coated paperboard, LDPE film" value="{{ old('meta_data.package_material', data_get($npMeta,'package_material','')) }}">
+                </div>
+                <div class="np-form-group" style="margin-bottom:0">
+                  <label class="np-label">Package Colour</label>
+                  <input type="text" name="meta_data[package_colour]" class="np-input" placeholder="e.g. White & Blue" value="{{ old('meta_data.package_colour', data_get($npMeta,'package_colour','')) }}">
+                </div>
               </div>
             </div>
           </div>
@@ -801,32 +853,38 @@
                 Shelf Life</span></div>
             <div class="np-card-body">
               <div class="np-form-row">
-                <div class="np-form-group"><label class="np-label">Storage Type</label><select
-                    name="meta_data[storage_type]" class="np-select">
-                    <option>Select…</option>
-                    <option>Ambient (Room Temp)</option>
-                    <option>Refrigerated (2–8°C)</option>
-                    <option>Frozen (−18°C or below)</option>
-                    <option>Cool &amp; Dry</option>
-                  </select></div>
+                <div class="np-form-group">
+                  <label class="np-label">Storage Type</label>
+                  <div class="np-inline-add">
+                    <select name="meta_data[storage_type]" id="npStorageType" class="np-select js-select2-custom">
+                      <option value="">Select…</option>
+                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                        @foreach(\App\Models\ProductSelectOption::where('type','storage_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.storage_type', data_get($npMeta,'storage_type','')) == $opt->name)>{{ $opt->name }}</option>
+                        @endforeach
+                      @endif
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('storage_type')">+</button>
+                  </div>
+                </div>
                 <div class="np-form-group"><label class="np-label">Temperature Range</label>
                   <div class="np-iw sfx"><input type="text" name="meta_data[temp_range]" class="np-input"
-                      placeholder="2 – 8"><span class="np-isfx">°C</span></div>
+                      placeholder="2 – 8" value="{{ old('meta_data.temp_range', data_get($npMeta,'temp_range','')) }}"><span class="np-isfx">°C</span></div>
                 </div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Shelf Life from Production</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[shelf_life_days]" class="np-input"
-                      placeholder="e.g. 180"><span class="np-isfx">days</span></div>
+                      placeholder="e.g. 180" value="{{ old('meta_data.shelf_life_days', data_get($npMeta,'shelf_life_days','')) }}"><span class="np-isfx">days</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Min. Days on Delivery</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[min_days_delivery]" class="np-input"
-                      placeholder="e.g. 30"><span class="np-isfx">days</span></div>
+                      placeholder="e.g. 30" value="{{ old('meta_data.min_days_delivery', data_get($npMeta,'min_days_delivery','')) }}"><span class="np-isfx">days</span></div>
                 </div>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Storage
                   Instructions</label><textarea name="meta_data[storage_instructions]" class="np-textarea" rows="2"
-                  placeholder="e.g. Once opened, keep refrigerated and consume within 3 days."></textarea></div>
+                  placeholder="e.g. Once opened, keep refrigerated and consume within 3 days.">{{ old('meta_data.storage_instructions', data_get($npMeta,'storage_instructions','')) }}</textarea></div>
             </div>
           </div>
           <div class="np-card">
@@ -836,13 +894,19 @@
               <div class="np-info-box">💡 Add product-specific attributes shown in the specifications table on the
                 product page.</div>
               <div id="npCustomAttrs">
-                <div class="np-form-row" style="margin-bottom:10px"><input type="text"
-                    name="meta_data[custom_attr_name][]" class="np-input"
-                    placeholder="Attribute name (e.g. Fat Content)"><input type="text"
-                    name="meta_data[custom_attr_val][]" class="np-input" placeholder="Value (e.g. 24g per 100g)"></div>
-                <div class="np-form-row" style="margin-bottom:10px"><input type="text"
-                    name="meta_data[custom_attr_name][]" class="np-input" placeholder="Attribute name"><input
-                    type="text" name="meta_data[custom_attr_val][]" class="np-input" placeholder="Value"></div>
+                @php
+                  $npAttrNames = old('meta_data.custom_attr_name', data_get($npMeta,'custom_attr_name', []));
+                  $npAttrVals = old('meta_data.custom_attr_val', data_get($npMeta,'custom_attr_val', []));
+                  if (!is_array($npAttrNames)) { $npAttrNames = []; }
+                  if (!is_array($npAttrVals)) { $npAttrVals = []; }
+                  $npAttrRows = max(count($npAttrNames), count($npAttrVals), 2);
+                @endphp
+                @for($i=0;$i<$npAttrRows;$i++)
+                  <div class="np-form-row" style="margin-bottom:10px">
+                    <input type="text" name="meta_data[custom_attr_name][]" class="np-input" placeholder="Attribute name (e.g. Fat Content)" value="{{ $npAttrNames[$i] ?? '' }}">
+                    <input type="text" name="meta_data[custom_attr_val][]" class="np-input" placeholder="Value (e.g. 24g per 100g)" value="{{ $npAttrVals[$i] ?? '' }}">
+                  </div>
+                @endfor
               </div>
               <button type="button" class="np-btn-add" onclick="npAddCustomAttr()">+ Add Attribute Row</button>
             </div>
@@ -853,24 +917,61 @@
             <div class="np-card-header"><span class="np-card-icon">🏷️</span><span class="np-card-title">Product
                 Type</span></div>
             <div class="np-card-body">
-              <div class="np-form-group"><label class="np-label">Product Type</label><select name="product_type"
-                  class="np-select">
-                  <option value="simple">Simple Product</option>
-                  <option value="variable">Variable Product</option>
-                  <option value="bundle">Bundle / Multipack</option>
-                </select></div>
-              <div class="np-form-group"><label class="np-label">Condition</label><select name="meta_data[condition]"
-                  class="np-select">
-                  <option>New</option>
-                  <option>Refurbished</option>
-                  <option>Used</option>
-                </select></div>
-              <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Age Restriction</label><select
-                  name="meta_data[age_restriction]" class="np-select">
-                  <option value="">None</option>
-                  <option value="18">18+</option>
-                  <option value="21">21+</option>
-                </select></div>
+              <div class="np-form-group">
+                <label class="np-label">Product Type</label>
+                <div class="np-inline-add">
+                  <select name="meta_data[product_type]" id="npProductType" class="np-select js-select2-custom">
+                    <option value="">Select…</option>
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','product_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                        <option value="{{ $opt->name }}" @selected(old('meta_data.product_type', data_get($npMeta,'product_type','')) == $opt->name)>{{ $opt->name }}</option>
+                      @endforeach
+                    @else
+                      <option value="Simple Product" @selected(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Simple Product')>Simple Product</option>
+                      <option value="Variable Product" @selected(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Variable Product')>Variable Product</option>
+                      <option value="Bundle / Multipack" @selected(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Bundle / Multipack')>Bundle / Multipack</option>
+                    @endif
+                  </select>
+                  <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('product_type')">+</button>
+                </div>
+              </div>
+
+              <div class="np-form-group">
+                <label class="np-label">Condition</label>
+                <div class="np-inline-add">
+                  <select name="meta_data[condition]" id="npCondition" class="np-select js-select2-custom">
+                    <option value="">Select…</option>
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','condition')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                        <option value="{{ $opt->name }}" @selected(old('meta_data.condition', data_get($npMeta,'condition','')) == $opt->name)>{{ $opt->name }}</option>
+                      @endforeach
+                    @else
+                      <option value="New" @selected(old('meta_data.condition', data_get($npMeta,'condition',''))=='New')>New</option>
+                      <option value="Refurbished" @selected(old('meta_data.condition', data_get($npMeta,'condition',''))=='Refurbished')>Refurbished</option>
+                      <option value="Used" @selected(old('meta_data.condition', data_get($npMeta,'condition',''))=='Used')>Used</option>
+                    @endif
+                  </select>
+                  <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('condition')">+</button>
+                </div>
+              </div>
+
+              <div class="np-form-group" style="margin-bottom:0">
+                <label class="np-label">Age Restriction</label>
+                <div class="np-inline-add">
+                  <select name="meta_data[age_restriction]" id="npAgeRestriction" class="np-select js-select2-custom">
+                    <option value="">None</option>
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','age_restriction')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                        <option value="{{ $opt->name }}" @selected(old('meta_data.age_restriction', data_get($npMeta,'age_restriction','')) == $opt->name)>{{ $opt->name }}</option>
+                      @endforeach
+                    @else
+                      <option value="18+" @selected(old('meta_data.age_restriction', data_get($npMeta,'age_restriction',''))=='18+')>18+</option>
+                      <option value="21+" @selected(old('meta_data.age_restriction', data_get($npMeta,'age_restriction',''))=='21+')>21+</option>
+                    @endif
+                  </select>
+                  <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('age_restriction')">+</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="np-card">
@@ -878,19 +979,24 @@
                 Lifecycle</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Product Launch Date</label><input type="date"
-                  name="meta_data[launch_date]" class="np-input"></div>
+                  name="meta_data[launch_date]" class="np-input" value="{{ old('meta_data.launch_date', data_get($npMeta,'launch_date','')) }}"></div>
               <div class="np-form-group"><label class="np-label">End-of-Life Date</label><input type="date"
-                  name="meta_data[eol_date]" class="np-input"></div>
+                  name="meta_data[eol_date]" class="np-input" value="{{ old('meta_data.eol_date', data_get($npMeta,'eol_date','')) }}"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Warranty Period</label><select
-                  name="meta_data[warranty]" class="np-select">
+                  name="meta_data[warranty]" id="npWarranty" class="np-select js-select2-custom">
                   <option value="">N/A</option>
-                  <option>1 Month</option>
-                  <option>3 Months</option>
-                  <option>6 Months</option>
-                  <option>1 Year</option>
-                  <option>2 Years</option>
-                  <option>3 Years</option>
-                </select></div>
+                  @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                    @foreach(\App\Models\ProductSelectOption::where('type','warranty')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                      <option value="{{ $opt->name }}" @selected(old('meta_data.warranty', data_get($npMeta,'warranty','')) == $opt->name)>{{ $opt->name }}</option>
+                    @endforeach
+                  @else
+                    @foreach(['1 Month','3 Months','6 Months','1 Year','2 Years','3 Years'] as $w)
+                      <option value="{{ $w }}" @selected(old('meta_data.warranty', data_get($npMeta,'warranty','')) == $w)>{{ $w }}</option>
+                    @endforeach
+                  @endif
+                </select>
+                <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('warranty')" style="margin-top:8px">+</button>
+              </div>
             </div>
           </div>
           <div class="np-card">
@@ -898,12 +1004,12 @@
                 class="np-card-title">Compliance</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Approval / Permit No.</label><input type="text"
-                  name="meta_data[approval_no]" class="np-input np-mono" placeholder="e.g. QFSSA-2024-XXXX"></div>
+                  name="meta_data[approval_no]" class="np-input np-mono" placeholder="e.g. QFSSA-2024-XXXX" value="{{ old('meta_data.approval_no', data_get($npMeta,'approval_no','')) }}"></div>
               <div class="np-form-group"><label class="np-label">Import Permit No.</label><input type="text"
-                  name="meta_data[import_permit]" class="np-input np-mono" placeholder="e.g. IMP-XXXX"></div>
+                  name="meta_data[import_permit]" class="np-input np-mono" placeholder="e.g. IMP-XXXX" value="{{ old('meta_data.import_permit', data_get($npMeta,'import_permit','')) }}"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">CE / Safety
                   Marking</label><input type="text" name="meta_data[safety_marking]" class="np-input"
-                  placeholder="e.g. CE, FCC, ROHS"></div>
+                  placeholder="e.g. CE, FCC, ROHS" value="{{ old('meta_data.safety_marking', data_get($npMeta,'safety_marking','')) }}"></div>
             </div>
           </div>
           <div class="np-card">
@@ -911,12 +1017,12 @@
                 class="np-card-title">Certifications</span></div>
             <div class="np-card-body">
               <div class="np-chk-grid">
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
-                    value="halal"> 🟢 Halal</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
-                    value="organic"> 🌱 Organic</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
-                    value="free_range"> 🐄 Free Range</label>
+                <label class="np-chk-item {{ in_array('halal',$npCert) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
+                    value="halal" @checked(in_array('halal',$npCert))> 🟢 Halal</label>
+                <label class="np-chk-item {{ in_array('organic',$npCert) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
+                    value="organic" @checked(in_array('organic',$npCert))> 🌱 Organic</label>
+                <label class="np-chk-item {{ in_array('free_range',$npCert) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
+                    value="free_range" @checked(in_array('free_range',$npCert))> 🐄 Free Range</label>
                 <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
                     value="non_gmo"> 🌿 Non-GMO</label>
                 <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
@@ -934,16 +1040,27 @@
             <div class="np-card-header"><span class="np-card-icon">↩️</span><span class="np-card-title">Return
                 Policy</span></div>
             <div class="np-card-body">
-              <div class="np-form-group"><label class="np-label">Returnable</label><select
-                  name="meta_data[return_policy]" class="np-select">
-                  <option>Yes — Within 7 days</option>
-                  <option>Yes — Within 14 days</option>
-                  <option>Yes — Within 30 days</option>
-                  <option>No — Non-returnable (perishable)</option>
-                </select></div>
+              <div class="np-form-group">
+                <label class="np-label">Returnable</label>
+                <div class="np-inline-add">
+                  <select name="meta_data[return_policy]" id="npReturnPolicy" class="np-select js-select2-custom">
+                    <option value="">Select…</option>
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','return_policy')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                        <option value="{{ $opt->name }}" @selected(old('meta_data.return_policy', data_get($npMeta,'return_policy','')) == $opt->name)>{{ $opt->name }}</option>
+                      @endforeach
+                    @else
+                      @foreach(['Yes — Within 7 days','Yes — Within 14 days','Yes — Within 30 days','No — Non-returnable (perishable)'] as $rp)
+                        <option value="{{ $rp }}" @selected(old('meta_data.return_policy', data_get($npMeta,'return_policy','')) == $rp)>{{ $rp }}</option>
+                      @endforeach
+                    @endif
+                  </select>
+                  <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('return_policy')">+</button>
+                </div>
+              </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Return
                   Conditions</label><textarea name="meta_data[return_conditions]" class="np-textarea" rows="2"
-                  placeholder="e.g. Original packaging, unopened, within expiry date."></textarea></div>
+                  placeholder="e.g. Original packaging, unopened, within expiry date.">{{ old('meta_data.return_conditions', data_get($npMeta,'return_conditions','')) }}</textarea></div>
             </div>
           </div>
         </div>
@@ -960,11 +1077,11 @@
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Ingredients List (English) <span
                     class="np-req">*</span></label><textarea name="meta_data[ingredients_en]" class="np-textarea"
-                  rows="4" placeholder="e.g. Pasteurised cow's milk, cream, salt, lactic acid bacteria…"></textarea>
+                  rows="4" placeholder="e.g. Pasteurised cow's milk, cream, salt, lactic acid bacteria…">{{ old('meta_data.ingredients_en', data_get($npMeta,'ingredients_en','')) }}</textarea>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Ingredients List
                   (Arabic)</label><textarea name="meta_data[ingredients_ar]" class="np-textarea" rows="3"
-                  placeholder="قائمة المكونات بالعربي…" style="direction:rtl;text-align:right"></textarea></div>
+                  placeholder="قائمة المكونات بالعربي…" style="direction:rtl;text-align:right">{{ old('meta_data.ingredients_ar', data_get($npMeta,'ingredients_ar','')) }}</textarea></div>
             </div>
           </div>
           <div class="np-card">
@@ -983,74 +1100,116 @@
                 <tbody>
                   <tr>
                     <td>Energy</td>
-                    <td><input type="text" name="meta_data[nutr_energy_100g]" class="np-input" placeholder="263"></td>
-                    <td><input type="text" name="meta_data[nutr_energy_srv]" class="np-input" placeholder="47"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_100g]" class="np-input" placeholder="263" value="{{ old('meta_data.nutr_energy_100g', data_get($npMeta,'nutr_energy_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_srv]" class="np-input" placeholder="47" value="{{ old('meta_data.nutr_energy_srv', data_get($npMeta,'nutr_energy_srv','')) }}"></td>
                     <td>kcal</td>
                   </tr>
                   <tr>
+                    <td>Energy (kJ)</td>
+                    <td><input type="text" name="meta_data[nutr_energy_kj_100g]" class="np-input" placeholder="1099" value="{{ old('meta_data.nutr_energy_kj_100g', data_get($npMeta,'nutr_energy_kj_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_kj_srv]" class="np-input" placeholder="198" value="{{ old('meta_data.nutr_energy_kj_srv', data_get($npMeta,'nutr_energy_kj_srv','')) }}"></td>
+                    <td>kJ</td>
+                  </tr>
+                  <tr>
                     <td>Total Fat</td>
-                    <td><input type="text" name="meta_data[nutr_fat_100g]" class="np-input" placeholder="24"></td>
-                    <td><input type="text" name="meta_data[nutr_fat_srv]" class="np-input" placeholder="4.3"></td>
+                    <td><input type="text" name="meta_data[nutr_fat_100g]" class="np-input" placeholder="24" value="{{ old('meta_data.nutr_fat_100g', data_get($npMeta,'nutr_fat_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_fat_srv]" class="np-input" placeholder="4.3" value="{{ old('meta_data.nutr_fat_srv', data_get($npMeta,'nutr_fat_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Saturated Fat</td>
-                    <td><input type="text" name="meta_data[nutr_satfat_100g]" class="np-input" placeholder="15"></td>
-                    <td><input type="text" name="meta_data[nutr_satfat_srv]" class="np-input" placeholder="2.7"></td>
+                    <td><input type="text" name="meta_data[nutr_satfat_100g]" class="np-input" placeholder="15" value="{{ old('meta_data.nutr_satfat_100g', data_get($npMeta,'nutr_satfat_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_satfat_srv]" class="np-input" placeholder="2.7" value="{{ old('meta_data.nutr_satfat_srv', data_get($npMeta,'nutr_satfat_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Trans Fat</td>
-                    <td><input type="text" name="meta_data[nutr_transfat_100g]" class="np-input" placeholder="0"></td>
-                    <td><input type="text" name="meta_data[nutr_transfat_srv]" class="np-input" placeholder="0"></td>
+                    <td><input type="text" name="meta_data[nutr_transfat_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_transfat_100g', data_get($npMeta,'nutr_transfat_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_transfat_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_transfat_srv', data_get($npMeta,'nutr_transfat_srv','')) }}"></td>
+                    <td>g</td>
+                  </tr>
+                  <tr>
+                    <td class="np-ind">Monounsaturated Fat</td>
+                    <td><input type="text" name="meta_data[nutr_monofat_100g]" class="np-input" placeholder="6.5" value="{{ old('meta_data.nutr_monofat_100g', data_get($npMeta,'nutr_monofat_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_monofat_srv]" class="np-input" placeholder="1.2" value="{{ old('meta_data.nutr_monofat_srv', data_get($npMeta,'nutr_monofat_srv','')) }}"></td>
+                    <td>g</td>
+                  </tr>
+                  <tr>
+                    <td class="np-ind">Polyunsaturated Fat</td>
+                    <td><input type="text" name="meta_data[nutr_polyfat_100g]" class="np-input" placeholder="0.8" value="{{ old('meta_data.nutr_polyfat_100g', data_get($npMeta,'nutr_polyfat_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_polyfat_srv]" class="np-input" placeholder="0.1" value="{{ old('meta_data.nutr_polyfat_srv', data_get($npMeta,'nutr_polyfat_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Total Carbohydrates</td>
-                    <td><input type="text" name="meta_data[nutr_carbs_100g]" class="np-input" placeholder="4.5"></td>
-                    <td><input type="text" name="meta_data[nutr_carbs_srv]" class="np-input" placeholder="0.8"></td>
+                    <td><input type="text" name="meta_data[nutr_carbs_100g]" class="np-input" placeholder="4.5" value="{{ old('meta_data.nutr_carbs_100g', data_get($npMeta,'nutr_carbs_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_carbs_srv]" class="np-input" placeholder="0.8" value="{{ old('meta_data.nutr_carbs_srv', data_get($npMeta,'nutr_carbs_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Total Sugars</td>
-                    <td><input type="text" name="meta_data[nutr_sugars_100g]" class="np-input" placeholder="2.2"></td>
-                    <td><input type="text" name="meta_data[nutr_sugars_srv]" class="np-input" placeholder="0.4"></td>
+                    <td><input type="text" name="meta_data[nutr_sugars_100g]" class="np-input" placeholder="2.2" value="{{ old('meta_data.nutr_sugars_100g', data_get($npMeta,'nutr_sugars_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_sugars_srv]" class="np-input" placeholder="0.4" value="{{ old('meta_data.nutr_sugars_srv', data_get($npMeta,'nutr_sugars_srv','')) }}"></td>
+                    <td>g</td>
+                  </tr>
+                  <tr>
+                    <td class="np-ind">Added Sugars</td>
+                    <td><input type="text" name="meta_data[nutr_added_sugars_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_added_sugars_100g', data_get($npMeta,'nutr_added_sugars_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_added_sugars_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_added_sugars_srv', data_get($npMeta,'nutr_added_sugars_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Dietary Fibre</td>
-                    <td><input type="text" name="meta_data[nutr_fibre_100g]" class="np-input" placeholder="0"></td>
-                    <td><input type="text" name="meta_data[nutr_fibre_srv]" class="np-input" placeholder="0"></td>
+                    <td><input type="text" name="meta_data[nutr_fibre_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_fibre_100g', data_get($npMeta,'nutr_fibre_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_fibre_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_fibre_srv', data_get($npMeta,'nutr_fibre_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Protein</td>
-                    <td><input type="text" name="meta_data[nutr_protein_100g]" class="np-input" placeholder="7.8"></td>
-                    <td><input type="text" name="meta_data[nutr_protein_srv]" class="np-input" placeholder="1.4"></td>
+                    <td><input type="text" name="meta_data[nutr_protein_100g]" class="np-input" placeholder="7.8" value="{{ old('meta_data.nutr_protein_100g', data_get($npMeta,'nutr_protein_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_protein_srv]" class="np-input" placeholder="1.4" value="{{ old('meta_data.nutr_protein_srv', data_get($npMeta,'nutr_protein_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Salt</td>
-                    <td><input type="text" name="meta_data[nutr_salt_100g]" class="np-input" placeholder="1.2"></td>
-                    <td><input type="text" name="meta_data[nutr_salt_srv]" class="np-input" placeholder="0.2"></td>
+                    <td><input type="text" name="meta_data[nutr_salt_100g]" class="np-input" placeholder="1.2" value="{{ old('meta_data.nutr_salt_100g', data_get($npMeta,'nutr_salt_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_salt_srv]" class="np-input" placeholder="0.2" value="{{ old('meta_data.nutr_salt_srv', data_get($npMeta,'nutr_salt_srv','')) }}"></td>
+                    <td>g</td>
+                  </tr>
+                  <tr>
+                    <td class="np-ind">Sodium</td>
+                    <td><input type="text" name="meta_data[nutr_sodium_100g]" class="np-input" placeholder="0.47" value="{{ old('meta_data.nutr_sodium_100g', data_get($npMeta,'nutr_sodium_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_sodium_srv]" class="np-input" placeholder="0.08" value="{{ old('meta_data.nutr_sodium_srv', data_get($npMeta,'nutr_sodium_srv','')) }}"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Calcium</td>
-                    <td><input type="text" name="meta_data[nutr_calcium_100g]" class="np-input" placeholder="100"></td>
-                    <td><input type="text" name="meta_data[nutr_calcium_srv]" class="np-input" placeholder="18"></td>
+                    <td><input type="text" name="meta_data[nutr_calcium_100g]" class="np-input" placeholder="100" value="{{ old('meta_data.nutr_calcium_100g', data_get($npMeta,'nutr_calcium_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_calcium_srv]" class="np-input" placeholder="18" value="{{ old('meta_data.nutr_calcium_srv', data_get($npMeta,'nutr_calcium_srv','')) }}"></td>
                     <td>mg</td>
                   </tr>
                   <tr>
                     <td>Vitamin A</td>
-                    <td><input type="text" name="meta_data[nutr_vita_100g]" class="np-input" placeholder="180"></td>
-                    <td><input type="text" name="meta_data[nutr_vita_srv]" class="np-input" placeholder="32"></td>
+                    <td><input type="text" name="meta_data[nutr_vita_100g]" class="np-input" placeholder="180" value="{{ old('meta_data.nutr_vita_100g', data_get($npMeta,'nutr_vita_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_vita_srv]" class="np-input" placeholder="32" value="{{ old('meta_data.nutr_vita_srv', data_get($npMeta,'nutr_vita_srv','')) }}"></td>
+                    <td>µg</td>
+                  </tr>
+                  <tr>
+                    <td>Vitamin D</td>
+                    <td><input type="text" name="meta_data[nutr_vitd_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_vitd_100g', data_get($npMeta,'nutr_vitd_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_vitd_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_vitd_srv', data_get($npMeta,'nutr_vitd_srv','')) }}"></td>
                     <td>µg</td>
                   </tr>
                   <tr>
                     <td>Cholesterol</td>
-                    <td><input type="text" name="meta_data[nutr_chol_100g]" class="np-input" placeholder="70"></td>
-                    <td><input type="text" name="meta_data[nutr_chol_srv]" class="np-input" placeholder="13"></td>
+                    <td><input type="text" name="meta_data[nutr_chol_100g]" class="np-input" placeholder="70" value="{{ old('meta_data.nutr_chol_100g', data_get($npMeta,'nutr_chol_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_chol_srv]" class="np-input" placeholder="13" value="{{ old('meta_data.nutr_chol_srv', data_get($npMeta,'nutr_chol_srv','')) }}"></td>
+                    <td>mg</td>
+                  </tr>
+                  <tr>
+                    <td>Iron</td>
+                    <td><input type="text" name="meta_data[nutr_iron_100g]" class="np-input" placeholder="0.1" value="{{ old('meta_data.nutr_iron_100g', data_get($npMeta,'nutr_iron_100g','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_iron_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_iron_srv', data_get($npMeta,'nutr_iron_srv','')) }}"></td>
                     <td>mg</td>
                   </tr>
                 </tbody>
@@ -1064,11 +1223,11 @@
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Serving Size</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[serving_size]" class="np-input"
-                      placeholder="18" step="0.5"><span class="np-isfx">g</span></div>
+                      placeholder="18" step="0.5" value="{{ old('meta_data.serving_size', data_get($npMeta,'serving_size','')) }}"><span class="np-isfx">g</span></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Servings per
                     Container</label><input type="number" name="meta_data[servings_per_container]" class="np-input"
-                    placeholder="48"></div>
+                    placeholder="48" value="{{ old('meta_data.servings_per_container', data_get($npMeta,'servings_per_container','')) }}"></div>
               </div>
             </div>
           </div>
@@ -1080,37 +1239,43 @@
             <div class="np-card-body">
               <div class="np-sec-head">Contains</div>
               <div class="np-chk-grid">
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="milk"> 🥛 Milk</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="gluten"> 🌾 Gluten/Wheat</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="eggs"> 🥚 Eggs</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="fish"> 🐟 Fish</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="crustaceans"> 🦐 Crustaceans</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="peanuts"> 🥜 Peanuts</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="tree_nuts"> 🌰 Tree Nuts</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="soybeans"> 🫘 Soybeans</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="sesame"> 🌱 Sesame</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="mustard"> 🌻 Mustard</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="celery"> 🥬 Celery</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="sulphites"> 🍇 Sulphites</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="molluscs"> 🦑 Molluscs</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="lupin"> 🫘 Lupin</label>
+                <label class="np-chk-item {{ in_array('milk',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="milk" @checked(in_array('milk',$npAllergen))> 🥛 Milk</label>
+                <label class="np-chk-item {{ in_array('gluten',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="gluten" @checked(in_array('gluten',$npAllergen))> 🌾 Gluten/Wheat</label>
+                <label class="np-chk-item {{ in_array('eggs',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="eggs" @checked(in_array('eggs',$npAllergen))> 🥚 Eggs</label>
+                <label class="np-chk-item {{ in_array('fish',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="fish" @checked(in_array('fish',$npAllergen))> 🐟 Fish</label>
+                <label class="np-chk-item {{ in_array('crustaceans',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="crustaceans" @checked(in_array('crustaceans',$npAllergen))> 🦐 Crustaceans</label>
+                <label class="np-chk-item {{ in_array('peanuts',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="peanuts" @checked(in_array('peanuts',$npAllergen))> 🥜 Peanuts</label>
+                <label class="np-chk-item {{ in_array('tree_nuts',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="tree_nuts" @checked(in_array('tree_nuts',$npAllergen))> 🌰 Tree Nuts</label>
+                <label class="np-chk-item {{ in_array('soybeans',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="soybeans" @checked(in_array('soybeans',$npAllergen))> 🫘 Soybeans</label>
+                <label class="np-chk-item {{ in_array('sesame',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="sesame" @checked(in_array('sesame',$npAllergen))> 🌱 Sesame</label>
+                <label class="np-chk-item {{ in_array('mustard',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="mustard" @checked(in_array('mustard',$npAllergen))> 🌻 Mustard</label>
+                <label class="np-chk-item {{ in_array('celery',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="celery" @checked(in_array('celery',$npAllergen))> 🥬 Celery</label>
+                <label class="np-chk-item {{ in_array('sulphites',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="sulphites" @checked(in_array('sulphites',$npAllergen))> 🍇 Sulphites</label>
+                <label class="np-chk-item {{ in_array('molluscs',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="molluscs" @checked(in_array('molluscs',$npAllergen))> 🦑 Molluscs</label>
+                <label class="np-chk-item {{ in_array('lupin',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="lupin" @checked(in_array('lupin',$npAllergen))> 🫘 Lupin</label>
               </div>
               <div class="np-sec-head" style="margin-top:14px">May Contain (Cross-contamination)</div>
               <div class="np-tag-wrap" id="npMcWrap" onclick="this.querySelector('input').focus()">
+                @foreach($npMayContain as $t)
+                  @php($t = is_string($t) ? trim($t) : '')
+                  @if(filled($t))
+                    <span class="np-tag t-orange">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[may_contain][]" value="{{ $t }}"></span>
+                  @endif
+                @endforeach
                 <input type="text" id="npMcInput" class="np-input" placeholder="e.g. Tree Nuts, Soy… press Enter"
                   onkeydown="npAddTag(event,'npMcWrap','npMcInput','t-orange','meta_data[may_contain][]')">
               </div>
@@ -1121,22 +1286,22 @@
                 Information</span></div>
             <div class="np-card-body">
               <div class="np-chk-grid">
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="halal"> ✅ Halal</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="kosher"> ✡️ Kosher</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="vegetarian"> 🌱 Vegetarian</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="vegan"> 🌿 Vegan</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="gluten_free"> 🚫🌾 Gluten-Free</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="dairy_free"> 🚫🥛 Dairy-Free</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="low_sugar"> 🍬 Low Sugar</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="no_preservatives"> 🫀 No Preservatives</label>
+                <label class="np-chk-item {{ in_array('halal',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="halal" @checked(in_array('halal',$npDietary))> ✅ Halal</label>
+                <label class="np-chk-item {{ in_array('kosher',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="kosher" @checked(in_array('kosher',$npDietary))> ✡️ Kosher</label>
+                <label class="np-chk-item {{ in_array('vegetarian',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="vegetarian" @checked(in_array('vegetarian',$npDietary))> 🌱 Vegetarian</label>
+                <label class="np-chk-item {{ in_array('vegan',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="vegan" @checked(in_array('vegan',$npDietary))> 🌿 Vegan</label>
+                <label class="np-chk-item {{ in_array('gluten_free',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="gluten_free" @checked(in_array('gluten_free',$npDietary))> 🚫🌾 Gluten-Free</label>
+                <label class="np-chk-item {{ in_array('dairy_free',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="dairy_free" @checked(in_array('dairy_free',$npDietary))> 🚫🥛 Dairy-Free</label>
+                <label class="np-chk-item {{ in_array('low_sugar',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="low_sugar" @checked(in_array('low_sugar',$npDietary))> 🍬 Low Sugar</label>
+                <label class="np-chk-item {{ in_array('no_preservatives',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="no_preservatives" @checked(in_array('no_preservatives',$npDietary))> 🫀 No Preservatives</label>
               </div>
             </div>
           </div>
@@ -1145,6 +1310,12 @@
                 E-Numbers</span></div>
             <div class="np-card-body">
               <div class="np-tag-wrap" id="npENumWrap" onclick="this.querySelector('input').focus()">
+                @foreach($npENumbers as $t)
+                  @php($t = is_string($t) ? trim($t) : '')
+                  @if(filled($t))
+                    <span class="np-tag t-blue">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[e_numbers][]" value="{{ $t }}"></span>
+                  @endif
+                @endforeach
                 <input type="text" id="npENumInput" class="np-input"
                   placeholder="Add E-number, press Enter… (e.g. E330)"
                   onkeydown="npAddTag(event,'npENumWrap','npENumInput','t-blue','meta_data[e_numbers][]')">
@@ -1163,8 +1334,77 @@
           @if (Config::get('module.current_module_type') == 'food')
             @includeif('admin-views.product.partials._food_variations')
           @else
-            @includeif('admin-views.product.partials._other_variations')
+            {{-- Moved into Colour/Flavour section below --}}
           @endif
+          <div class="np-card" style="margin-top:18px">
+            <div class="np-card-header"><span class="np-card-icon">🎨</span><span class="np-card-title">Colour / Flavour
+                Variants</span></div>
+            <div class="np-card-body">
+              <div class="np-form-row" style="align-items:flex-end">
+                <div class="np-form-group" style="margin-bottom:0;min-width:220px">
+                  <label class="np-label">Variant Type</label>
+                  <select name="meta_data[variant_type]" class="np-select">
+                    @foreach(['Flavour','Colour','Scent','Style'] as $vt)
+                      <option value="{{ $vt }}" @selected(old('meta_data.variant_type', data_get($npMeta,'variant_type','Flavour'))==$vt)>{{ $vt }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="np-form-group" style="margin-bottom:0;flex:1">
+                  <label class="np-label">Colour Palette</label>
+                  <div class="np-swatches" id="npSwatchesWrap">
+                    @foreach(['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey'] as $hex => $name)
+                      <div class="np-swatch {{ in_array($hex,$npSwatches) ? 'sel' : '' }}"
+                        data-hex="{{ $hex }}"
+                        style="background:{{ $hex }}{{ $hex === '#f9fafb' ? ';border:1.5px solid #d1d5db' : '' }}"
+                        title="{{ $name }}"
+                        onclick="npToggleSwatch(this)"></div>
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+
+              <div class="np-form-group" style="margin-bottom:0;margin-top:12px">
+                <label class="np-label">Custom Flavour / Colour Names</label>
+                <div class="np-tag-wrap" id="npFlavWrap" onclick="this.querySelector('input').focus()">
+                  @foreach($npFlavorNames as $t)
+                    @php($t = is_string($t) ? trim($t) : '')
+                    @if(filled($t))
+                      <span class="np-tag t-green">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[flavor_names][]" value="{{ $t }}"></span>
+                    @endif
+                  @endforeach
+                  <input type="text" id="npFlavInput" class="np-input" placeholder="Add variant, press Enter…"
+                    onkeydown="npAddTag(event,'npFlavWrap','npFlavInput','t-green','meta_data[flavor_names][]')">
+                </div>
+              </div>
+
+              @if (Config::get('module.current_module_type') != 'food')
+                <div style="margin-top:16px">
+                  <div class="np-sec-head" style="margin:0 0 10px">Attribute</div>
+                  <div id="npAttrEmbed">
+                    @includeif('admin-views.product.partials._other_variations')
+                  </div>
+                </div>
+              @endif
+            </div>
+          </div>
+
+          <div class="np-card">
+            <div class="np-card-header"><span class="np-card-icon">📏</span><span class="np-card-title">Size / Weight
+                Variants</span></div>
+            <div class="np-card-body">
+              <div class="np-tag-wrap" id="npSizeWrap" onclick="this.querySelector('input').focus()">
+                @foreach($npSizeVariants as $t)
+                  @php($t = is_string($t) ? trim($t) : '')
+                  @if(filled($t))
+                    <span class="np-tag t-purple">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[size_variants][]" value="{{ $t }}"></span>
+                  @endif
+                @endforeach
+                <input type="text" id="npSizeInput" class="np-input" placeholder="Add size/weight, press Enter…"
+                  onkeydown="npAddTag(event,'npSizeWrap','npSizeInput','t-purple','meta_data[size_variants][]')">
+              </div>
+            </div>
+          </div>
+
           <div class="np-card" style="margin-top:18px">
             <div class="np-card-header"><span class="np-card-icon">📊</span><span class="np-card-title">Variant SKU
                 Matrix</span><span class="np-card-subtitle">Per variant pricing &amp; stock</span></div>
@@ -1181,23 +1421,38 @@
                   </tr>
                 </thead>
                 <tbody id="npVariantBody">
-                  <tr>
-                    <td><input type="text" name="meta_data[var_name][]" class="np-input"
-                        placeholder="e.g. Original / 864g"></td>
-                    <td><input type="text" name="meta_data[var_sku][]" class="np-input np-mono" placeholder="SKU-001">
-                    </td>
-                    <td><input type="number" name="meta_data[var_price][]" class="np-input" placeholder="0.00"
-                        step="0.01"></td>
-                    <td><input type="number" name="meta_data[var_stock][]" class="np-input" placeholder="0"></td>
-                    <td><select name="meta_data[var_status][]" class="np-select"
-                        style="font-size:11.5px;padding:5px 28px 5px 8px">
-                        <option>Active</option>
-                        <option>Out of Stock</option>
-                        <option>Disabled</option>
-                      </select></td>
-                    <td><button type="button" class="np-btn-tiny del" onclick="this.closest('tr').remove()">✕</button>
-                    </td>
-                  </tr>
+                  @php($npVarName = old('meta_data.var_name', data_get($npMeta,'var_name', [])))
+                  @php($npVarSku = old('meta_data.var_sku', data_get($npMeta,'var_sku', [])))
+                  @php($npVarPrice = old('meta_data.var_price', data_get($npMeta,'var_price', [])))
+                  @php($npVarStock = old('meta_data.var_stock', data_get($npMeta,'var_stock', [])))
+                  @php($npVarStatus = old('meta_data.var_status', data_get($npMeta,'var_status', [])))
+                  @php($npVarName = is_array($npVarName) ? $npVarName : [])
+                  @php($npVarSku = is_array($npVarSku) ? $npVarSku : [])
+                  @php($npVarPrice = is_array($npVarPrice) ? $npVarPrice : [])
+                  @php($npVarStock = is_array($npVarStock) ? $npVarStock : [])
+                  @php($npVarStatus = is_array($npVarStatus) ? $npVarStatus : [])
+                  @php($npVarRows = max(count($npVarName), count($npVarSku), count($npVarPrice), count($npVarStock), count($npVarStatus), 1))
+                  @for($i=0;$i<$npVarRows;$i++)
+                    <tr>
+                      <td><input type="text" name="meta_data[var_name][]" class="np-input"
+                          placeholder="e.g. Original / 864g" value="{{ $npVarName[$i] ?? '' }}"></td>
+                      <td><input type="text" name="meta_data[var_sku][]" class="np-input np-mono" placeholder="SKU-001"
+                          value="{{ $npVarSku[$i] ?? '' }}"></td>
+                      <td><input type="number" name="meta_data[var_price][]" class="np-input" placeholder="0.00"
+                          step="0.01" value="{{ $npVarPrice[$i] ?? '' }}"></td>
+                      <td><input type="number" name="meta_data[var_stock][]" class="np-input" placeholder="0"
+                          value="{{ $npVarStock[$i] ?? '' }}"></td>
+                      <td>
+                        @php($st = $npVarStatus[$i] ?? 'Active')
+                        <select name="meta_data[var_status][]" class="np-select" style="font-size:11.5px;padding:5px 28px 5px 8px">
+                          <option value="Active" @selected($st==='Active')>Active</option>
+                          <option value="Out of Stock" @selected($st==='Out of Stock')>Out of Stock</option>
+                          <option value="Disabled" @selected($st==='Disabled')>Disabled</option>
+                        </select>
+                      </td>
+                      <td><button type="button" class="np-btn-tiny del" onclick="this.closest('tr').remove()">✕</button></td>
+                    </tr>
+                  @endfor
                 </tbody>
               </table>
               <div style="padding:12px 16px"><button type="button" class="np-btn-add" onclick="npAddVariantRow()">+ Add
@@ -1207,52 +1462,47 @@
         </div>
         <div>
           <div class="np-card">
-            <div class="np-card-header"><span class="np-card-icon">🎨</span><span class="np-card-title">Colour / Flavour
-                Variants</span></div>
-            <div class="np-card-body">
-              <div class="np-form-group"><label class="np-label">Variant Type</label><select
-                  name="meta_data[variant_type]" class="np-select">
-                  <option>Flavour</option>
-                  <option>Colour</option>
-                  <option>Scent</option>
-                  <option>Style</option>
-                </select></div>
-              <div class="np-form-group"><label class="np-label">Colour Palette</label>
-                <div class="np-swatches">
-                  @foreach(['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey'] as $hex => $name)
-                    <div class="np-swatch" style="background:{{ $hex }}" title="{{ $name }}"
-                      onclick="this.classList.toggle('sel')"></div>
-                  @endforeach
-                </div>
-              </div>
-              <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Custom Flavour / Colour
-                  Names</label>
-                <div class="np-tag-wrap" id="npFlavWrap" onclick="this.querySelector('input').focus()">
-                  <input type="text" id="npFlavInput" class="np-input" placeholder="Add variant, press Enter…"
-                    onkeydown="npAddTag(event,'npFlavWrap','npFlavInput','t-green','meta_data[flavor_names][]')">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="np-card">
-            <div class="np-card-header"><span class="np-card-icon">📏</span><span class="np-card-title">Size / Weight
-                Variants</span></div>
-            <div class="np-card-body">
-              <div class="np-tag-wrap" id="npSizeWrap" onclick="this.querySelector('input').focus()">
-                <input type="text" id="npSizeInput" class="np-input" placeholder="Add size/weight, press Enter…"
-                  onkeydown="npAddTag(event,'npSizeWrap','npSizeInput','t-purple','meta_data[size_variants][]')">
-              </div>
-            </div>
-          </div>
-          <div class="np-card">
             <div class="np-card-header"><span class="np-card-icon">🔗</span><span class="np-card-title">Related
                 Products</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Upsell Products</label><input type="text"
-                  name="meta_data[upsell]" class="np-input" placeholder="Search by name or SKU…"></div>
+                  name="meta_data[upsell]" class="np-input" placeholder="Search by name or SKU…" value="{{ old('meta_data.upsell', data_get($npMeta,'upsell','')) }}"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Cross-Sell
                   Products</label><input type="text" name="meta_data[crosssell]" class="np-input"
-                  placeholder="Search by name or SKU…"></div>
+                  placeholder="Search by name or SKU…" value="{{ old('meta_data.crosssell', data_get($npMeta,'crosssell','')) }}"></div>
+            </div>
+          </div>
+          <div class="np-card">
+            <div class="np-card-header"><span class="np-card-icon">🎁</span><span class="np-card-title">Bundle /
+                Multipack</span></div>
+            <div class="np-card-body" style="padding:6px 20px 12px">
+              @php($npIsBundle = (string) old('meta_data.is_bundle', data_get($npMeta,'is_bundle','0')) === '1')
+              <div class="np-trow" style="padding-top:0">
+                <div>
+                  <div class="np-tlbl">Is Bundle / Multipack</div>
+                  <div class="np-tdsc">Contains multiple units</div>
+                </div>
+                <label class="np-tog">
+                  <input type="checkbox" id="npBundleToggle" name="meta_data[is_bundle]" value="1"
+                    @checked($npIsBundle)>
+                  <span class="np-tog-track"></span>
+                </label>
+              </div>
+              <div id="npBundleFields" style="display:{{ $npIsBundle ? 'block' : 'none' }};margin-top:14px">
+                <div class="np-form-group">
+                  <label class="np-label">Bundle Components</label>
+                  <textarea rows="2" name="meta_data[bundle_components]" class="np-textarea"
+                    placeholder="e.g. 2× Kiri Cheese 24 portions pack">{{ old('meta_data.bundle_components', data_get($npMeta,'bundle_components','')) }}</textarea>
+                </div>
+                <div class="np-form-group" style="margin-bottom:0">
+                  <label class="np-label">Bundle Discount %</label>
+                  <div class="np-iw sfx">
+                    <input type="number" name="meta_data[bundle_discount]" class="np-input" placeholder="10" min="0"
+                      max="100" value="{{ old('meta_data.bundle_discount', data_get($npMeta,'bundle_discount','')) }}">
+                    <span class="np-isfx">%</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="np-card">
@@ -1260,10 +1510,10 @@
                 Limits</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Min. Order Quantity</label><input type="number"
-                  name="min_order_qty" class="np-input" placeholder="1" min="1"></div>
+                  name="meta_data[min_order_qty]" class="np-input" placeholder="1" min="1" value="{{ old('meta_data.min_order_qty', data_get($npMeta,'min_order_qty','1')) }}"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Max. Order Quantity per
                   Customer</label><input type="number" name="meta_data[max_order_qty]" class="np-input" placeholder="10"
-                  min="1"></div>
+                  min="1" value="{{ old('meta_data.max_order_qty', data_get($npMeta,'max_order_qty','')) }}"></div>
             </div>
           </div>
         </div>
@@ -2488,6 +2738,26 @@
       document.getElementById('npVariantBody').appendChild(tr);
     }
 
+    // Swatch selection needs hidden inputs to submit
+    function npToggleSwatch(el) {
+      if (!el) return;
+      el.classList.toggle('sel');
+      const wrap = document.getElementById('npSwatchesWrap');
+      if (!wrap) return;
+      // remove existing hidden inputs
+      wrap.querySelectorAll('input[type="hidden"][name="meta_data[variant_swatches][]"]').forEach(n => n.remove());
+      // add for selected
+      wrap.querySelectorAll('.np-swatch.sel').forEach(sw => {
+        const hex = sw.getAttribute('data-hex') || '';
+        if (!hex) return;
+        const hi = document.createElement('input');
+        hi.type = 'hidden';
+        hi.name = 'meta_data[variant_swatches][]';
+        hi.value = hex;
+        wrap.appendChild(hi);
+      });
+    }
+
     // ═══ DRAFT SAVE ═══
     function npSaveDraft() {
       document.getElementById('npLastSaved').textContent = `Draft — ${new Date().toLocaleTimeString()}`;
@@ -2949,6 +3219,19 @@
       // Ensure delivery cards reflect saved checkbox values after any restore
       try { npSyncDeliveryCardsFromInputs(); } catch (e) { }
       try { npSyncStatusPillsFromInputs(); } catch (e) { }
+      try {
+        // Ensure saved swatches are submitted
+        document.querySelectorAll('#npSwatchesWrap .np-swatch.sel').forEach(sw => npToggleSwatch(sw));
+      } catch (e) { }
+
+      // Bundle / Multipack toggle
+      try {
+        const $b = $('#npBundleToggle');
+        const $f = $('#npBundleFields');
+        function syncBundleUI() { $f.toggle(!!$b.prop('checked')); }
+        $b.off('change.npBundle').on('change.npBundle', syncBundleUI);
+        syncBundleUI();
+      } catch (e) { }
 
       $('#item_form').on('submit', function (e) {
         e.preventDefault();
@@ -3503,6 +3786,15 @@
         const titleMap = {
           origin_country: 'Add Country of Origin',
           seller: 'Add Seller',
+          country_of_manufacture: 'Add Country of Manufacture',
+          packaging_type: 'Add Packaging Type',
+          recyclable: 'Add Recyclable Packaging Option',
+          storage_type: 'Add Storage Type',
+          condition: 'Add Condition',
+          age_restriction: 'Add Age Restriction',
+          warranty: 'Add Warranty Period',
+          return_policy: 'Add Return Policy',
+          product_type: 'Add Product Type',
         };
         document.getElementById('npProductSelectOptionModalLabel').textContent = titleMap[type] || 'Add Option';
         modal.modal('show');
@@ -3528,6 +3820,15 @@
             const map = {
               origin_country: '#npOriginCountry',
               seller: '#npSeller',
+              country_of_manufacture: '#npCountryOfManufacture',
+              packaging_type: '#npPackagingType',
+              recyclable: '#npRecyclable',
+              storage_type: '#npStorageType',
+              condition: '#npCondition',
+              age_restriction: '#npAgeRestriction',
+              warranty: '#npWarranty',
+              return_policy: '#npReturnPolicy',
+              product_type: '#npProductType',
             };
             const sel = map[res.type];
             const $sel = sel ? $(sel) : $();

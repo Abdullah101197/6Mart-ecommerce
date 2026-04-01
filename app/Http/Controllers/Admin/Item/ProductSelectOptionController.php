@@ -14,7 +14,7 @@ class ProductSelectOptionController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:origin_country,seller',
+            'type' => 'required|in:origin_country,seller,country_of_manufacture,packaging_type,recyclable,storage_type,condition,age_restriction,warranty,return_policy,product_type',
             'name' => 'required|string|max:191',
         ]);
 
