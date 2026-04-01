@@ -374,10 +374,51 @@ class ItemController extends Controller
         $item->discount_expires_at = $request->discount_expires_at;
         $item->images = $images;
         $item->is_halal = $request->is_halal ?? 0;
-// Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
+
+        // Persist General tab dynamic fields (stored under items.meta_data)
+        $metaData = is_array($item->meta_data) ? $item->meta_data : [];
+        $requestMeta = $request->input('meta_data', []);
+        if (is_array($requestMeta) && count($requestMeta) > 0) {
+            $metaData = array_merge($metaData, $requestMeta);
+        }
+        // General tab fields that currently exist outside meta_data[]
+        if ($request->filled('full_description')) {
+            $metaData['full_description'] = $request->input('full_description');
+        } else {
+            unset($metaData['full_description']);
+        }
+        if ($request->filled('promo_start_date')) {
+            $metaData['promo_start_date'] = $request->input('promo_start_date');
+        } else {
+            unset($metaData['promo_start_date']);
+        }
+        if ($request->filled('promo_end_date')) {
+            $metaData['promo_end_date'] = $request->input('promo_end_date');
+        } else {
+            unset($metaData['promo_end_date']);
+        }
+        $sellingPoints = $request->input('selling_point', []);
+        if (is_array($sellingPoints)) {
+            $sellingPoints = array_values(array_filter(array_map(fn($v) => is_string($v) ? trim($v) : $v, $sellingPoints), fn($v) => filled($v)));
+            if (count($sellingPoints) > 0) {
+                $metaData['selling_points'] = $sellingPoints;
+            }
+        }
+        // UI-only feature toggles from General tab
+        $metaData['is_featured'] = $request->boolean('is_featured') ? 1 : 0;
+        $metaData['is_sale'] = $request->boolean('is_sale') ? 1 : 0;
+        $item->recommended = $request->boolean('is_recommended') ? 1 : 0;
+
+        $item->meta_data = $metaData;
+
         if ($request->filled('custom_tabs_json')) {
             $item->meta_data = array_merge($item->meta_data ?? [], [
                 'custom_tabs' => json_decode($request->custom_tabs_json, true),
+            ]);
+        }
+        if ($request->filled('custom_tabs_ui_json')) {
+            $item->meta_data = array_merge($item->meta_data ?? [], [
+                'custom_tabs_ui' => json_decode($request->custom_tabs_ui_json, true),
             ]);
         }
         $item->status = $isDraftMode ? 0 : 1;
@@ -468,8 +509,25 @@ class ItemController extends Controller
         $taxVats = $taxData['taxVats'];
         $taxVatIds = $productWiseTax ? $product->taxVats()->pluck('tax_id')->toArray() : [];
 
+        // Use the new unified product UI for editing as well.
+        $categories = Category::where(['position' => 0])->get();
+        $language = getWebConfig('language');
+        $languages = is_array($language) ? $language : [];
+        $defaultLang = str_replace('_', '-', app()->getLocale());
 
-        return view('admin-views.product.edit', compact('product', 'sub_category', 'category', 'temp_product', 'productWiseTax', 'taxVats', 'taxVatIds'));
+        return view('admin-views.product.index', compact(
+            'categories',
+            'language',
+            'languages',
+            'defaultLang',
+            'productWiseTax',
+            'taxVats',
+            'taxVatIds',
+            'product',
+            'sub_category',
+            'category',
+            'temp_product'
+        ));
     }
 
     public function status(Request $request)
@@ -908,10 +966,46 @@ class ItemController extends Controller
                 info($e->getMessage());
             }
         }
-// Note: meta_data is now handled via addOrUpdateMetaData for ecommerce module
+        // Persist General tab dynamic fields (stored under items.meta_data)
+        $metaData = is_array($item->meta_data) ? $item->meta_data : [];
+        $requestMeta = $request->input('meta_data', []);
+        if (is_array($requestMeta) && count($requestMeta) > 0) {
+            $metaData = array_merge($metaData, $requestMeta);
+        }
+        // General tab fields that currently exist outside meta_data[]
+        if ($request->filled('full_description')) {
+            $metaData['full_description'] = $request->input('full_description');
+        }
+        if ($request->filled('promo_start_date')) {
+            $metaData['promo_start_date'] = $request->input('promo_start_date');
+        }
+        if ($request->filled('promo_end_date')) {
+            $metaData['promo_end_date'] = $request->input('promo_end_date');
+        }
+        $sellingPoints = $request->input('selling_point', []);
+        if (is_array($sellingPoints)) {
+            $sellingPoints = array_values(array_filter(array_map(fn($v) => is_string($v) ? trim($v) : $v, $sellingPoints), fn($v) => filled($v)));
+            if (count($sellingPoints) > 0) {
+                $metaData['selling_points'] = $sellingPoints;
+            } else {
+                unset($metaData['selling_points']);
+            }
+        }
+        // UI-only feature toggles from General tab
+        $metaData['is_featured'] = $request->boolean('is_featured') ? 1 : 0;
+        $metaData['is_sale'] = $request->boolean('is_sale') ? 1 : 0;
+        $item->recommended = $request->boolean('is_recommended') ? 1 : 0;
+
+        $item->meta_data = $metaData;
+
         if ($request->filled('custom_tabs_json')) {
             $item->meta_data = array_merge($item->meta_data ?? [], [
                 'custom_tabs' => json_decode($request->custom_tabs_json, true),
+            ]);
+        }
+        if ($request->filled('custom_tabs_ui_json')) {
+            $item->meta_data = array_merge($item->meta_data ?? [], [
+                'custom_tabs_ui' => json_decode($request->custom_tabs_ui_json, true),
             ]);
         }
         $item->save();

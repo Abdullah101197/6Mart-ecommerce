@@ -15,13 +15,40 @@
     #npItemTypeModal { z-index: 2000; }
     #npProductSelectOptionModal { z-index: 2000; }
     #npCustomTabModal { z-index: 2000; }
+    #npManageTabsModal { z-index: 2000; }
+    #npManageSectionsModal { z-index: 2000; }
     .modal-backdrop { z-index: 1990; }
+
+    /* Inline validation highlighting */
+    .new-product-form .np-invalid {
+      border-color: #ea5455 !important;
+      box-shadow: 0 0 0 0.15rem rgba(234, 84, 85, .18) !important;
+      background-color: #fff6f6 !important;
+    }
+    .new-product-form .np-field-error {
+      margin-top: 6px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #ea5455;
+      font-weight: 600;
+    }
+    .new-product-form .select2-container--default .select2-selection--single.np-invalid,
+    .new-product-form .select2-container--default .select2-selection--multiple.np-invalid {
+      border-color: #ea5455 !important;
+      box-shadow: 0 0 0 0.15rem rgba(234, 84, 85, .18) !important;
+      background-color: #fff6f6 !important;
+    }
   </style>
 @endpush
 
 @section('content')
 @php
   $openai_config = \App\CentralLogics\Helpers::get_business_settings('openai_config');
+  $product = $product ?? null;
+  $isEdit = !blank($product?->id);
+  $npMeta = is_array($product?->meta_data) ? $product->meta_data : [];
+  $npSellingPoints = data_get($npMeta, 'selling_points', []);
+  if (!is_array($npSellingPoints)) { $npSellingPoints = []; }
 @endphp
 <div class="content container-fluid">
 
@@ -33,9 +60,17 @@
       </span>
       <span>{{ translate('messages.add_new_item') }}</span>
     </h1>
-    <div class="d-flex align-items-end">
+    <div class="d-flex align-items-center" style="gap:10px">
+      <button type="button"
+        class="btn btn-outline-secondary d-flex align-items-center rounded-8"
+        style="gap:8px;height:38px"
+        onclick="npOpenManageTabsModal()">
+        <span style="font-size:16px;line-height:1">⚙️</span>
+        <span>Manage Tabs</span>
+      </button>
       <a href="{{ route('admin.item.product_gallery') }}"
-        class="btn btn-outline-primary btn--primary d-flex align-items-center bg-not-hover-primary-ash rounded-8 gap-2">
+        class="btn btn-outline-primary btn--primary d-flex align-items-center bg-not-hover-primary-ash rounded-8"
+        style="gap:8px;height:38px">
         <img src="{{ asset('assets/admin/img/product-gallery.png') }}" class="w--22" alt="">
         <span>{{ translate('Add Info From Gallery') }}</span>
       </a>
@@ -45,7 +80,7 @@
   <form id="item_form" enctype="multipart/form-data" class="custom-validation new-product-form" data-ajax="true">
     <input type="hidden" id="request_type" value="admin">
     <input type="hidden" id="module_type" value="{{ Config::get('module.current_module_type') }}">
-    <input type="hidden" id="item_id" name="item_id" value="">
+    <input type="hidden" id="item_id" name="item_id" value="{{ $isEdit ? $product->id : '' }}">
     <input type="hidden" id="draft_mode" name="draft_mode" value="0">
 
     {{-- ═══ TAB NAVIGATION ═══ --}}
@@ -61,9 +96,11 @@
         Shipping</button>
       <button type="button" class="np-tab-btn" onclick="npSwitchTab(this,'np-tab-reviews')">⭐ Reviews &amp;
         Analytics</button>
+      <button type="button" class="np-tab-btn" id="npManageTabsBtn" onclick="npOpenManageTabsModal()">⚙️ Manage Tabs</button>
       <button type="button" class="np-tab-btn" id="npAddTabBtn" onclick="npOpenCustomTabModal()">+ Add Tab</button>
     </div>
     <input type="hidden" name="custom_tabs_json" id="custom_tabs_json" value="">
+    <input type="hidden" name="custom_tabs_ui_json" id="custom_tabs_ui_json" value="">
 
     {{-- ══════════════════════════════════════════════════ --}}
     {{-- TAB 1: GENERAL --}}
@@ -128,7 +165,7 @@
               <div class="np-form-group">
                 <label class="np-label">Full Description</label>
                 <textarea name="full_description" class="np-textarea" rows="5"
-                  placeholder="Detailed product description including features, usage, storage instructions…"></textarea>
+                  placeholder="Detailed product description including features, usage, storage instructions…">{{ old('full_description', data_get($npMeta,'full_description','')) }}</textarea>
               </div>
 
               <div class="np-form-row">
@@ -138,7 +175,7 @@
                     <select name="brand_id" id="npBrand" class="np-select" onchange="npUpdateQuality()">
                       <option value="">Select brand…</option>
                       @foreach(\App\Models\Brand::where('status', 1)->get() as $brand)
-                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                        <option value="{{ $brand->id }}" @selected(old('brand_id', data_get($product,'brand_id','')) == $brand->id)>{{ $brand->name }}</option>
                       @endforeach
                     </select>
                     <button type="button"
@@ -170,7 +207,7 @@
                   <div class="np-iw">
                     <span class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span>
                     <input type="number" name="price" id="npRegPrice" class="np-input" placeholder="0.00" step="0.01"
-                      min="0" oninput="npUpdateDiscount();npUpdateQuality()">
+                      min="0" oninput="npUpdateDiscount();npUpdateQuality()" value="{{ old('price', $product?->price ?? '') }}">
                   </div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
@@ -178,14 +215,14 @@
                   <div class="np-iw">
                     <span class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span>
                     <input type="number" name="discount" id="npSalePrice" class="np-input" placeholder="0.00"
-                      step="0.01" min="0" oninput="npUpdateDiscount()">
+                      step="0.01" min="0" oninput="npUpdateDiscount()" value="{{ old('discount', $product?->discount ?? '') }}">
                   </div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Discount Type</label>
                   <select name="discount_type" id="discount_type" class="np-select">
-                    <option value="percent">Percent (%)</option>
-                    <option value="amount">Amount ({{ \App\CentralLogics\Helpers::currency_symbol() }})</option>
+                    <option value="percent" @selected(old('discount_type', $product?->discount_type ?? 'percent') == 'percent')>Percent (%)</option>
+                    <option value="amount" @selected(old('discount_type', $product?->discount_type ?? 'percent') == 'amount')>Amount ({{ \App\CentralLogics\Helpers::currency_symbol() }})</option>
                   </select>
                 </div>
               </div>
@@ -193,18 +230,18 @@
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Promo Start Date</label>
-                  <input type="date" name="promo_start_date" class="np-input">
+                  <input type="date" name="promo_start_date" class="np-input" value="{{ old('promo_start_date', data_get($npMeta,'promo_start_date','')) }}">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Promo End Date</label>
-                  <input type="date" name="promo_end_date" class="np-input">
+                  <input type="date" name="promo_end_date" class="np-input" value="{{ old('promo_end_date', data_get($npMeta,'promo_end_date','')) }}">
                 </div>
               </div>
             </div>
           </div>
 
           {{-- About This Item --}}
-          <div class="np-card">
+          <div class="np-card" data-np-section="general.about">
             <div class="np-card-header">
               <span class="np-card-icon">📋</span>
               <span class="np-card-title">About This Item</span>
@@ -218,7 +255,7 @@
                 @for($i = 1; $i <= 6; $i++)
                   <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">
                     <span style="margin-top:10px;font-size:14px;flex-shrink:0">✅</span>
-                    <input type="text" name="selling_point[]" class="np-input" placeholder="Add a key selling point…">
+                    <input type="text" name="selling_point[]" class="np-input" placeholder="Add a key selling point…" value="{{ old('selling_point.'.($i-1), $npSellingPoints[$i-1] ?? '') }}">
                   </div>
                 @endfor
               </div>
@@ -229,18 +266,18 @@
               <div class="np-form-group">
                 <label class="np-label">Product Overview (long-form) <span class="np-opt">(Shown in "Product Description" section on Amazon A+)</span></label>
                 <textarea name="meta_data[product_overview_long]" class="np-textarea" rows="4"
-                  placeholder="Write a 2–4 sentence paragraph expanding on what makes this product special — flavour profile, story, occasions, origin…"></textarea>
+                  placeholder="Write a 2–4 sentence paragraph expanding on what makes this product special — flavour profile, story, occasions, origin…">{{ old('meta_data.product_overview_long', data_get($npMeta,'product_overview_long','')) }}</textarea>
               </div>
               <div class="np-form-group" style="margin-bottom:0">
                 <label class="np-label">Usage Directions / How to Use</label>
                 <textarea name="meta_data[usage_directions]" class="np-textarea" rows="2"
-                  placeholder="e.g. Spread directly from the individual portion on bread, toast or crackers. Ideal chilled. Can also be used in dips, sauces, and cheesecakes."></textarea>
+                  placeholder="e.g. Spread directly from the individual portion on bread, toast or crackers. Ideal chilled. Can also be used in dips, sauces, and cheesecakes.">{{ old('meta_data.usage_directions', data_get($npMeta,'usage_directions','')) }}</textarea>
               </div>
             </div>
           </div>
 
           {{-- Instacart Listing Details --}}
-          <div class="np-card">
+          <div class="np-card" data-np-section="general.instacart">
             <div class="np-card-header">
               <span class="np-card-icon">🛒</span>
               <span class="np-card-title">Instacart Listing Details</span>
@@ -257,7 +294,7 @@
                       <option value="">— Select —</option>
                       @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
                         @foreach(\App\Models\InstacartOption::where('type','department')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}">{{ $opt->name }}</option>
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.instacart_department', data_get($npMeta,'instacart_department','')) == $opt->name)>{{ $opt->name }}</option>
                         @endforeach
                       @else
                         <option value="" disabled>(Run migration to enable options)</option>
@@ -268,7 +305,7 @@
                 </div>
                 <div class="np-form-group">
                   <label class="np-label">Instacart Aisle / Shelf</label>
-                  <input type="text" name="meta_data[instacart_aisle]" class="np-input" placeholder="e.g. Cream Cheese &amp; Soft Cheese">
+                  <input type="text" name="meta_data[instacart_aisle]" class="np-input" placeholder="e.g. Cream Cheese &amp; Soft Cheese" value="{{ old('meta_data.instacart_aisle', data_get($npMeta,'instacart_aisle','')) }}">
                 </div>
               </div>
 
@@ -280,7 +317,7 @@
                       <option value="">None</option>
                       @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
                         @foreach(\App\Models\InstacartOption::where('type','promo_label')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}">{{ $opt->name }}</option>
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.instacart_promo_label', data_get($npMeta,'instacart_promo_label','')) == $opt->name)>{{ $opt->name }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -294,7 +331,7 @@
                       <option value="">— Select —</option>
                       @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
                         @foreach(\App\Models\InstacartOption::where('type','unit_pricing_display')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}">{{ $opt->name }}</option>
+                          <option value="{{ $opt->name }}" @selected(old('meta_data.instacart_unit_pricing_display', data_get($npMeta,'instacart_unit_pricing_display','')) == $opt->name)>{{ $opt->name }}</option>
                         @endforeach
                       @endif
                     </select>
@@ -305,14 +342,14 @@
 
               <div class="np-form-group" style="margin-bottom:0">
                 <label class="np-label">Instacart Product Tags</label>
-                <input type="text" name="meta_data[instacart_product_tags]" class="np-input" placeholder="e.g. Halal, Gluten-free, Family size">
+                <input type="text" name="meta_data[instacart_product_tags]" class="np-input" placeholder="e.g. Halal, Gluten-free, Family size" value="{{ old('meta_data.instacart_product_tags', data_get($npMeta,'instacart_product_tags','')) }}">
                 <div class="np-hint">Comma-separated. Tags map to Instacart dietary filters (e.g. Organic, Vegan, Kosher, Gluten-Free).</div>
               </div>
             </div>
           </div>
 
           {{-- Categories --}}
-          <div class="np-card">
+          <div class="np-card" data-np-section="general.categories">
             <div class="np-card-header">
               <span class="np-card-icon">🗂️</span>
               <span class="np-card-title">Categories &amp; Classification</span>
@@ -460,7 +497,7 @@
           </div>
 
           {{-- Origin & Seller --}}
-          <div class="np-card">
+          <div class="np-card" data-np-section="general.origin_seller">
             <div class="np-card-header">
               <span class="np-card-icon">🌍</span>
               <span class="np-card-title">Origin &amp; Seller</span>
@@ -473,7 +510,7 @@
                     <option value="">Select…</option>
                     @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
                       @foreach(\App\Models\ProductSelectOption::where('type','origin_country')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}">{{ $opt->name }}</option>
+                        <option value="{{ $opt->name }}" @selected(old('meta_data.country_of_origin', data_get($npMeta,'country_of_origin','')) == $opt->name)>{{ $opt->name }}</option>
                       @endforeach
                     @else
                       <option value="" disabled>(Run migration to enable options)</option>
@@ -485,7 +522,7 @@
 
               <div class="np-form-group">
                 <label class="np-label">Manufacturer / Producer</label>
-                <input type="text" name="meta_data[manufacturer]" class="np-input" placeholder="e.g. Groupe Bel S.A.">
+                <input type="text" name="meta_data[manufacturer]" class="np-input" placeholder="e.g. Groupe Bel S.A." value="{{ old('meta_data.manufacturer', data_get($npMeta,'manufacturer','')) }}">
               </div>
 
               <div class="np-form-group" style="margin-bottom:0">
@@ -495,7 +532,7 @@
                     <option value="">Select…</option>
                     @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
                       @foreach(\App\Models\ProductSelectOption::where('type','seller')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}">{{ $opt->name }}</option>
+                        <option value="{{ $opt->name }}" @selected(old('meta_data.seller', data_get($npMeta,'seller','')) == $opt->name)>{{ $opt->name }}</option>
                       @endforeach
                     @endif
                   </select>
@@ -506,7 +543,7 @@
           </div>
 
           {{-- Visibility & Features --}}
-          <div class="np-card">
+          <div class="np-card" data-np-section="general.visibility">
             <div class="np-card-header">
               <span class="np-card-icon">👁️</span>
               <span class="np-card-title">Visibility &amp; Features</span>
@@ -517,7 +554,7 @@
                   <div class="np-tlbl">Featured Product</div>
                   <div class="np-tdsc">Show in homepage carousel</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="is_featured" value="1"><span
+                <label class="np-tog"><input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', data_get($npMeta,'is_featured',0)) == 1)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -525,7 +562,7 @@
                   <div class="np-tlbl">Recommended</div>
                   <div class="np-tdsc">Show in recommended section</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="is_recommended" value="1"><span
+                <label class="np-tog"><input type="checkbox" name="is_recommended" value="1" @checked(old('is_recommended', $product?->recommended ?? 0) == 1)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -533,7 +570,7 @@
                   <div class="np-tlbl">Special Offer Badge</div>
                   <div class="np-tdsc">Display sale badge on listing</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="is_sale" value="1"><span
+                <label class="np-tog"><input type="checkbox" name="is_sale" value="1" @checked(old('is_sale', data_get($npMeta,'is_sale',0)) == 1)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -555,29 +592,29 @@
             </div>
             <div class="np-card-body">
               <div class="np-dlv-grid">
-                <div class="np-dlv-card sel" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card {{ old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) ? 'sel' : '' }}" onclick="this.classList.toggle('sel')">
                   <div class="np-dlv-icon">📅</div>
                   <div class="np-dlv-name">Scheduled</div>
                   <div class="np-dlv-time">Next day</div>
-                  <input type="checkbox" name="meta_data[delivery_scheduled]" value="1" checked style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_scheduled]" value="1" @checked(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) == 1) style="display:none">
                 </div>
-                <div class="np-dlv-card sel" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card {{ old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) ? 'sel' : '' }}" onclick="this.classList.toggle('sel')">
                   <div class="np-dlv-icon">⚡</div>
                   <div class="np-dlv-name">Express</div>
                   <div class="np-dlv-time">60–120 mins</div>
-                  <input type="checkbox" name="meta_data[delivery_express]" value="1" checked style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_express]" value="1" @checked(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) == 1) style="display:none">
                 </div>
-                <div class="np-dlv-card" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card {{ old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) ? 'sel' : '' }}" onclick="this.classList.toggle('sel')">
                   <div class="np-dlv-icon">🏎️</div>
                   <div class="np-dlv-name">Rapid</div>
                   <div class="np-dlv-time">35 mins</div>
-                  <input type="checkbox" name="meta_data[delivery_rapid]" value="1" style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_rapid]" value="1" @checked(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) == 1) style="display:none">
                 </div>
-                <div class="np-dlv-card" onclick="this.classList.toggle('sel')">
+                <div class="np-dlv-card {{ old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) ? 'sel' : '' }}" onclick="this.classList.toggle('sel')">
                   <div class="np-dlv-icon">🏬</div>
                   <div class="np-dlv-name">Click &amp; Collect</div>
                   <div class="np-dlv-time">In-store</div>
-                  <input type="checkbox" name="meta_data[delivery_click_collect]" value="1" style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_click_collect]" value="1" @checked(old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) == 1) style="display:none">
                 </div>
               </div>
             </div>
@@ -592,17 +629,17 @@
             <div class="np-card-body">
               <div class="np-form-group">
                 <label class="np-label">SKU / Barcode</label>
-                <input type="text" name="sku" id="sku" class="np-input np-mono" placeholder="e.g. SKU-001234">
+                <input type="text" name="sku" id="sku" class="np-input np-mono" placeholder="e.g. SKU-001234" value="{{ old('sku', $product?->sku ?? '') }}">
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Stock Qty</label>
-                  <input type="number" name="current_stock" id="quantity" class="np-input" placeholder="0" min="0">
+                  <input type="number" name="current_stock" id="quantity" class="np-input" placeholder="0" min="0" value="{{ old('current_stock', $product?->stock ?? 0) }}">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">{{ translate('messages.Maximum_Purchase_Quantity_Limit') }}</label>
                   <input type="number" name="maximum_cart_quantity" id="cart_quantity" class="np-input" placeholder="10"
-                    min="0">
+                    min="0" value="{{ old('maximum_cart_quantity', $product?->maximum_cart_quantity ?? '') }}">
                 </div>
               </div>
             </div>
@@ -2034,6 +2071,63 @@
       </div>
     </div>
   </div>
+
+  {{-- Manage tabs modal --}}
+  <div class="modal fade" id="npManageTabsModal" tabindex="-1" role="dialog" aria-labelledby="npManageTabsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="npManageTabsModalLabel">Manage Tabs</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="np-info-box">Use this to rename/hide built-in tabs and rename/delete custom tabs. (Built-in tabs can be hidden, not deleted.)</div>
+          <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+              <thead>
+                <tr>
+                  <th style="width:220px">Tab</th>
+                  <th>Title</th>
+                  <th style="width:110px">Visible</th>
+                  <th style="width:170px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="npManageTabsTbody"></tbody>
+            </table>
+          </div>
+          <small class="text-muted d-block mt-2">Custom tab values/fields can be edited inside the tab. To remove a value, clear the field.</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
+          <button type="button" class="btn btn-primary" onclick="npSaveManageTabsAndClose()">{{ translate('messages.save') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{-- Manage sections modal (built-in tabs) --}}
+  <div class="modal fade" id="npManageSectionsModal" tabindex="-1" role="dialog" aria-labelledby="npManageSectionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="npManageSectionsModalLabel">Manage Sections</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="np-info-box">Hide/show built-in sections. Hidden sections are removed from the UI.</div>
+          <div id="npManageSectionsBody"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
+          <button type="button" class="btn btn-primary" onclick="npSaveManageSectionsAndClose()">{{ translate('messages.save') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <span id="message-enter-choice-values" data-text="{{ translate('enter_choice_values') }}"></span>
@@ -2088,17 +2182,34 @@
 
     const npTabIds = ['np-tab-general', 'np-tab-attributes', 'np-tab-nutrition', 'np-tab-variants', 'np-tab-seo', 'np-tab-media', 'np-tab-logistics', 'np-tab-reviews'];
 
+    function npIsTabHidden(tabId) {
+      try {
+        const raw = document.getElementById('custom_tabs_ui_json')?.value || '';
+        if (!raw) return false;
+        const ui = JSON.parse(raw);
+        return !!ui?.built_in?.[tabId]?.hidden;
+      } catch {
+        return false;
+      }
+    }
+
+    function npVisibleTabIds() {
+      return npTabIds.filter(id => !npIsTabHidden(id));
+    }
+
     function npCurrentTabIndex() {
       const activePanel = document.querySelector('.np-tab-panel.active');
-      return Math.max(npTabIds.indexOf(activePanel?.id), 0);
+      const ids = npVisibleTabIds();
+      return Math.max(ids.indexOf(activePanel?.id), 0);
     }
 
     function npSetActionButtons() {
+      const ids = npVisibleTabIds();
       const idx = npCurrentTabIndex();
       const prevBtn = document.querySelector('.np-btn-row button[onclick="npPrevTab()"]');
       const nextBtn = document.querySelector('.np-btn-row button[onclick="npNextTab()"]');
       if (prevBtn) prevBtn.disabled = idx === 0;
-      if (nextBtn) nextBtn.style.display = idx === npTabIds.length - 1 ? 'none' : '';
+      if (nextBtn) nextBtn.style.display = idx === ids.length - 1 ? 'none' : '';
     }
 
     // ═══ TABS ═══
@@ -2111,11 +2222,12 @@
     }
 
     function npOpenTabByIndex(index) {
-      const targetIndex = Math.max(0, Math.min(index, npTabIds.length - 1));
-      const btn = document.querySelectorAll('.np-tab-btn')[targetIndex];
-      if (btn) {
-        npSwitchTab(btn, npTabIds[targetIndex]);
-      }
+      const ids = npVisibleTabIds();
+      const targetIndex = Math.max(0, Math.min(index, ids.length - 1));
+      const id = ids[targetIndex];
+      if (!id) return;
+      const btn = Array.from(document.querySelectorAll('.np-tab-btn')).find(b => (b.getAttribute('onclick') || '').includes(`'${id}'`));
+      if (btn) npSwitchTab(btn, id);
     }
 
     function npPrevTab() {
@@ -2123,31 +2235,39 @@
     }
 
     function npNextTab() {
-      if (!npValidateCurrentTab()) {
-        return;
-      }
+      // Next should behave like a step wizard: validate current tab first
+      if (!npValidateCurrentTab()) return;
       npPersistWizardStep({ publish: false, moveNext: true });
     }
 
     function npValidateCurrentTab() {
-      const currentTabId = npTabIds[npCurrentTabIndex()];
+      const ids = npVisibleTabIds();
+      const currentTabId = ids[npCurrentTabIndex()];
       const errors = [];
+      npClearFieldErrors();
+
+      function invalid(sel, msg) {
+        const el = document.querySelector(sel);
+        if (el) npMarkFieldInvalid(el, msg);
+        errors.push(msg);
+      }
 
       if (currentTabId === 'np-tab-general') {
-        if (!$('#productNameEn').val()?.trim()) errors.push('Product name is required.');
-        if (!$('#npShortDesc').val()?.trim()) errors.push('Short description is required.');
-        if (!$('#store_id').val()) errors.push('Store is required.');
-        if (!$('#category_id').val()) errors.push('Category is required.');
-        if (!(parseFloat($('#npRegPrice').val()) > 0)) errors.push('Price must be greater than 0.');
+        if (!$('#productNameEn').val()?.trim()) invalid('#productNameEn', 'Product name is required.');
+        if (!$('#npShortDesc').val()?.trim()) invalid('#npShortDesc', 'Short description is required.');
+        if (!$('#store_id').val()) invalid('#store_id', 'Store is required.');
+        if (!$('#category_id').val()) invalid('#category_id', 'Category is required.');
+        if (!(parseFloat($('#npRegPrice').val()) > 0)) invalid('#npRegPrice', 'Price must be greater than 0.');
       }
 
       if (currentTabId === 'np-tab-media') {
         const hasThumbnail = $('#item_id').val() || ($('#customFileEg1')[0] && $('#customFileEg1')[0].files.length > 0);
-        if (!hasThumbnail) errors.push('Thumbnail image is required.');
+        if (!hasThumbnail) invalid('#customFileEg1', 'Thumbnail image is required.');
       }
 
       if (errors.length) {
-        errors.forEach(message => toastr.error(message, { CloseButton: true, ProgressBar: true }));
+        // One toast is enough because field-level hints are now visible
+        toastr.error(errors[0], { CloseButton: true, ProgressBar: true });
         return false;
       }
 
@@ -2322,13 +2442,272 @@
       npPersistWizardStep({ publish: false, moveNext: false });
     }
 
+    const npFormDraftKeyBase = 'np_item_form_draft_v1';
+    const npFormDraftLastKey = 'np_item_form_draft_last_item_id_v1';
+    function npFormDraftKey() {
+      const id = ($('#item_id').val() || '').toString().trim();
+      return `${npFormDraftKeyBase}:${id ? id : 'new'}`;
+    }
+
+    function npIsSkippableDraftField(el) {
+      if (!el || !el.name) return true;
+      if (el.disabled) return true;
+      if (el.type === 'file' || el.type === 'password') return true;
+      // Do not persist CSRF, buttons
+      if (el.name === '_token') return true;
+      return false;
+    }
+
+    function npSaveFormDraft() {
+      const form = document.getElementById('item_form');
+      if (!form) return;
+
+      const data = {};
+      const els = Array.from(form.elements || []);
+
+      // group by name for checkbox[] and radio
+      const byName = {};
+      els.forEach(el => {
+        if (npIsSkippableDraftField(el)) return;
+        byName[el.name] = byName[el.name] || [];
+        byName[el.name].push(el);
+      });
+
+      Object.keys(byName).forEach(name => {
+        const group = byName[name];
+        const first = group[0];
+
+        if (first.type === 'radio') {
+          const checked = group.find(x => x.checked);
+          data[name] = checked ? checked.value : null;
+          return;
+        }
+
+        if (first.type === 'checkbox') {
+          // array checkbox e.g. meta_data[cert][]
+          if (name.endsWith('[]')) {
+            data[name] = group.filter(x => x.checked).map(x => x.value);
+          } else {
+            data[name] = group.some(x => x.checked) ? 1 : 0;
+          }
+          return;
+        }
+
+        if (first.tagName === 'SELECT' && first.multiple) {
+          data[name] = Array.from(first.options).filter(o => o.selected).map(o => o.value);
+          return;
+        }
+
+        data[name] = first.value;
+      });
+
+      // Track which tab was active
+      data.__active_tab_id = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
+
+      try {
+        const key = npFormDraftKey();
+        localStorage.setItem(key, JSON.stringify(data));
+        // Remember latest item id draft so refresh can restore even when item_id input is empty initially
+        const currentId = ($('#item_id').val() || '').toString().trim();
+        if (currentId) localStorage.setItem(npFormDraftLastKey, currentId);
+      } catch (e) { /* ignore */ }
+    }
+
+    function npApplyFieldValue(el, value) {
+      if (!el) return;
+      const $el = $(el);
+
+      if (el.type === 'checkbox') {
+        el.checked = (String(value) === '1' || value === 1 || value === true);
+        $el.trigger('change');
+        return;
+      }
+
+      if (el.type === 'radio') {
+        // handled in group loader
+        return;
+      }
+
+      if (el.tagName === 'SELECT' && el.multiple) {
+        const arr = Array.isArray(value) ? value : [];
+        Array.from(el.options).forEach(o => { o.selected = arr.includes(o.value); });
+        $el.trigger('change');
+        if ($el.hasClass('js-select2-custom')) $el.trigger('change.select2');
+        return;
+      }
+
+      el.value = (value ?? '');
+      $el.trigger('input').trigger('change');
+      if ($el.hasClass('js-select2-custom')) $el.trigger('change.select2');
+    }
+
+    function npLoadFormDraft() {
+      // Only for add-new experience; edit page should rely on DB prefill
+      const isEdit = {{ $isEdit ? 'true' : 'false' }};
+      if (isEdit) return;
+
+      let raw = null;
+      try {
+        // 1) Try "new" draft
+        raw = localStorage.getItem(`${npFormDraftKeyBase}:new`);
+        // 2) If not found, try last saved item draft key
+        if (!raw) {
+          const lastId = (localStorage.getItem(npFormDraftLastKey) || '').toString().trim();
+          if (lastId) raw = localStorage.getItem(`${npFormDraftKeyBase}:${lastId}`);
+        }
+        // 3) Finally, try whatever current key resolves to
+        if (!raw) raw = localStorage.getItem(npFormDraftKey());
+      } catch (e) { raw = null; }
+      if (!raw) return;
+
+      let data = null;
+      try { data = JSON.parse(raw); } catch (e) { data = null; }
+      if (!data || typeof data !== 'object') return;
+
+      // restore item_id first (if any)
+      if (data.item_id && !$('#item_id').val()) {
+        $('#item_id').val(data.item_id);
+      }
+
+      Object.keys(data).forEach(name => {
+        if (name === '__active_tab_id') return;
+        const els = document.querySelectorAll(`#item_form [name="${name.replace(/"/g, '\\"')}"]`);
+        if (!els || !els.length) return;
+
+        const first = els[0];
+        const val = data[name];
+
+        if (first.type === 'radio') {
+          Array.from(els).forEach(r => { r.checked = (r.value == val); });
+          $(first).trigger('change');
+          return;
+        }
+
+        if (first.type === 'checkbox' && name.endsWith('[]')) {
+          const arr = Array.isArray(val) ? val.map(String) : [];
+          Array.from(els).forEach(c => { c.checked = arr.includes(String(c.value)); });
+          $(first).trigger('change');
+          return;
+        }
+
+        npApplyFieldValue(first, val);
+      });
+
+      // restore active tab if it exists
+      if (data.__active_tab_id) {
+        const idx = npVisibleTabIds().indexOf(data.__active_tab_id);
+        if (idx >= 0) npOpenTabByIndex(idx);
+      }
+    }
+
+    function npClearFieldErrors() {
+      $('#item_form .np-invalid').removeClass('np-invalid');
+      $('#item_form .np-field-error').remove();
+      $('#item_form .js-select2-custom').each(function () {
+        const $sel = $(this);
+        const $container = $sel.next('.select2-container');
+        $container.find('.select2-selection').removeClass('np-invalid');
+      });
+    }
+
+    function npNormalizeErrorCode(code) {
+      if (!code) return '';
+      return String(code).trim();
+    }
+
+    function npFindFieldByCode(code) {
+      const c = npNormalizeErrorCode(code);
+      if (!c) return null;
+
+      if (c.startsWith('meta_data.')) {
+        const key = c.replace(/^meta_data\./, '');
+        const name = `meta_data[${key}]`;
+        try {
+          return document.querySelector(`#item_form [name="${CSS.escape(name)}"]`);
+        } catch (e) {
+          return document.querySelector(`#item_form [name="${name.replace(/"/g, '\\"')}"]`);
+        }
+      }
+
+      if (c.startsWith('selling_point.')) {
+        const idx = parseInt(c.replace(/^selling_point\./, ''), 10);
+        const all = document.querySelectorAll('#item_form [name="selling_point[]"]');
+        return Number.isFinite(idx) ? (all[idx] || all[0] || null) : (all[0] || null);
+      }
+
+      if (c.startsWith('name.') || c.startsWith('description.')) {
+        const parts = c.split('.');
+        const base = parts[0];
+        const idx = parseInt(parts[1] || '0', 10);
+        const all = document.querySelectorAll(`#item_form [name="${base}[]"]`);
+        return Number.isFinite(idx) ? (all[idx] || all[0] || null) : (all[0] || null);
+      }
+
+      try {
+        const direct = document.querySelector(`#item_form [name="${CSS.escape(c)}"]`);
+        if (direct) return direct;
+      } catch (e) {
+        const direct = document.querySelector(`#item_form [name="${c.replace(/"/g, '\\"')}"]`);
+        if (direct) return direct;
+      }
+
+      return null;
+    }
+
+    function npMarkFieldInvalid(el, message) {
+      if (!el) return;
+      const $el = $(el);
+
+      if ($el.is('select') && ($el.hasClass('js-select2-custom') || $el.data('select2'))) {
+        const $container = $el.next('.select2-container');
+        $container.find('.select2-selection').addClass('np-invalid');
+      } else {
+        $el.addClass('np-invalid');
+      }
+
+      const $group = $el.closest('.np-form-group');
+      if ($group.length && $group.find('.np-field-error').length) return;
+
+      const $msg = $('<div class="np-field-error"></div>').text(message || 'This field is required.');
+      if ($group.length) $group.append($msg);
+      else $el.after($msg);
+    }
+
+    function npShowFieldErrors(errors) {
+      npClearFieldErrors();
+      if (!Array.isArray(errors)) return;
+
+      errors.forEach(function (e) {
+        const code = npNormalizeErrorCode(e?.code);
+        const msg = e?.message || 'Invalid value';
+        const el = npFindFieldByCode(code);
+        if (el) npMarkFieldInvalid(el, msg);
+      });
+
+      const first = document.querySelector('#item_form .np-invalid, #item_form .select2-selection.np-invalid');
+      if (first) {
+        if (first.classList.contains('select2-selection')) {
+          const $sel = $(first).closest('.select2-container').prev('select');
+          if ($sel.length) { try { $sel.select2('open'); } catch (e) { } }
+        }
+        try { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { }
+        try { first.focus({ preventScroll: true }); } catch (e) { }
+      }
+    }
+
     function npPersistWizardStep({ publish = false, moveNext = false } = {}) {
       const form = document.getElementById('item_form');
       if (!form) return;
 
+      npClearFieldErrors();
+      const startTabIndex = npCurrentTabIndex();
+
       // Ensure custom tabs JSON is up-to-date before submit
       if (typeof npSaveCustomTabsToInput === 'function') {
         npSaveCustomTabsToInput();
+      }
+      if (typeof npSaveTabsUi === 'function') {
+        npSaveTabsUi();
       }
 
       $('#draft_mode').val(publish ? '0' : '1');
@@ -2375,6 +2754,7 @@
           $('#loading').hide();
           $('#submitButton').attr('disabled', false);
           if (data.errors) {
+            npShowFieldErrors(data.errors);
             for (let i = 0; i < data.errors.length; i++) {
               toastr.error(data.errors[i].message, { CloseButton: true, ProgressBar: true });
             }
@@ -2390,6 +2770,10 @@
           if (publish) {
             toastr.success(data.success || "{{ translate('messages.product_added_successfully') }}", { CloseButton: true, ProgressBar: true });
             try { localStorage.removeItem('np_custom_tabs_draft'); } catch (e) { }
+            try { localStorage.removeItem('np_tabs_ui_draft'); } catch (e) { }
+            try { localStorage.removeItem(npFormDraftKey()); } catch (e) { }
+            try { localStorage.removeItem(`${npFormDraftKeyBase}:new`); } catch (e) { }
+            try { localStorage.removeItem(npFormDraftLastKey); } catch (e) { }
             setTimeout(function () {
               location.href = "{{ route('admin.item.list') }}";
             }, 1000);
@@ -2397,13 +2781,17 @@
           }
 
           toastr.success('Draft saved', { CloseButton: true, ProgressBar: true });
+          try { npSaveFormDraft(); } catch (e) { }
           if (moveNext) {
-            npOpenTabByIndex(npCurrentTabIndex() + 1);
+            npOpenTabByIndex(startTabIndex + 1);
           }
         },
         error: function (xhr) {
           $('#loading').hide();
           $('#submitButton').attr('disabled', false);
+          if (xhr?.responseJSON?.errors) {
+            npShowFieldErrors(xhr.responseJSON.errors);
+          }
           toastr.error(xhr.responseJSON?.message || 'Request failed', { CloseButton: true, ProgressBar: true });
         }
       });
@@ -2417,6 +2805,8 @@
 
     $(document).ready(function () {
       $("#add_new_option_button").click(function (e) { if (typeof add_new_option_button === 'function') add_new_option_button(); });
+      // Restore saved draft (add-new only) before select2 init
+      try { npLoadFormDraft(); } catch (e) { }
       $('.js-select2-custom').each(function () { if ($.HSCore && $.HSCore.components && $.HSCore.components.HSSelect2) $.HSCore.components.HSSelect2.init($(this)); });
 
       $('#item_form').on('submit', function (e) {
@@ -2990,6 +3380,8 @@
       // ── Custom tabs (builder) ────────────────────────────────────────────
       let npCustomTabs = [];
       const npCustomTabsDraftKey = 'np_custom_tabs_draft';
+      const npTabsUiDraftKey = 'np_tabs_ui_draft';
+      let npTabsUi = { built_in: {}, custom: {} };
 
       function npLoadCustomTabsFromInput() {
         const raw = document.getElementById('custom_tabs_json')?.value || '';
@@ -3262,6 +3654,396 @@
       // Ensure hidden input reflects restored draft so it gets submitted on save
       npSaveCustomTabsToInput();
       npRenderCustomTabs();
+
+      function npLoadTabsUi() {
+        const raw = document.getElementById('custom_tabs_ui_json')?.value || '';
+        if (raw) {
+          try { return JSON.parse(raw) || { built_in: {}, custom: {} }; } catch { /* fallthrough */ }
+        }
+        const currentItemId = document.getElementById('item_id')?.value || '';
+        if (!currentItemId) {
+          try {
+            const draft = localStorage.getItem(npTabsUiDraftKey);
+            return draft ? (JSON.parse(draft) || { built_in: {}, custom: {} }) : { built_in: {}, custom: {} };
+          } catch { return { built_in: {}, custom: {} }; }
+        }
+        return { built_in: {}, custom: {} };
+      }
+      function npSaveTabsUi() {
+        const el = document.getElementById('custom_tabs_ui_json');
+        if (el) el.value = JSON.stringify(npTabsUi || { built_in: {}, custom: {} });
+        const currentItemId = document.getElementById('item_id')?.value || '';
+        if (!currentItemId) {
+          try { localStorage.setItem(npTabsUiDraftKey, el?.value || '{}'); } catch { /* ignore */ }
+        }
+      }
+
+      function npApplyTabsUi() {
+        // Built-in tab buttons: match by onclick panel id string
+        const map = {
+          'np-tab-general': { defaultTitle: '📝 General' },
+          'np-tab-attributes': { defaultTitle: '🔧 Attributes' },
+          'np-tab-nutrition': { defaultTitle: '🧪 Nutrition & Allergens' },
+          'np-tab-variants': { defaultTitle: '🎨 Variants' },
+          'np-tab-seo': { defaultTitle: '🔍 SEO & Meta' },
+          'np-tab-media': { defaultTitle: '🖼️ Media' },
+          'np-tab-logistics': { defaultTitle: '✈️ Logistics & Shipping' },
+          'np-tab-reviews': { defaultTitle: '⭐ Reviews & Analytics' },
+        };
+        document.querySelectorAll('.np-tab-nav .np-tab-btn').forEach(btn => {
+          const on = btn.getAttribute('onclick') || '';
+          const m = on.match(/npSwitchTab\\(this,'([^']+)'\\)/);
+          if (!m) return;
+          const panelId = m[1];
+          const ov = npTabsUi?.built_in?.[panelId];
+          if (ov?.hidden) {
+            btn.style.display = 'none';
+          } else {
+            btn.style.display = '';
+          }
+          if (ov?.title) {
+            btn.textContent = ov.title;
+          } else if (map[panelId]?.defaultTitle) {
+            btn.textContent = map[panelId].defaultTitle;
+          }
+        });
+        // Custom tabs are rendered by npRenderCustomTabs() using tab.title/icon
+      }
+
+      let npManageSectionsContext = { tabKey: null };
+      let npBuiltInSectionsRendered = false;
+
+      function npSlugify(s) {
+        return String(s || '')
+          .toLowerCase()
+          .replace(/&amp;/g, 'and')
+          .replace(/[^a-z0-9]+/g, '_')
+          .replace(/^_+|_+$/g, '')
+          .slice(0, 60) || 'section';
+      }
+
+      function npEnsureSectionKeys() {
+        // Assign stable data-np-section keys to every card under each built-in tab panel
+        document.querySelectorAll('.np-tab-panel[id^="np-tab-"]').forEach(panel => {
+          const tabId = panel.id;
+          panel.querySelectorAll('.np-card').forEach((card, idx) => {
+            if (card.getAttribute('data-np-section')) return;
+            const titleEl = card.querySelector('.np-card-title');
+            const title = titleEl ? titleEl.textContent.trim() : `card_${idx + 1}`;
+            const key = `${tabId}.${npSlugify(title)}_${idx + 1}`;
+            card.setAttribute('data-np-section', key);
+          });
+        });
+      }
+
+      function npApplySectionsUi() {
+        const sectionsHidden = npTabsUi?.sections_hidden || {};
+        document.querySelectorAll('[data-np-section]').forEach(el => {
+          const key = el.getAttribute('data-np-section');
+          const hidden = !!sectionsHidden[key];
+          el.style.display = hidden ? 'none' : '';
+        });
+      }
+
+      function npGetBuiltInAddedSections() {
+        npTabsUi.added_sections = npTabsUi.added_sections || [];
+        return npTabsUi.added_sections;
+      }
+
+      function npRenderBuiltInAddedSections() {
+        if (npBuiltInSectionsRendered) return;
+        npBuiltInSectionsRendered = true;
+        npEnsureSectionKeys();
+        const added = npGetBuiltInAddedSections();
+        added.forEach(sec => {
+          const panel = document.getElementById(sec.tabId);
+          if (!panel) return;
+          const col = panel.querySelector('.np-grid > div:first-child') || panel;
+          const existing = col.querySelector(`[data-np-added-section-id="${sec.id}"]`);
+          if (existing) return;
+
+          const card = document.createElement('div');
+          card.className = 'np-card';
+          card.setAttribute('data-np-added-section-id', sec.id);
+          card.setAttribute('data-np-section', `${sec.tabId}.custom_${sec.id}`);
+          const fields = (sec.fields || []);
+
+          const fieldsHtml = fields.map(f => {
+            const safeLabel = String(f.label || '').replace(/</g, '&lt;');
+            let input = '';
+            if (f.type === 'textarea') {
+              input = `<textarea class="np-textarea" rows="3" oninput="npSetBuiltInFieldValue('${sec.id}','${f.id}', this.value)">${String(f.value ?? '').replace(/</g,'&lt;')}</textarea>`;
+            } else if (f.type === 'number') {
+              input = `<input type="number" class="np-input" value="${String(f.value ?? '').replace(/"/g,'&quot;')}" oninput="npSetBuiltInFieldValue('${sec.id}','${f.id}', this.value)">`;
+            } else if (f.type === 'checkbox') {
+              const checked = f.value ? 'checked' : '';
+              input = `<label class="np-tog"><input type="checkbox" ${checked} onchange="npSetBuiltInFieldValue('${sec.id}','${f.id}', this.checked)"><span class="np-tog-track"></span></label>`;
+            } else if (f.type === 'select') {
+              const opts = (f.options || []).map(o => {
+                const sel = (String(o) === String(f.value)) ? 'selected' : '';
+                return `<option ${sel} value="${String(o).replace(/"/g,'&quot;')}">${String(o).replace(/</g,'&lt;')}</option>`;
+              }).join('');
+              input = `<select class="np-select" onchange="npSetBuiltInFieldValue('${sec.id}','${f.id}', this.value)">${opts}</select>`;
+            } else {
+              input = `<input type="text" class="np-input" value="${String(f.value ?? '').replace(/"/g,'&quot;')}" oninput="npSetBuiltInFieldValue('${sec.id}','${f.id}', this.value)">`;
+            }
+
+            return `
+              <div class="np-form-group">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+                  <label class="np-label" style="margin:0">${safeLabel}</label>
+                  <button type="button" class="np-btn-tiny del" onclick="npDeleteBuiltInField('${sec.id}','${f.id}')">Delete</button>
+                </div>
+                ${input}
+              </div>
+            `;
+          }).join('');
+
+          card.innerHTML = `
+            <div class="np-card-header">
+              <span class="np-card-icon">${sec.icon || '🧩'}</span>
+              <span class="np-card-title">${String(sec.title || 'Custom Section').replace(/</g,'&lt;')}</span>
+              <span class="np-card-subtitle">Added section</span>
+            </div>
+            <div class="np-card-body">
+              <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                <button type="button" class="np-btn-tiny" onclick="npAddBuiltInField('${sec.id}')">+ Add Field</button>
+                <button type="button" class="np-btn-tiny del" onclick="npDeleteBuiltInSection('${sec.id}')">Delete Section</button>
+              </div>
+              ${fieldsHtml || '<div class="np-hint">No fields yet. Click “+ Add Field”.</div>'}
+            </div>
+          `;
+
+          col.appendChild(card);
+        });
+
+        npApplySectionsUi();
+      }
+      window.npRenderBuiltInAddedSections = npRenderBuiltInAddedSections;
+
+      function npAddBuiltInSection(tabId) {
+        const title = (prompt('Section title', 'New Section') || '').trim();
+        if (!title) return;
+        const icon = (prompt('Section icon (emoji)', '🧩') || '').trim() || '🧩';
+        npTabsUi = npLoadTabsUi();
+        const added = npGetBuiltInAddedSections();
+        const sec = { id: npUid('bsec'), tabId, title, icon, fields: [] };
+        added.push(sec);
+        npSaveTabsUi();
+        npBuiltInSectionsRendered = false;
+        npRenderBuiltInAddedSections();
+      }
+      window.npAddBuiltInSection = npAddBuiltInSection;
+
+      function npAddBuiltInField(sectionId) {
+        npTabsUi = npLoadTabsUi();
+        const sec = (npGetBuiltInAddedSections() || []).find(s => s.id === sectionId);
+        if (!sec) return;
+        const label = (prompt('Field label', 'New Field') || '').trim();
+        if (!label) return;
+        const type = (prompt('Field type: text / textarea / number / checkbox / select', 'text') || 'text').trim().toLowerCase();
+        const allowed = ['text', 'textarea', 'number', 'checkbox', 'select'];
+        if (!allowed.includes(type)) return;
+        const field = { id: npUid('bfld'), label, type, value: (type === 'checkbox' ? false : '') };
+        if (type === 'select') {
+          const opts = (prompt('Select options (comma separated)', 'Option A, Option B') || '').split(',').map(s => s.trim()).filter(Boolean);
+          field.options = opts;
+          field.value = opts[0] || '';
+        }
+        sec.fields = sec.fields || [];
+        sec.fields.push(field);
+        npSaveTabsUi();
+        npBuiltInSectionsRendered = false;
+        npRenderBuiltInAddedSections();
+      }
+      window.npAddBuiltInField = npAddBuiltInField;
+
+      function npSetBuiltInFieldValue(sectionId, fieldId, value) {
+        npTabsUi = npLoadTabsUi();
+        const sec = (npGetBuiltInAddedSections() || []).find(s => s.id === sectionId);
+        const fld = (sec?.fields || []).find(f => f.id === fieldId);
+        if (!fld) return;
+        fld.value = value;
+        npSaveTabsUi();
+      }
+      window.npSetBuiltInFieldValue = npSetBuiltInFieldValue;
+
+      function npDeleteBuiltInField(sectionId, fieldId) {
+        npTabsUi = npLoadTabsUi();
+        const sec = (npGetBuiltInAddedSections() || []).find(s => s.id === sectionId);
+        if (!sec) return;
+        if (!confirm('Delete this field?')) return;
+        sec.fields = (sec.fields || []).filter(f => f.id !== fieldId);
+        npSaveTabsUi();
+        npBuiltInSectionsRendered = false;
+        npRenderBuiltInAddedSections();
+      }
+      window.npDeleteBuiltInField = npDeleteBuiltInField;
+
+      function npDeleteBuiltInSection(sectionId) {
+        npTabsUi = npLoadTabsUi();
+        if (!confirm('Delete this section?')) return;
+        npTabsUi.added_sections = (npTabsUi.added_sections || []).filter(s => s.id !== sectionId);
+        npSaveTabsUi();
+        // Remove from DOM if present
+        document.querySelectorAll(`[data-np-added-section-id="${sectionId}"]`).forEach(el => el.remove());
+      }
+      window.npDeleteBuiltInSection = npDeleteBuiltInSection;
+
+      function npOpenManageSectionsModal(tabId) {
+        const modal = $('#npManageSectionsModal');
+        if (!modal.length) return;
+        if (!modal.parent().is('body')) modal.appendTo('body');
+        npTabsUi = npLoadTabsUi();
+        npManageSectionsContext.tabKey = tabId;
+
+        npEnsureSectionKeys();
+
+        const panel = document.getElementById(tabId);
+        const defs = panel
+          ? Array.from(panel.querySelectorAll('.np-card[data-np-section]')).map(card => {
+            const key = card.getAttribute('data-np-section');
+            const titleEl = card.querySelector('.np-card-title');
+            const label = titleEl ? titleEl.textContent.trim() : key;
+            return { key, label };
+          })
+          : [];
+        const hidden = npTabsUi.sections_hidden || {};
+        const body = document.getElementById('npManageSectionsBody');
+        if (body) {
+          body.innerHTML = `
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px">
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="npAddBuiltInSection('${tabId}')">+ Add Section</button>
+            </div>
+          ` + defs.map(d => {
+            const checked = hidden[d.key] ? '' : 'checked';
+            return `
+              <div class="d-flex align-items-center justify-content-between" style="padding:10px 0;border-bottom:1px solid #eef2f7">
+                <div><strong>${d.label}</strong></div>
+                <label class="m-0 d-flex align-items-center" style="gap:10px">
+                  <span class="text-muted">Visible</span>
+                  <input type="checkbox" data-np-section-visible="${d.key}" ${checked}>
+                </label>
+              </div>
+            `;
+          }).join('');
+        }
+
+        modal.modal('show');
+      }
+      window.npOpenManageSectionsModal = npOpenManageSectionsModal;
+
+      function npSaveManageSectionsAndClose() {
+        npTabsUi.sections_hidden = npTabsUi.sections_hidden || {};
+        document.querySelectorAll('[data-np-section-visible]').forEach(chk => {
+          const key = chk.getAttribute('data-np-section-visible');
+          npTabsUi.sections_hidden[key] = !chk.checked;
+        });
+        npSaveTabsUi();
+        npApplySectionsUi();
+        $('#npManageSectionsModal').modal('hide');
+      }
+      window.npSaveManageSectionsAndClose = npSaveManageSectionsAndClose;
+
+      function npOpenManageTabsModal() {
+        const modal = $('#npManageTabsModal');
+        if (!modal.length) return;
+        if (!modal.parent().is('body')) modal.appendTo('body');
+        npTabsUi = npLoadTabsUi();
+        npRenderManageTabsTable();
+        modal.modal('show');
+      }
+      window.npOpenManageTabsModal = npOpenManageTabsModal;
+
+      function npRenderManageTabsTable() {
+        const tbody = document.getElementById('npManageTabsTbody');
+        if (!tbody) return;
+        const builtIns = [
+          { id: 'np-tab-general', label: 'General' },
+          { id: 'np-tab-attributes', label: 'Attributes' },
+          { id: 'np-tab-nutrition', label: 'Nutrition' },
+          { id: 'np-tab-variants', label: 'Variants' },
+          { id: 'np-tab-seo', label: 'SEO' },
+          { id: 'np-tab-media', label: 'Media' },
+          { id: 'np-tab-logistics', label: 'Logistics' },
+          { id: 'np-tab-reviews', label: 'Reviews' },
+        ];
+        const rows = [];
+        builtIns.forEach(t => {
+          const ov = npTabsUi.built_in?.[t.id] || {};
+          const title = ov.title || '';
+          const hidden = !!ov.hidden;
+          rows.push(`
+            <tr>
+              <td><strong>${t.label}</strong> <span class="text-muted">(built-in)</span></td>
+              <td><input type="text" class="form-control" data-np-tab-title="${t.id}" value="${title.replace(/"/g,'&quot;')}" placeholder="Leave empty to keep default"></td>
+              <td class="text-center"><input type="checkbox" data-np-tab-hidden="${t.id}" ${hidden ? 'checked' : ''}></td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="npOpenManageSectionsModal('${t.id}')">Sections</button>
+              </td>
+            </tr>
+          `);
+        });
+        (npCustomTabs || []).forEach(tab => {
+          rows.push(`
+            <tr>
+              <td><strong>${String(tab.title || 'Custom')}</strong> <span class="text-muted">(custom)</span></td>
+              <td><input type="text" class="form-control" data-np-custom-tab-title="${tab.id}" value="${String(tab.title || '').replace(/"/g,'&quot;')}"></td>
+              <td class="text-center"><input type="checkbox" data-np-custom-tab-visible="${tab.id}" checked disabled></td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="npDeleteCustomTab('${tab.id}')">Delete</button>
+              </td>
+            </tr>
+          `);
+        });
+        tbody.innerHTML = rows.join('');
+      }
+
+      function npDeleteCustomTab(tabId) {
+        if (!confirm('Delete this custom tab?')) return;
+        npCustomTabs = (npCustomTabs || []).filter(t => t.id !== tabId);
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+        npRenderManageTabsTable();
+      }
+      window.npDeleteCustomTab = npDeleteCustomTab;
+
+      function npSaveManageTabsAndClose() {
+        // collect built-in overrides
+        const built = {};
+        document.querySelectorAll('[data-np-tab-title]').forEach(inp => {
+          const id = inp.getAttribute('data-np-tab-title');
+          const title = (inp.value || '').trim();
+          built[id] = built[id] || {};
+          if (title) built[id].title = title;
+        });
+        document.querySelectorAll('[data-np-tab-hidden]').forEach(chk => {
+          const id = chk.getAttribute('data-np-tab-hidden');
+          built[id] = built[id] || {};
+          built[id].hidden = !!chk.checked;
+        });
+        // collect custom tab titles
+        document.querySelectorAll('[data-np-custom-tab-title]').forEach(inp => {
+          const id = inp.getAttribute('data-np-custom-tab-title');
+          const t = (inp.value || '').trim();
+          const tab = npFindTab(id);
+          if (tab && t) tab.title = t;
+        });
+        npTabsUi.built_in = built;
+        npSaveTabsUi();
+        npSaveCustomTabsToInput();
+        npRenderCustomTabs();
+        npApplyTabsUi();
+        $('#npManageTabsModal').modal('hide');
+      }
+      window.npSaveManageTabsAndClose = npSaveManageTabsAndClose;
+
+      // init UI overrides
+      npTabsUi = npLoadTabsUi();
+      npEnsureSectionKeys();
+      npRenderBuiltInAddedSections();
+      npApplyTabsUi();
+      npApplySectionsUi();
 
     </script>
 @endpush

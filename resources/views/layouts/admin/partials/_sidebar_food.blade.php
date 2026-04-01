@@ -678,7 +678,7 @@
             };
             let updateSuggestions = (val) => {
                 $suggestionsList.empty();
-                suggestions.forEach(suggestion => {
+                ((typeof suggestions !== 'undefined' && Array.isArray(suggestions)) ? suggestions : []).forEach(suggestion => {
                     if (suggestion.toLowerCase().includes(val.toLowerCase())) {
                         $suggestionsList.append(
                             `<span class="search-suggestion badge badge-soft-light m-1 fs-14">${suggestion}</span>`

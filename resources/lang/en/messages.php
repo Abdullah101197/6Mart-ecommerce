@@ -9123,4 +9123,6 @@ Smartly or Earn. ',
   'Setup your account credentials' => 'Setup your account credentials',
   'unit_added_successfully' => 'Unit added successfully',
   'default_unit_is_required' => 'Default unit is required',
+  'Category required' => 'Category required',
+  'Item name required' => 'Item name required',
 );
