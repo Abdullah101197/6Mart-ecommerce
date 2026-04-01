@@ -14,7 +14,7 @@ class ProductSelectOptionController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:origin_country,seller,country_of_manufacture,packaging_type,recyclable,storage_type,condition,age_restriction,warranty,return_policy,product_type,variant_color',
+            'type' => 'required|in:origin_country,seller,country_of_manufacture,packaging_type,recyclable,storage_type,condition,age_restriction,warranty,return_policy,product_type,variant_color,variant_type,schema_type',
             'name' => 'required|string|max:191',
             'value' => 'nullable|string|max:191',
         ]);
@@ -35,6 +35,10 @@ class ProductSelectOptionController extends Controller
                 return response()->json(['errors' => ['value' => ['Please provide a valid hex color like #ff0000']]], 422);
             }
             $value = strtolower($value);
+        } elseif ($type === 'variant_type') {
+            $value = null;
+        } elseif ($type === 'schema_type') {
+            $value = null;
         } else {
             $value = null;
         }

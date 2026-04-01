@@ -1,11 +1,10 @@
-@extends('layouts.admin.app')
-@section('title', translate('messages.add_new_item'))
+<?php $__env->startSection('title', translate('messages.add_new_item')); ?>
 
-@push('css_or_js')
-  <meta name="csrf-token" content="{{ csrf_token() }}">
-  <link href="{{ asset('assets/admin/css/tags-input.min.css') }}" rel="stylesheet">
-  <link href="{{ asset('assets/admin/css/AI/animation/product/ai-sidebar.css') }}" rel="stylesheet">
-  <link href="{{ asset('assets/admin/css/new-product.css') }}" rel="stylesheet">
+<?php $__env->startPush('css_or_js'); ?>
+  <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+  <link href="<?php echo e(asset('assets/admin/css/tags-input.min.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/AI/animation/product/ai-sidebar.css')); ?>" rel="stylesheet">
+  <link href="<?php echo e(asset('assets/admin/css/new-product.css')); ?>" rel="stylesheet">
   <style>
     /* Ensure Bootstrap modal overlays custom layout */
     #npBrandModal { z-index: 2000; }
@@ -47,10 +46,10 @@
     #npAttrEmbed #attribute_section > .card > .card-body { padding: 0 !important; }
     #npAttrEmbed .customer_choice_options { flex-wrap: wrap; }
   </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
   $openai_config = \App\CentralLogics\Helpers::get_business_settings('openai_config');
   $product = $product ?? null;
   $isEdit = !blank($product?->id);
@@ -110,16 +109,16 @@
   if ($isEdit) {
     $npNameAr = optional(optional($product?->translations)->where('key','name')->where('locale','ar')->first())->value ?? '';
   }
-@endphp
+?>
 <div class="content container-fluid">
 
-  {{-- Page Header --}}
+  
   <div class="page-header d-flex flex-wrap __gap-15px justify-content-between align-items-center mb-3">
     <h1 class="page-header-title">
       <span class="page-header-icon">
-        <img src="{{ asset('assets/admin/img/items.png') }}" class="w--22" alt="">
+        <img src="<?php echo e(asset('assets/admin/img/items.png')); ?>" class="w--22" alt="">
       </span>
-      <span>{{ translate('messages.add_new_item') }}</span>
+      <span><?php echo e(translate('messages.add_new_item')); ?></span>
     </h1>
     <div class="d-flex align-items-center" style="gap:10px">
       <button type="button"
@@ -129,22 +128,22 @@
         <span style="font-size:16px;line-height:1">⚙️</span>
         <span>Manage Tabs</span>
       </button>
-      <a href="{{ route('admin.item.product_gallery') }}"
+      <a href="<?php echo e(route('admin.item.product_gallery')); ?>"
         class="btn btn-outline-primary btn--primary d-flex align-items-center bg-not-hover-primary-ash rounded-8"
         style="gap:8px;height:38px">
-        <img src="{{ asset('assets/admin/img/product-gallery.png') }}" class="w--22" alt="">
-        <span>{{ translate('Add Info From Gallery') }}</span>
+        <img src="<?php echo e(asset('assets/admin/img/product-gallery.png')); ?>" class="w--22" alt="">
+        <span><?php echo e(translate('Add Info From Gallery')); ?></span>
       </a>
     </div>
   </div>
 
   <form id="item_form" enctype="multipart/form-data" class="custom-validation new-product-form" data-ajax="true">
     <input type="hidden" id="request_type" value="admin">
-    <input type="hidden" id="module_type" value="{{ Config::get('module.current_module_type') }}">
-    <input type="hidden" id="item_id" name="item_id" value="{{ $isEdit ? $product->id : '' }}">
+    <input type="hidden" id="module_type" value="<?php echo e(Config::get('module.current_module_type')); ?>">
+    <input type="hidden" id="item_id" name="item_id" value="<?php echo e($isEdit ? $product->id : ''); ?>">
     <input type="hidden" id="draft_mode" name="draft_mode" value="0">
 
-    {{-- ═══ TAB NAVIGATION ═══ --}}
+    
     <div class="np-tab-nav">
       <button type="button" class="np-tab-btn active" data-tab="np-tab-general" onclick="npSwitchTab(this,'np-tab-general')">📝 General</button>
       <button type="button" class="np-tab-btn" data-tab="np-tab-attributes" onclick="npSwitchTab(this,'np-tab-attributes')">🔧 Attributes</button>
@@ -163,14 +162,14 @@
     <input type="hidden" name="custom_tabs_json" id="custom_tabs_json" value="">
     <input type="hidden" name="custom_tabs_ui_json" id="custom_tabs_ui_json" value="">
 
-    {{-- ══════════════════════════════════════════════════ --}}
-    {{-- TAB 1: GENERAL --}}
-    {{-- ══════════════════════════════════════════════════ --}}
+    
+    
+    
     <div class="np-tab-panel active" id="np-tab-general">
       <div class="np-grid">
-        {{-- LEFT --}}
+        
         <div>
-          {{-- Basic Information --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">📝</span>
@@ -178,39 +177,39 @@
             </div>
             <div class="np-card-body">
               <div class="np-form-group">
-                <label class="np-label">{{ translate('messages.item_name') }} (English)
+                <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (English)
                   <span class="np-req">*</span></label>
                 <input type="text" name="name[]" id="productNameEn" class="np-input"
-                  placeholder="e.g. Kiri Spreadable Cream Cheese Squares 48 Portions 864g" required oninput="npUpdateQuality();npUpdateSEO()" value="{{ old('name.0', $product?->name ?? '') }}">
+                  placeholder="e.g. Kiri Spreadable Cream Cheese Squares 48 Portions 864g" required oninput="npUpdateQuality();npUpdateSEO()" value="<?php echo e(old('name.0', $product?->name ?? '')); ?>">
                 <input type="hidden" name="lang[]" value="default">
               </div>
 
-              @php
+              <?php
                 $langsLower = array_map('strtolower', $languages ?? []);
                 $optionalNameLocalesRendered = in_array('ar', $langsLower);
-              @endphp
-              @unless($optionalNameLocalesRendered)
+              ?>
+              <?php if (! ($optionalNameLocalesRendered)): ?>
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.item_name') }} (Arabic) <span
+                  <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (Arabic) <span
                       class="np-opt">(optional)</span></label>
                   <input type="text" name="name[]" id="productNameAr" class="np-input" placeholder="اسم المنتج بالعربي"
-                    style="direction:rtl;text-align:right" value="{{ old('name.1', $npNameAr) }}">
+                    style="direction:rtl;text-align:right" value="<?php echo e(old('name.1', $npNameAr)); ?>">
                   <input type="hidden" name="lang[]" value="ar">
                 </div>
-              @endunless
+              <?php endif; ?>
 
-              @foreach($languages as $lang)
-                @if($lang != 'en')
+              <?php $__currentLoopData = $languages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $lang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php if($lang != 'en'): ?>
                   <div class="np-form-group">
-                    <label class="np-label">{{ translate('messages.item_name') }} ({{ strtoupper($lang) }}) <span
+                    <label class="np-label"><?php echo e(translate('messages.item_name')); ?> (<?php echo e(strtoupper($lang)); ?>) <span
                         class="np-opt">(optional)</span></label>
                     <input type="text" name="name[]" class="np-input"
-                      placeholder="{{ translate('messages.item_name') }} in {{ strtoupper($lang) }}" @if($lang == 'ar')
-                      style="direction:rtl;text-align:right" @endif>
-                    <input type="hidden" name="lang[]" value="{{ $lang }}">
+                      placeholder="<?php echo e(translate('messages.item_name')); ?> in <?php echo e(strtoupper($lang)); ?>" <?php if($lang == 'ar'): ?>
+                      style="direction:rtl;text-align:right" <?php endif; ?>>
+                    <input type="hidden" name="lang[]" value="<?php echo e($lang); ?>">
                   </div>
-                @endif
-              @endforeach
+                <?php endif; ?>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
               <div class="np-form-group">
                 <label class="np-label">Short Description <span class="np-req">*</span></label>
@@ -226,7 +225,7 @@
               <div class="np-form-group">
                 <label class="np-label">Full Description</label>
                 <textarea name="full_description" class="np-textarea" rows="5"
-                  placeholder="Detailed product description including features, usage, storage instructions…">{{ old('full_description', data_get($npMeta,'full_description','')) }}</textarea>
+                  placeholder="Detailed product description including features, usage, storage instructions…"><?php echo e(old('full_description', data_get($npMeta,'full_description',''))); ?></textarea>
               </div>
 
               <div class="np-form-row">
@@ -235,15 +234,15 @@
                   <div class="d-flex align-items-center" style="gap:8px">
                     <select name="brand_id" id="npBrand" class="np-select" onchange="npUpdateQuality()">
                       <option value="">Select brand…</option>
-                      @foreach(\App\Models\Brand::where('status', 1)->get() as $brand)
-                        <option value="{{ $brand->id }}" @selected($npBrandId == $brand->id)>{{ $brand->name }}</option>
-                      @endforeach
+                      <?php $__currentLoopData = \App\Models\Brand::where('status', 1)->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $brand): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($brand->id); ?>" <?php if($npBrandId == $brand->id): echo 'selected'; endif; ?>><?php echo e($brand->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button"
                             class="btn btn-outline-primary"
                             style="min-width:40px;height:38px;display:flex;align-items:center;justify-content:center;padding:0"
                             onclick="npOpenBrandModal()"
-                            title="{{ translate('messages.add_new_brand') }}">+</button>
+                            title="<?php echo e(translate('messages.add_new_brand')); ?>">+</button>
                   </div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
@@ -255,7 +254,7 @@
             </div>
           </div>
 
-          {{-- Pricing --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">💰</span>
@@ -266,24 +265,24 @@
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Regular Price <span class="np-req">*</span></label>
                   <div class="np-iw">
-                    <span class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span>
+                    <span class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span>
                     <input type="number" name="price" id="npRegPrice" class="np-input" placeholder="0.00" step="0.01"
-                      min="0" oninput="npUpdateDiscount();npUpdateQuality()" value="{{ old('price', $product?->price ?? '') }}">
+                      min="0" oninput="npUpdateDiscount();npUpdateQuality()" value="<?php echo e(old('price', $product?->price ?? '')); ?>">
                   </div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Sale / Discounted Price</label>
                   <div class="np-iw">
-                    <span class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span>
+                    <span class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span>
                     <input type="number" name="discount" id="npSalePrice" class="np-input" placeholder="0.00"
-                      step="0.01" min="0" oninput="npUpdateDiscount()" value="{{ old('discount', $product?->discount ?? '') }}">
+                      step="0.01" min="0" oninput="npUpdateDiscount()" value="<?php echo e(old('discount', $product?->discount ?? '')); ?>">
                   </div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Discount Type</label>
                   <select name="discount_type" id="discount_type" class="np-select">
-                    <option value="percent" @selected(old('discount_type', $product?->discount_type ?? 'percent') == 'percent')>Percent (%)</option>
-                    <option value="amount" @selected(old('discount_type', $product?->discount_type ?? 'percent') == 'amount')>Amount ({{ \App\CentralLogics\Helpers::currency_symbol() }})</option>
+                    <option value="percent" <?php if(old('discount_type', $product?->discount_type ?? 'percent') == 'percent'): echo 'selected'; endif; ?>>Percent (%)</option>
+                    <option value="amount" <?php if(old('discount_type', $product?->discount_type ?? 'percent') == 'amount'): echo 'selected'; endif; ?>>Amount (<?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?>)</option>
                   </select>
                 </div>
               </div>
@@ -291,17 +290,17 @@
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Promo Start Date</label>
-                  <input type="date" name="promo_start_date" class="np-input" value="{{ old('promo_start_date', data_get($npMeta,'promo_start_date','')) }}">
+                  <input type="date" name="promo_start_date" class="np-input" value="<?php echo e(old('promo_start_date', data_get($npMeta,'promo_start_date',''))); ?>">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Promo End Date</label>
-                  <input type="date" name="promo_end_date" class="np-input" value="{{ old('promo_end_date', data_get($npMeta,'promo_end_date','')) }}">
+                  <input type="date" name="promo_end_date" class="np-input" value="<?php echo e(old('promo_end_date', data_get($npMeta,'promo_end_date',''))); ?>">
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- About This Item --}}
+          
           <div class="np-card" data-np-section="general.about">
             <div class="np-card-header">
               <span class="np-card-icon">📋</span>
@@ -313,12 +312,12 @@
               </div>
               <div class="np-sec-head">Key Selling Points (up to 6)</div>
               <div id="npAboutRows">
-                @for($i = 1; $i <= 6; $i++)
+                <?php for($i = 1; $i <= 6; $i++): ?>
                   <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px">
                     <span style="margin-top:10px;font-size:14px;flex-shrink:0">✅</span>
-                    <input type="text" name="selling_point[]" class="np-input" placeholder="Add a key selling point…" value="{{ old('selling_point.'.($i-1), $npSellingPoints[$i-1] ?? '') }}">
+                    <input type="text" name="selling_point[]" class="np-input" placeholder="Add a key selling point…" value="<?php echo e(old('selling_point.'.($i-1), $npSellingPoints[$i-1] ?? '')); ?>">
                   </div>
-                @endfor
+                <?php endfor; ?>
               </div>
               <button type="button" class="np-btn-add" onclick="npAddSellingPoint()">+ Add Selling Point</button>
 
@@ -327,17 +326,17 @@
               <div class="np-form-group">
                 <label class="np-label">Product Overview (long-form) <span class="np-opt">(Shown in "Product Description" section on Amazon A+)</span></label>
                 <textarea name="meta_data[product_overview_long]" class="np-textarea" rows="4"
-                  placeholder="Write a 2–4 sentence paragraph expanding on what makes this product special — flavour profile, story, occasions, origin…">{{ old('meta_data.product_overview_long', data_get($npMeta,'product_overview_long','')) }}</textarea>
+                  placeholder="Write a 2–4 sentence paragraph expanding on what makes this product special — flavour profile, story, occasions, origin…"><?php echo e(old('meta_data.product_overview_long', data_get($npMeta,'product_overview_long',''))); ?></textarea>
               </div>
               <div class="np-form-group" style="margin-bottom:0">
                 <label class="np-label">Usage Directions / How to Use</label>
                 <textarea name="meta_data[usage_directions]" class="np-textarea" rows="2"
-                  placeholder="e.g. Spread directly from the individual portion on bread, toast or crackers. Ideal chilled. Can also be used in dips, sauces, and cheesecakes.">{{ old('meta_data.usage_directions', data_get($npMeta,'usage_directions','')) }}</textarea>
+                  placeholder="e.g. Spread directly from the individual portion on bread, toast or crackers. Ideal chilled. Can also be used in dips, sauces, and cheesecakes."><?php echo e(old('meta_data.usage_directions', data_get($npMeta,'usage_directions',''))); ?></textarea>
               </div>
             </div>
           </div>
 
-          {{-- Instacart Listing Details --}}
+          
           <div class="np-card" data-np-section="general.instacart">
             <div class="np-card-header">
               <span class="np-card-icon">🛒</span>
@@ -353,20 +352,20 @@
                   <div class="np-inline-add">
                     <select name="meta_data[instacart_department]" id="npInstacartDepartment" class="np-select js-select2-custom">
                       <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
-                        @foreach(\App\Models\InstacartOption::where('type','department')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.instacart_department', data_get($npMeta,'instacart_department','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @else
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options')): ?>
+                        <?php $__currentLoopData = \App\Models\InstacartOption::where('type','department')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.instacart_department', data_get($npMeta,'instacart_department','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php else: ?>
                         <option value="" disabled>(Run migration to enable options)</option>
-                      @endif
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenInstacartOptionModal('department')">+</button>
                   </div>
                 </div>
                 <div class="np-form-group">
                   <label class="np-label">Instacart Aisle / Shelf</label>
-                  <input type="text" name="meta_data[instacart_aisle]" class="np-input" placeholder="e.g. Cream Cheese &amp; Soft Cheese" value="{{ old('meta_data.instacart_aisle', data_get($npMeta,'instacart_aisle','')) }}">
+                  <input type="text" name="meta_data[instacart_aisle]" class="np-input" placeholder="e.g. Cream Cheese &amp; Soft Cheese" value="<?php echo e(old('meta_data.instacart_aisle', data_get($npMeta,'instacart_aisle',''))); ?>">
                 </div>
               </div>
 
@@ -376,11 +375,11 @@
                   <div class="np-inline-add">
                     <select name="meta_data[instacart_promo_label]" id="npInstacartPromoLabel" class="np-select js-select2-custom">
                       <option value="">None</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
-                        @foreach(\App\Models\InstacartOption::where('type','promo_label')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.instacart_promo_label', data_get($npMeta,'instacart_promo_label','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options')): ?>
+                        <?php $__currentLoopData = \App\Models\InstacartOption::where('type','promo_label')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.instacart_promo_label', data_get($npMeta,'instacart_promo_label','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenInstacartOptionModal('promo_label')">+</button>
                   </div>
@@ -390,11 +389,11 @@
                   <div class="np-inline-add">
                     <select name="meta_data[instacart_unit_pricing_display]" id="npInstacartUnitPricingDisplay" class="np-select js-select2-custom">
                       <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options'))
-                        @foreach(\App\Models\InstacartOption::where('type','unit_pricing_display')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.instacart_unit_pricing_display', data_get($npMeta,'instacart_unit_pricing_display','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('instacart_options')): ?>
+                        <?php $__currentLoopData = \App\Models\InstacartOption::where('type','unit_pricing_display')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.instacart_unit_pricing_display', data_get($npMeta,'instacart_unit_pricing_display','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenInstacartOptionModal('unit_pricing_display')">+</button>
                   </div>
@@ -403,13 +402,13 @@
 
               <div class="np-form-group" style="margin-bottom:0">
                 <label class="np-label">Instacart Product Tags</label>
-                <input type="text" name="meta_data[instacart_product_tags]" class="np-input" placeholder="e.g. Halal, Gluten-free, Family size" value="{{ old('meta_data.instacart_product_tags', data_get($npMeta,'instacart_product_tags','')) }}">
+                <input type="text" name="meta_data[instacart_product_tags]" class="np-input" placeholder="e.g. Halal, Gluten-free, Family size" value="<?php echo e(old('meta_data.instacart_product_tags', data_get($npMeta,'instacart_product_tags',''))); ?>">
                 <div class="np-hint">Comma-separated. Tags map to Instacart dietary filters (e.g. Organic, Vegan, Kosher, Gluten-Free).</div>
               </div>
             </div>
           </div>
 
-          {{-- Categories --}}
+          
           <div class="np-card" data-np-section="general.categories">
             <div class="np-card-header">
               <span class="np-card-icon">🗂️</span>
@@ -420,14 +419,14 @@
               <div class="np-info-box">🗂️ Select the deepest (leaf) category whenever possible. Leaf selection can auto-fill Amazon backend fields like Browse Node.</div>
               <div class="np-form-row">
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.store') }} <span class="np-req">*</span></label>
+                  <label class="np-label"><?php echo e(translate('messages.store')); ?> <span class="np-req">*</span></label>
                   <select name="store_id" id="store_id" class="np-select js-select2-custom" required>
-                    <option value="">{{ translate('messages.select_store') }}</option>
-                    @foreach(\App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
+                    <option value=""><?php echo e(translate('messages.select_store')); ?></option>
+                    <?php $__currentLoopData = \App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
                       $query->where('module_id', $moduleId);
-                    })->orderBy('name')->get(['id', 'name']) as $store)
-                      <option value="{{ $store->id }}" @selected(old('store_id', $product?->store_id ?? '') == $store->id)>{{ $store->name }}</option>
-                    @endforeach
+                    })->orderBy('name')->get(['id', 'name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $store): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($store->id); ?>" <?php if(old('store_id', $product?->store_id ?? '') == $store->id): echo 'selected'; endif; ?>><?php echo e($store->name); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   </select>
                 </div>
                 <div class="np-form-group">
@@ -436,9 +435,9 @@
                     <select name="category_id" id="category_id" class="np-select js-select2-custom"
                       onchange="npUpdateQuality()">
                       <option value="">— Select Category —</option>
-                      @foreach(\App\Models\Category::where('position', 0)->where('status', 1)->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', Config::get('module.current_module_id')); })->get() as $cat)
-                        <option value="{{ $cat->id }}" @selected(old('category_id', $npCatPos1 ?? '') == $cat->id)>{{ $cat->name }}</option>
-                      @endforeach
+                      <?php $__currentLoopData = \App\Models\Category::where('position', 0)->where('status', 1)->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', Config::get('module.current_module_id')); })->get(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($cat->id); ?>" <?php if(old('category_id', $npCatPos1 ?? '') == $cat->id): echo 'selected'; endif; ?>><?php echo e($cat->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(0)">+</button>
                   </div>
@@ -449,7 +448,7 @@
                   <label class="np-label">Sub Category (Level 2)</label>
                   <div class="np-inline-add">
                     <select name="sub_category_id" id="sub_category_id" class="np-select js-select2-custom"
-                      data-selected="{{ old('sub_category_id', $npCatPos2 ?? '') }}">
+                      data-selected="<?php echo e(old('sub_category_id', $npCatPos2 ?? '')); ?>">
                       <option value="">Select main first…</option>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(1)">+</button>
@@ -459,7 +458,7 @@
                   <label class="np-label">Sub-Sub Category (Level 3)</label>
                   <div class="np-inline-add">
                     <select name="sub_sub_category_id" id="sub_sub_category_id" class="np-select js-select2-custom"
-                      data-selected="{{ old('sub_sub_category_id', $npCatPos3 ?? '') }}">
+                      data-selected="<?php echo e(old('sub_sub_category_id', $npCatPos3 ?? '')); ?>">
                       <option value="">Select Level 2 first…</option>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(2)">+</button>
@@ -471,20 +470,20 @@
                   <label class="np-label">Level 4 (Leaf Node)</label>
                   <div class="np-inline-add">
                     <select name="sub_sub_sub_category_id" id="sub_sub_sub_category_id" class="np-select js-select2-custom"
-                      data-selected="{{ old('sub_sub_sub_category_id', $npCatPos4 ?? '') }}">
+                      data-selected="<?php echo e(old('sub_sub_sub_category_id', $npCatPos4 ?? '')); ?>">
                       <option value="">Select Level 3 first…</option>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(3)">+</button>
                   </div>
                 </div>
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.unit') }}</label>
+                  <label class="np-label"><?php echo e(translate('messages.unit')); ?></label>
                   <div class="np-inline-add">
                     <select name="unit" id="unit" class="np-select js-select2-custom">
-                      <option value="">{{ translate('messages.select_unit') }}</option>
-                      @foreach(\App\Models\Unit::get(['id', 'unit']) as $unit)
-                        <option value="{{ $unit->id }}" @selected(old('unit', $product?->unit_id ?? '') == $unit->id)>{{ $unit->unit }}</option>
-                      @endforeach
+                      <option value=""><?php echo e(translate('messages.select_unit')); ?></option>
+                      <?php $__currentLoopData = \App\Models\Unit::get(['id', 'unit']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $unit): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($unit->id); ?>" <?php if(old('unit', $product?->unit_id ?? '') == $unit->id): echo 'selected'; endif; ?>><?php echo e($unit->unit); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenUnitModal()">+</button>
                   </div>
@@ -505,24 +504,24 @@
               </div>
               <div class="np-form-row">
                 <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.item_type') }}</label>
+                  <label class="np-label"><?php echo e(translate('messages.item_type')); ?></label>
                   <div class="np-inline-add">
                     <select id="npItemTypeSelect" class="np-select js-select2-custom">
                       <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('item_types'))
-                        @foreach(\App\Models\ItemType::where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','is_veg']) as $t)
-                          <option value="{{ $t->id }}" data-is-veg="{{ (int)$t->is_veg }}">{{ $t->name }}</option>
-                        @endforeach
-                      @else
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('item_types')): ?>
+                        <?php $__currentLoopData = \App\Models\ItemType::where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','is_veg']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($t->id); ?>" data-is-veg="<?php echo e((int)$t->is_veg); ?>"><?php echo e($t->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php else: ?>
                         <option value="" disabled>(Run migration to enable item types)</option>
-                      @endif
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenItemTypeModal()">+</button>
                   </div>
-                  {{-- Keep backend compatibility: ItemController expects veg=0/1 --}}
-                  <input type="hidden" name="veg" id="veg" value="{{ old('veg', $product?->veg ?? 0) }}">
-                  <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="{{ old('meta_data.item_type_id', data_get($npMeta,'item_type_id','')) }}">
-                  <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="{{ old('meta_data.item_type_name', data_get($npMeta,'item_type_name','')) }}">
+                  
+                  <input type="hidden" name="veg" id="veg" value="<?php echo e(old('veg', $product?->veg ?? 0)); ?>">
+                  <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="<?php echo e(old('meta_data.item_type_id', data_get($npMeta,'item_type_id',''))); ?>">
+                  <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="<?php echo e(old('meta_data.item_type_name', data_get($npMeta,'item_type_name',''))); ?>">
                 </div>
                 <div class="np-form-group">
                   <label class="np-label">Tags</label>
@@ -534,9 +533,9 @@
           </div>
         </div>
 
-        {{-- RIGHT COLUMN --}}
+        
         <div>
-          {{-- Status --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🚦</span>
@@ -544,23 +543,23 @@
             </div>
             <div class="np-card-body">
               <div class="np-pill-row">
-                <div class="np-pill {{ (int)$npStatus === 1 ? 'sel' : '' }}" onclick="npSelStatus(this,'active')">
+                <div class="np-pill <?php echo e((int)$npStatus === 1 ? 'sel' : ''); ?>" onclick="npSelStatus(this,'active')">
                   <span class="np-sdot"></span>Active
-                  <input type="radio" name="status" value="1" @checked((int)$npStatus === 1) style="display:none">
+                  <input type="radio" name="status" value="1" <?php if((int)$npStatus === 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-pill {{ (int)$npStatus === 0 ? 'sel out' : '' }}" onclick="npSelStatus(this,'out')">
+                <div class="np-pill <?php echo e((int)$npStatus === 0 ? 'sel out' : ''); ?>" onclick="npSelStatus(this,'out')">
                   <span class="np-sdot"></span>Out of Stock
-                  <input type="radio" name="status" value="0" @checked((int)$npStatus === 0) style="display:none">
+                  <input type="radio" name="status" value="0" <?php if((int)$npStatus === 0): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-pill {{ (int)$npStatus === 2 ? 'sel draft' : '' }}" onclick="npSelStatus(this,'draft')">
+                <div class="np-pill <?php echo e((int)$npStatus === 2 ? 'sel draft' : ''); ?>" onclick="npSelStatus(this,'draft')">
                   <span class="np-sdot"></span>Draft
-                  <input type="radio" name="status" value="2" @checked((int)$npStatus === 2) style="display:none">
+                  <input type="radio" name="status" value="2" <?php if((int)$npStatus === 2): echo 'checked'; endif; ?> style="display:none">
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- Origin & Seller --}}
+          
           <div class="np-card" data-np-section="general.origin_seller">
             <div class="np-card-header">
               <span class="np-card-icon">🌍</span>
@@ -572,13 +571,13 @@
                 <div class="np-inline-add">
                   <select name="meta_data[country_of_origin]" id="npOriginCountry" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','origin_country')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected(old('meta_data.country_of_origin', data_get($npMeta,'country_of_origin','')) == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @else
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','origin_country')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.country_of_origin', data_get($npMeta,'country_of_origin','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
                       <option value="" disabled>(Run migration to enable options)</option>
-                    @endif
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('origin_country')">+</button>
                 </div>
@@ -586,7 +585,7 @@
 
               <div class="np-form-group">
                 <label class="np-label">Manufacturer / Producer</label>
-                <input type="text" name="meta_data[manufacturer]" class="np-input" placeholder="e.g. Groupe Bel S.A." value="{{ old('meta_data.manufacturer', data_get($npMeta,'manufacturer','')) }}">
+                <input type="text" name="meta_data[manufacturer]" class="np-input" placeholder="e.g. Groupe Bel S.A." value="<?php echo e(old('meta_data.manufacturer', data_get($npMeta,'manufacturer',''))); ?>">
               </div>
 
               <div class="np-form-group" style="margin-bottom:0">
@@ -594,11 +593,11 @@
                 <div class="np-inline-add">
                   <select name="meta_data[seller]" id="npSeller" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','seller')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected(old('meta_data.seller', data_get($npMeta,'seller','')) == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @endif
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','seller')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.seller', data_get($npMeta,'seller','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('seller')">+</button>
                 </div>
@@ -606,7 +605,7 @@
             </div>
           </div>
 
-          {{-- Visibility & Features --}}
+          
           <div class="np-card" data-np-section="general.visibility">
             <div class="np-card-header">
               <span class="np-card-icon">👁️</span>
@@ -618,7 +617,7 @@
                   <div class="np-tlbl">Featured Product</div>
                   <div class="np-tdsc">Show in homepage carousel</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="is_featured" value="1" @checked(old('is_featured', data_get($npMeta,'is_featured',0)) == 1)><span
+                <label class="np-tog"><input type="checkbox" name="is_featured" value="1" <?php if(old('is_featured', data_get($npMeta,'is_featured',0)) == 1): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -626,7 +625,7 @@
                   <div class="np-tlbl">Recommended</div>
                   <div class="np-tdsc">Show in recommended section</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="is_recommended" value="1" @checked(old('is_recommended', $product?->recommended ?? 0) == 1)><span
+                <label class="np-tog"><input type="checkbox" name="is_recommended" value="1" <?php if(old('is_recommended', $product?->recommended ?? 0) == 1): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -634,7 +633,7 @@
                   <div class="np-tlbl">Special Offer Badge</div>
                   <div class="np-tdsc">Display sale badge on listing</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="is_sale" value="1" @checked(old('is_sale', data_get($npMeta,'is_sale',0)) == 1)><span
+                <label class="np-tog"><input type="checkbox" name="is_sale" value="1" <?php if(old('is_sale', data_get($npMeta,'is_sale',0)) == 1): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -648,7 +647,7 @@
             </div>
           </div>
 
-          {{-- Delivery Options --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">🚚</span>
@@ -656,35 +655,35 @@
             </div>
             <div class="np-card-body">
               <div class="np-dlv-grid">
-                <div class="np-dlv-card {{ old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) ? 'sel' : '' }}" onclick="npToggleDeliveryCard(this)">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">📅</div>
                   <div class="np-dlv-name">Scheduled</div>
                   <div class="np-dlv-time">Next day</div>
-                  <input type="checkbox" name="meta_data[delivery_scheduled]" value="1" @checked(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) == 1) style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_scheduled]" value="1" <?php if(old('meta_data.delivery_scheduled', data_get($npMeta,'delivery_scheduled',1)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-dlv-card {{ old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) ? 'sel' : '' }}" onclick="npToggleDeliveryCard(this)">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">⚡</div>
                   <div class="np-dlv-name">Express</div>
                   <div class="np-dlv-time">60–120 mins</div>
-                  <input type="checkbox" name="meta_data[delivery_express]" value="1" @checked(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) == 1) style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_express]" value="1" <?php if(old('meta_data.delivery_express', data_get($npMeta,'delivery_express',1)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-dlv-card {{ old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) ? 'sel' : '' }}" onclick="npToggleDeliveryCard(this)">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">🏎️</div>
                   <div class="np-dlv-name">Rapid</div>
                   <div class="np-dlv-time">35 mins</div>
-                  <input type="checkbox" name="meta_data[delivery_rapid]" value="1" @checked(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) == 1) style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_rapid]" value="1" <?php if(old('meta_data.delivery_rapid', data_get($npMeta,'delivery_rapid',0)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
-                <div class="np-dlv-card {{ old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) ? 'sel' : '' }}" onclick="npToggleDeliveryCard(this)">
+                <div class="np-dlv-card <?php echo e(old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) ? 'sel' : ''); ?>" onclick="npToggleDeliveryCard(this)">
                   <div class="np-dlv-icon">🏬</div>
                   <div class="np-dlv-name">Click &amp; Collect</div>
                   <div class="np-dlv-time">In-store</div>
-                  <input type="checkbox" name="meta_data[delivery_click_collect]" value="1" @checked(old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) == 1) style="display:none">
+                  <input type="checkbox" name="meta_data[delivery_click_collect]" value="1" <?php if(old('meta_data.delivery_click_collect', data_get($npMeta,'delivery_click_collect',0)) == 1): echo 'checked'; endif; ?> style="display:none">
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- Inventory --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">📊</span>
@@ -693,23 +692,23 @@
             <div class="np-card-body">
               <div class="np-form-group">
                 <label class="np-label">SKU / Barcode</label>
-                <input type="text" name="sku" id="sku" class="np-input np-mono" placeholder="e.g. SKU-001234" value="{{ old('sku', $product?->sku ?? '') }}">
+                <input type="text" name="sku" id="sku" class="np-input np-mono" placeholder="e.g. SKU-001234" value="<?php echo e(old('sku', $product?->sku ?? '')); ?>">
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Stock Qty</label>
-                  <input type="number" name="current_stock" id="quantity" class="np-input" placeholder="0" min="0" value="{{ old('current_stock', $product?->stock ?? 0) }}">
+                  <input type="number" name="current_stock" id="quantity" class="np-input" placeholder="0" min="0" value="<?php echo e(old('current_stock', $product?->stock ?? 0)); ?>">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
-                  <label class="np-label">{{ translate('messages.Maximum_Purchase_Quantity_Limit') }}</label>
+                  <label class="np-label"><?php echo e(translate('messages.Maximum_Purchase_Quantity_Limit')); ?></label>
                   <input type="number" name="maximum_cart_quantity" id="cart_quantity" class="np-input" placeholder="10"
-                    min="0" value="{{ old('maximum_cart_quantity', $product?->maximum_cart_quantity ?? '') }}">
+                    min="0" value="<?php echo e(old('maximum_cart_quantity', $product?->maximum_cart_quantity ?? '')); ?>">
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- Listing Quality --}}
+          
           <div class="np-card">
             <div class="np-card-header">
               <span class="np-card-icon">⭐</span>
@@ -731,9 +730,9 @@
       </div>
     </div>
 
-    {{-- Custom tabs get injected here --}}
+    
     <div id="npCustomTabsMount"></div>
-    {{-- ══ TAB 2: ATTRIBUTES ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-attributes">
       <div class="np-grid">
         <div>
@@ -745,26 +744,26 @@
               <div class="np-form-row-3">
                 <div class="np-form-group"><label class="np-label">Length</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[length]" class="np-input"
-                      placeholder="0.0" step="0.1" value="{{ old('meta_data.length', data_get($npMeta,'length','')) }}"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" step="0.1" value="<?php echo e(old('meta_data.length', data_get($npMeta,'length',''))); ?>"><span class="np-isfx">cm</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Width</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[width]" class="np-input" placeholder="0.0"
-                      step="0.1" value="{{ old('meta_data.width', data_get($npMeta,'width','')) }}"><span class="np-isfx">cm</span></div>
+                      step="0.1" value="<?php echo e(old('meta_data.width', data_get($npMeta,'width',''))); ?>"><span class="np-isfx">cm</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Height</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[height]" class="np-input"
-                      placeholder="0.0" step="0.1" value="{{ old('meta_data.height', data_get($npMeta,'height','')) }}"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" step="0.1" value="<?php echo e(old('meta_data.height', data_get($npMeta,'height',''))); ?>"><span class="np-isfx">cm</span></div>
                 </div>
               </div>
               <div class="np-sec-head">Weight</div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Net Weight</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[net_weight]" class="np-input"
-                      placeholder="0.00" step="0.01" value="{{ old('meta_data.net_weight', data_get($npMeta,'net_weight','')) }}"><span class="np-isfx">g</span></div>
+                      placeholder="0.00" step="0.01" value="<?php echo e(old('meta_data.net_weight', data_get($npMeta,'net_weight',''))); ?>"><span class="np-isfx">g</span></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Gross Weight</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[gross_weight]" class="np-input"
-                      placeholder="0.00" step="0.01" value="{{ old('meta_data.gross_weight', data_get($npMeta,'gross_weight','')) }}"><span class="np-isfx">g</span></div>
+                      placeholder="0.00" step="0.01" value="<?php echo e(old('meta_data.gross_weight', data_get($npMeta,'gross_weight',''))); ?>"><span class="np-isfx">g</span></div>
                 </div>
               </div>
             </div>
@@ -775,30 +774,30 @@
             <div class="np-card-body">
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">EAN / GTIN Barcode</label><input type="text"
-                    name="meta_data[ean]" class="np-input np-mono" placeholder="e.g. 3073781039180" value="{{ old('meta_data.ean', data_get($npMeta,'ean','')) }}"></div>
+                    name="meta_data[ean]" class="np-input np-mono" placeholder="e.g. 3073781039180" value="<?php echo e(old('meta_data.ean', data_get($npMeta,'ean',''))); ?>"></div>
                 <div class="np-form-group"><label class="np-label">Internal SKU</label><input type="text"
-                    name="meta_data[internal_sku]" class="np-input np-mono" placeholder="e.g. PRD-001" value="{{ old('meta_data.internal_sku', data_get($npMeta,'internal_sku','')) }}"></div>
+                    name="meta_data[internal_sku]" class="np-input np-mono" placeholder="e.g. PRD-001" value="<?php echo e(old('meta_data.internal_sku', data_get($npMeta,'internal_sku',''))); ?>"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Manufacturer Part No.</label><input type="text"
-                    name="meta_data[mpn]" class="np-input np-mono" placeholder="e.g. MPN-001" value="{{ old('meta_data.mpn', data_get($npMeta,'mpn','')) }}"></div>
+                    name="meta_data[mpn]" class="np-input np-mono" placeholder="e.g. MPN-001" value="<?php echo e(old('meta_data.mpn', data_get($npMeta,'mpn',''))); ?>"></div>
                 <div class="np-form-group"><label class="np-label">Model / Item Number</label><input type="text"
-                    name="meta_data[model_no]" class="np-input" placeholder="e.g. MDL-2024-V1" value="{{ old('meta_data.model_no', data_get($npMeta,'model_no','')) }}"></div>
+                    name="meta_data[model_no]" class="np-input" placeholder="e.g. MDL-2024-V1" value="<?php echo e(old('meta_data.model_no', data_get($npMeta,'model_no',''))); ?>"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">HS Code
                     (Customs)</label><input type="text" name="meta_data[hs_code]" class="np-input np-mono"
-                    placeholder="e.g. 0406.10" value="{{ old('meta_data.hs_code', data_get($npMeta,'hs_code','')) }}"></div>
+                    placeholder="e.g. 0406.10" value="<?php echo e(old('meta_data.hs_code', data_get($npMeta,'hs_code',''))); ?>"></div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Country of
                     Manufacture</label>
                   <div class="np-inline-add">
                     <select name="meta_data[country_of_manufacture]" id="npCountryOfManufacture" class="np-select js-select2-custom">
                       <option value="">Select…</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                        @foreach(\App\Models\ProductSelectOption::where('type','country_of_manufacture')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.country_of_manufacture', data_get($npMeta,'country_of_manufacture','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                        <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','country_of_manufacture')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.country_of_manufacture', data_get($npMeta,'country_of_manufacture','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('country_of_manufacture')">+</button>
                   </div>
@@ -816,31 +815,31 @@
                   <div class="np-inline-add">
                     <select name="meta_data[packaging_type]" id="npPackagingType" class="np-select js-select2-custom">
                       <option value="">Select…</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                        @foreach(\App\Models\ProductSelectOption::where('type','packaging_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.packaging_type', data_get($npMeta,'packaging_type','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                        <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','packaging_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.packaging_type', data_get($npMeta,'packaging_type','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('packaging_type')">+</button>
                   </div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Units per Pack</label><input type="number"
-                    name="meta_data[units_per_pack]" class="np-input" placeholder="e.g. 24" value="{{ old('meta_data.units_per_pack', data_get($npMeta,'units_per_pack','')) }}"></div>
+                    name="meta_data[units_per_pack]" class="np-input" placeholder="e.g. 24" value="<?php echo e(old('meta_data.units_per_pack', data_get($npMeta,'units_per_pack',''))); ?>"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Packs per Carton</label><input type="number"
-                    name="meta_data[packs_per_carton]" class="np-input" placeholder="e.g. 12" value="{{ old('meta_data.packs_per_carton', data_get($npMeta,'packs_per_carton','')) }}"></div>
+                    name="meta_data[packs_per_carton]" class="np-input" placeholder="e.g. 12" value="<?php echo e(old('meta_data.packs_per_carton', data_get($npMeta,'packs_per_carton',''))); ?>"></div>
                 <div class="np-form-group">
                   <label class="np-label">Recyclable Packaging</label>
                   <div class="np-inline-add">
                     <select name="meta_data[recyclable]" id="npRecyclable" class="np-select js-select2-custom">
                       <option value="">Select…</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                        @foreach(\App\Models\ProductSelectOption::where('type','recyclable')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.recyclable', data_get($npMeta,'recyclable','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                        <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','recyclable')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.recyclable', data_get($npMeta,'recyclable','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('recyclable')">+</button>
                   </div>
@@ -849,11 +848,11 @@
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Package Material</label>
-                  <input type="text" name="meta_data[package_material]" class="np-input" placeholder="e.g. Coated paperboard, LDPE film" value="{{ old('meta_data.package_material', data_get($npMeta,'package_material','')) }}">
+                  <input type="text" name="meta_data[package_material]" class="np-input" placeholder="e.g. Coated paperboard, LDPE film" value="<?php echo e(old('meta_data.package_material', data_get($npMeta,'package_material',''))); ?>">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Package Colour</label>
-                  <input type="text" name="meta_data[package_colour]" class="np-input" placeholder="e.g. White & Blue" value="{{ old('meta_data.package_colour', data_get($npMeta,'package_colour','')) }}">
+                  <input type="text" name="meta_data[package_colour]" class="np-input" placeholder="e.g. White & Blue" value="<?php echo e(old('meta_data.package_colour', data_get($npMeta,'package_colour',''))); ?>">
                 </div>
               </div>
             </div>
@@ -868,33 +867,33 @@
                   <div class="np-inline-add">
                     <select name="meta_data[storage_type]" id="npStorageType" class="np-select js-select2-custom">
                       <option value="">Select…</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                        @foreach(\App\Models\ProductSelectOption::where('type','storage_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                          <option value="{{ $opt->name }}" @selected(old('meta_data.storage_type', data_get($npMeta,'storage_type','')) == $opt->name)>{{ $opt->name }}</option>
-                        @endforeach
-                      @endif
+                      <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                        <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','storage_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                          <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.storage_type', data_get($npMeta,'storage_type','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                      <?php endif; ?>
                     </select>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('storage_type')">+</button>
                   </div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Temperature Range</label>
                   <div class="np-iw sfx"><input type="text" name="meta_data[temp_range]" class="np-input"
-                      placeholder="2 – 8" value="{{ old('meta_data.temp_range', data_get($npMeta,'temp_range','')) }}"><span class="np-isfx">°C</span></div>
+                      placeholder="2 – 8" value="<?php echo e(old('meta_data.temp_range', data_get($npMeta,'temp_range',''))); ?>"><span class="np-isfx">°C</span></div>
                 </div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Shelf Life from Production</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[shelf_life_days]" class="np-input"
-                      placeholder="e.g. 180" value="{{ old('meta_data.shelf_life_days', data_get($npMeta,'shelf_life_days','')) }}"><span class="np-isfx">days</span></div>
+                      placeholder="e.g. 180" value="<?php echo e(old('meta_data.shelf_life_days', data_get($npMeta,'shelf_life_days',''))); ?>"><span class="np-isfx">days</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Min. Days on Delivery</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[min_days_delivery]" class="np-input"
-                      placeholder="e.g. 30" value="{{ old('meta_data.min_days_delivery', data_get($npMeta,'min_days_delivery','')) }}"><span class="np-isfx">days</span></div>
+                      placeholder="e.g. 30" value="<?php echo e(old('meta_data.min_days_delivery', data_get($npMeta,'min_days_delivery',''))); ?>"><span class="np-isfx">days</span></div>
                 </div>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Storage
                   Instructions</label><textarea name="meta_data[storage_instructions]" class="np-textarea" rows="2"
-                  placeholder="e.g. Once opened, keep refrigerated and consume within 3 days.">{{ old('meta_data.storage_instructions', data_get($npMeta,'storage_instructions','')) }}</textarea></div>
+                  placeholder="e.g. Once opened, keep refrigerated and consume within 3 days."><?php echo e(old('meta_data.storage_instructions', data_get($npMeta,'storage_instructions',''))); ?></textarea></div>
             </div>
           </div>
           <div class="np-card">
@@ -904,19 +903,19 @@
               <div class="np-info-box">💡 Add product-specific attributes shown in the specifications table on the
                 product page.</div>
               <div id="npCustomAttrs">
-                @php
+                <?php
                   $npAttrNames = old('meta_data.custom_attr_name', data_get($npMeta,'custom_attr_name', []));
                   $npAttrVals = old('meta_data.custom_attr_val', data_get($npMeta,'custom_attr_val', []));
                   if (!is_array($npAttrNames)) { $npAttrNames = []; }
                   if (!is_array($npAttrVals)) { $npAttrVals = []; }
                   $npAttrRows = max(count($npAttrNames), count($npAttrVals), 2);
-                @endphp
-                @for($i=0;$i<$npAttrRows;$i++)
+                ?>
+                <?php for($i=0;$i<$npAttrRows;$i++): ?>
                   <div class="np-form-row" style="margin-bottom:10px">
-                    <input type="text" name="meta_data[custom_attr_name][]" class="np-input" placeholder="Attribute name (e.g. Fat Content)" value="{{ $npAttrNames[$i] ?? '' }}">
-                    <input type="text" name="meta_data[custom_attr_val][]" class="np-input" placeholder="Value (e.g. 24g per 100g)" value="{{ $npAttrVals[$i] ?? '' }}">
+                    <input type="text" name="meta_data[custom_attr_name][]" class="np-input" placeholder="Attribute name (e.g. Fat Content)" value="<?php echo e($npAttrNames[$i] ?? ''); ?>">
+                    <input type="text" name="meta_data[custom_attr_val][]" class="np-input" placeholder="Value (e.g. 24g per 100g)" value="<?php echo e($npAttrVals[$i] ?? ''); ?>">
                   </div>
-                @endfor
+                <?php endfor; ?>
               </div>
               <button type="button" class="np-btn-add" onclick="npAddCustomAttr()">+ Add Attribute Row</button>
             </div>
@@ -932,15 +931,15 @@
                 <div class="np-inline-add">
                   <select name="meta_data[product_type]" id="npProductType" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','product_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected(old('meta_data.product_type', data_get($npMeta,'product_type','')) == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @else
-                      <option value="Simple Product" @selected(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Simple Product')>Simple Product</option>
-                      <option value="Variable Product" @selected(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Variable Product')>Variable Product</option>
-                      <option value="Bundle / Multipack" @selected(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Bundle / Multipack')>Bundle / Multipack</option>
-                    @endif
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','product_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.product_type', data_get($npMeta,'product_type','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                      <option value="Simple Product" <?php if(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Simple Product'): echo 'selected'; endif; ?>>Simple Product</option>
+                      <option value="Variable Product" <?php if(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Variable Product'): echo 'selected'; endif; ?>>Variable Product</option>
+                      <option value="Bundle / Multipack" <?php if(old('meta_data.product_type', data_get($npMeta,'product_type',''))=='Bundle / Multipack'): echo 'selected'; endif; ?>>Bundle / Multipack</option>
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('product_type')">+</button>
                 </div>
@@ -951,15 +950,15 @@
                 <div class="np-inline-add">
                   <select name="meta_data[condition]" id="npCondition" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','condition')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected(old('meta_data.condition', data_get($npMeta,'condition','')) == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @else
-                      <option value="New" @selected(old('meta_data.condition', data_get($npMeta,'condition',''))=='New')>New</option>
-                      <option value="Refurbished" @selected(old('meta_data.condition', data_get($npMeta,'condition',''))=='Refurbished')>Refurbished</option>
-                      <option value="Used" @selected(old('meta_data.condition', data_get($npMeta,'condition',''))=='Used')>Used</option>
-                    @endif
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','condition')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.condition', data_get($npMeta,'condition','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                      <option value="New" <?php if(old('meta_data.condition', data_get($npMeta,'condition',''))=='New'): echo 'selected'; endif; ?>>New</option>
+                      <option value="Refurbished" <?php if(old('meta_data.condition', data_get($npMeta,'condition',''))=='Refurbished'): echo 'selected'; endif; ?>>Refurbished</option>
+                      <option value="Used" <?php if(old('meta_data.condition', data_get($npMeta,'condition',''))=='Used'): echo 'selected'; endif; ?>>Used</option>
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('condition')">+</button>
                 </div>
@@ -970,14 +969,14 @@
                 <div class="np-inline-add">
                   <select name="meta_data[age_restriction]" id="npAgeRestriction" class="np-select js-select2-custom">
                     <option value="">None</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','age_restriction')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected(old('meta_data.age_restriction', data_get($npMeta,'age_restriction','')) == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @else
-                      <option value="18+" @selected(old('meta_data.age_restriction', data_get($npMeta,'age_restriction',''))=='18+')>18+</option>
-                      <option value="21+" @selected(old('meta_data.age_restriction', data_get($npMeta,'age_restriction',''))=='21+')>21+</option>
-                    @endif
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','age_restriction')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.age_restriction', data_get($npMeta,'age_restriction','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                      <option value="18+" <?php if(old('meta_data.age_restriction', data_get($npMeta,'age_restriction',''))=='18+'): echo 'selected'; endif; ?>>18+</option>
+                      <option value="21+" <?php if(old('meta_data.age_restriction', data_get($npMeta,'age_restriction',''))=='21+'): echo 'selected'; endif; ?>>21+</option>
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('age_restriction')">+</button>
                 </div>
@@ -989,21 +988,21 @@
                 Lifecycle</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Product Launch Date</label><input type="date"
-                  name="meta_data[launch_date]" class="np-input" value="{{ old('meta_data.launch_date', data_get($npMeta,'launch_date','')) }}"></div>
+                  name="meta_data[launch_date]" class="np-input" value="<?php echo e(old('meta_data.launch_date', data_get($npMeta,'launch_date',''))); ?>"></div>
               <div class="np-form-group"><label class="np-label">End-of-Life Date</label><input type="date"
-                  name="meta_data[eol_date]" class="np-input" value="{{ old('meta_data.eol_date', data_get($npMeta,'eol_date','')) }}"></div>
+                  name="meta_data[eol_date]" class="np-input" value="<?php echo e(old('meta_data.eol_date', data_get($npMeta,'eol_date',''))); ?>"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Warranty Period</label><select
                   name="meta_data[warranty]" id="npWarranty" class="np-select js-select2-custom">
                   <option value="">N/A</option>
-                  @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                    @foreach(\App\Models\ProductSelectOption::where('type','warranty')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                      <option value="{{ $opt->name }}" @selected(old('meta_data.warranty', data_get($npMeta,'warranty','')) == $opt->name)>{{ $opt->name }}</option>
-                    @endforeach
-                  @else
-                    @foreach(['1 Month','3 Months','6 Months','1 Year','2 Years','3 Years'] as $w)
-                      <option value="{{ $w }}" @selected(old('meta_data.warranty', data_get($npMeta,'warranty','')) == $w)>{{ $w }}</option>
-                    @endforeach
-                  @endif
+                  <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                    <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','warranty')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.warranty', data_get($npMeta,'warranty','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                  <?php else: ?>
+                    <?php $__currentLoopData = ['1 Month','3 Months','6 Months','1 Year','2 Years','3 Years']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $w): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($w); ?>" <?php if(old('meta_data.warranty', data_get($npMeta,'warranty','')) == $w): echo 'selected'; endif; ?>><?php echo e($w); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                  <?php endif; ?>
                 </select>
                 <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('warranty')" style="margin-top:8px">+</button>
               </div>
@@ -1014,12 +1013,12 @@
                 class="np-card-title">Compliance</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Approval / Permit No.</label><input type="text"
-                  name="meta_data[approval_no]" class="np-input np-mono" placeholder="e.g. QFSSA-2024-XXXX" value="{{ old('meta_data.approval_no', data_get($npMeta,'approval_no','')) }}"></div>
+                  name="meta_data[approval_no]" class="np-input np-mono" placeholder="e.g. QFSSA-2024-XXXX" value="<?php echo e(old('meta_data.approval_no', data_get($npMeta,'approval_no',''))); ?>"></div>
               <div class="np-form-group"><label class="np-label">Import Permit No.</label><input type="text"
-                  name="meta_data[import_permit]" class="np-input np-mono" placeholder="e.g. IMP-XXXX" value="{{ old('meta_data.import_permit', data_get($npMeta,'import_permit','')) }}"></div>
+                  name="meta_data[import_permit]" class="np-input np-mono" placeholder="e.g. IMP-XXXX" value="<?php echo e(old('meta_data.import_permit', data_get($npMeta,'import_permit',''))); ?>"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">CE / Safety
                   Marking</label><input type="text" name="meta_data[safety_marking]" class="np-input"
-                  placeholder="e.g. CE, FCC, ROHS" value="{{ old('meta_data.safety_marking', data_get($npMeta,'safety_marking','')) }}"></div>
+                  placeholder="e.g. CE, FCC, ROHS" value="<?php echo e(old('meta_data.safety_marking', data_get($npMeta,'safety_marking',''))); ?>"></div>
             </div>
           </div>
           <div class="np-card">
@@ -1027,12 +1026,12 @@
                 class="np-card-title">Certifications</span></div>
             <div class="np-card-body">
               <div class="np-chk-grid">
-                <label class="np-chk-item {{ in_array('halal',$npCert) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
-                    value="halal" @checked(in_array('halal',$npCert))> 🟢 Halal</label>
-                <label class="np-chk-item {{ in_array('organic',$npCert) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
-                    value="organic" @checked(in_array('organic',$npCert))> 🌱 Organic</label>
-                <label class="np-chk-item {{ in_array('free_range',$npCert) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
-                    value="free_range" @checked(in_array('free_range',$npCert))> 🐄 Free Range</label>
+                <label class="np-chk-item <?php echo e(in_array('halal',$npCert) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
+                    value="halal" <?php if(in_array('halal',$npCert)): echo 'checked'; endif; ?>> 🟢 Halal</label>
+                <label class="np-chk-item <?php echo e(in_array('organic',$npCert) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
+                    value="organic" <?php if(in_array('organic',$npCert)): echo 'checked'; endif; ?>> 🌱 Organic</label>
+                <label class="np-chk-item <?php echo e(in_array('free_range',$npCert) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
+                    value="free_range" <?php if(in_array('free_range',$npCert)): echo 'checked'; endif; ?>> 🐄 Free Range</label>
                 <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
                     value="non_gmo"> 🌿 Non-GMO</label>
                 <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[cert][]"
@@ -1055,29 +1054,29 @@
                 <div class="np-inline-add">
                   <select name="meta_data[return_policy]" id="npReturnPolicy" class="np-select js-select2-custom">
                     <option value="">Select…</option>
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','return_policy')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected(old('meta_data.return_policy', data_get($npMeta,'return_policy','')) == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @else
-                      @foreach(['Yes — Within 7 days','Yes — Within 14 days','Yes — Within 30 days','No — Non-returnable (perishable)'] as $rp)
-                        <option value="{{ $rp }}" @selected(old('meta_data.return_policy', data_get($npMeta,'return_policy','')) == $rp)>{{ $rp }}</option>
-                      @endforeach
-                    @endif
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','return_policy')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if(old('meta_data.return_policy', data_get($npMeta,'return_policy','')) == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                      <?php $__currentLoopData = ['Yes — Within 7 days','Yes — Within 14 days','Yes — Within 30 days','No — Non-returnable (perishable)']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rp): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($rp); ?>" <?php if(old('meta_data.return_policy', data_get($npMeta,'return_policy','')) == $rp): echo 'selected'; endif; ?>><?php echo e($rp); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
                   </select>
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('return_policy')">+</button>
                 </div>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Return
                   Conditions</label><textarea name="meta_data[return_conditions]" class="np-textarea" rows="2"
-                  placeholder="e.g. Original packaging, unopened, within expiry date.">{{ old('meta_data.return_conditions', data_get($npMeta,'return_conditions','')) }}</textarea></div>
+                  placeholder="e.g. Original packaging, unopened, within expiry date."><?php echo e(old('meta_data.return_conditions', data_get($npMeta,'return_conditions',''))); ?></textarea></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    {{-- ══ TAB 3: NUTRITION & ALLERGENS ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-nutrition">
       <div class="np-grid">
         <div>
@@ -1087,11 +1086,11 @@
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Ingredients List (English) <span
                     class="np-req">*</span></label><textarea name="meta_data[ingredients_en]" class="np-textarea"
-                  rows="4" placeholder="e.g. Pasteurised cow's milk, cream, salt, lactic acid bacteria…">{{ old('meta_data.ingredients_en', data_get($npMeta,'ingredients_en','')) }}</textarea>
+                  rows="4" placeholder="e.g. Pasteurised cow's milk, cream, salt, lactic acid bacteria…"><?php echo e(old('meta_data.ingredients_en', data_get($npMeta,'ingredients_en',''))); ?></textarea>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Ingredients List
                   (Arabic)</label><textarea name="meta_data[ingredients_ar]" class="np-textarea" rows="3"
-                  placeholder="قائمة المكونات بالعربي…" style="direction:rtl;text-align:right">{{ old('meta_data.ingredients_ar', data_get($npMeta,'ingredients_ar','')) }}</textarea></div>
+                  placeholder="قائمة المكونات بالعربي…" style="direction:rtl;text-align:right"><?php echo e(old('meta_data.ingredients_ar', data_get($npMeta,'ingredients_ar',''))); ?></textarea></div>
             </div>
           </div>
           <div class="np-card">
@@ -1110,116 +1109,116 @@
                 <tbody>
                   <tr>
                     <td>Energy</td>
-                    <td><input type="text" name="meta_data[nutr_energy_100g]" class="np-input" placeholder="263" value="{{ old('meta_data.nutr_energy_100g', data_get($npMeta,'nutr_energy_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_energy_srv]" class="np-input" placeholder="47" value="{{ old('meta_data.nutr_energy_srv', data_get($npMeta,'nutr_energy_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_100g]" class="np-input" placeholder="263" value="<?php echo e(old('meta_data.nutr_energy_100g', data_get($npMeta,'nutr_energy_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_srv]" class="np-input" placeholder="47" value="<?php echo e(old('meta_data.nutr_energy_srv', data_get($npMeta,'nutr_energy_srv',''))); ?>"></td>
                     <td>kcal</td>
                   </tr>
                   <tr>
                     <td>Energy (kJ)</td>
-                    <td><input type="text" name="meta_data[nutr_energy_kj_100g]" class="np-input" placeholder="1099" value="{{ old('meta_data.nutr_energy_kj_100g', data_get($npMeta,'nutr_energy_kj_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_energy_kj_srv]" class="np-input" placeholder="198" value="{{ old('meta_data.nutr_energy_kj_srv', data_get($npMeta,'nutr_energy_kj_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_kj_100g]" class="np-input" placeholder="1099" value="<?php echo e(old('meta_data.nutr_energy_kj_100g', data_get($npMeta,'nutr_energy_kj_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_energy_kj_srv]" class="np-input" placeholder="198" value="<?php echo e(old('meta_data.nutr_energy_kj_srv', data_get($npMeta,'nutr_energy_kj_srv',''))); ?>"></td>
                     <td>kJ</td>
                   </tr>
                   <tr>
                     <td>Total Fat</td>
-                    <td><input type="text" name="meta_data[nutr_fat_100g]" class="np-input" placeholder="24" value="{{ old('meta_data.nutr_fat_100g', data_get($npMeta,'nutr_fat_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_fat_srv]" class="np-input" placeholder="4.3" value="{{ old('meta_data.nutr_fat_srv', data_get($npMeta,'nutr_fat_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_fat_100g]" class="np-input" placeholder="24" value="<?php echo e(old('meta_data.nutr_fat_100g', data_get($npMeta,'nutr_fat_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_fat_srv]" class="np-input" placeholder="4.3" value="<?php echo e(old('meta_data.nutr_fat_srv', data_get($npMeta,'nutr_fat_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Saturated Fat</td>
-                    <td><input type="text" name="meta_data[nutr_satfat_100g]" class="np-input" placeholder="15" value="{{ old('meta_data.nutr_satfat_100g', data_get($npMeta,'nutr_satfat_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_satfat_srv]" class="np-input" placeholder="2.7" value="{{ old('meta_data.nutr_satfat_srv', data_get($npMeta,'nutr_satfat_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_satfat_100g]" class="np-input" placeholder="15" value="<?php echo e(old('meta_data.nutr_satfat_100g', data_get($npMeta,'nutr_satfat_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_satfat_srv]" class="np-input" placeholder="2.7" value="<?php echo e(old('meta_data.nutr_satfat_srv', data_get($npMeta,'nutr_satfat_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Trans Fat</td>
-                    <td><input type="text" name="meta_data[nutr_transfat_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_transfat_100g', data_get($npMeta,'nutr_transfat_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_transfat_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_transfat_srv', data_get($npMeta,'nutr_transfat_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_transfat_100g]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_transfat_100g', data_get($npMeta,'nutr_transfat_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_transfat_srv]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_transfat_srv', data_get($npMeta,'nutr_transfat_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Monounsaturated Fat</td>
-                    <td><input type="text" name="meta_data[nutr_monofat_100g]" class="np-input" placeholder="6.5" value="{{ old('meta_data.nutr_monofat_100g', data_get($npMeta,'nutr_monofat_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_monofat_srv]" class="np-input" placeholder="1.2" value="{{ old('meta_data.nutr_monofat_srv', data_get($npMeta,'nutr_monofat_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_monofat_100g]" class="np-input" placeholder="6.5" value="<?php echo e(old('meta_data.nutr_monofat_100g', data_get($npMeta,'nutr_monofat_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_monofat_srv]" class="np-input" placeholder="1.2" value="<?php echo e(old('meta_data.nutr_monofat_srv', data_get($npMeta,'nutr_monofat_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Polyunsaturated Fat</td>
-                    <td><input type="text" name="meta_data[nutr_polyfat_100g]" class="np-input" placeholder="0.8" value="{{ old('meta_data.nutr_polyfat_100g', data_get($npMeta,'nutr_polyfat_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_polyfat_srv]" class="np-input" placeholder="0.1" value="{{ old('meta_data.nutr_polyfat_srv', data_get($npMeta,'nutr_polyfat_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_polyfat_100g]" class="np-input" placeholder="0.8" value="<?php echo e(old('meta_data.nutr_polyfat_100g', data_get($npMeta,'nutr_polyfat_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_polyfat_srv]" class="np-input" placeholder="0.1" value="<?php echo e(old('meta_data.nutr_polyfat_srv', data_get($npMeta,'nutr_polyfat_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Total Carbohydrates</td>
-                    <td><input type="text" name="meta_data[nutr_carbs_100g]" class="np-input" placeholder="4.5" value="{{ old('meta_data.nutr_carbs_100g', data_get($npMeta,'nutr_carbs_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_carbs_srv]" class="np-input" placeholder="0.8" value="{{ old('meta_data.nutr_carbs_srv', data_get($npMeta,'nutr_carbs_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_carbs_100g]" class="np-input" placeholder="4.5" value="<?php echo e(old('meta_data.nutr_carbs_100g', data_get($npMeta,'nutr_carbs_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_carbs_srv]" class="np-input" placeholder="0.8" value="<?php echo e(old('meta_data.nutr_carbs_srv', data_get($npMeta,'nutr_carbs_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Total Sugars</td>
-                    <td><input type="text" name="meta_data[nutr_sugars_100g]" class="np-input" placeholder="2.2" value="{{ old('meta_data.nutr_sugars_100g', data_get($npMeta,'nutr_sugars_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_sugars_srv]" class="np-input" placeholder="0.4" value="{{ old('meta_data.nutr_sugars_srv', data_get($npMeta,'nutr_sugars_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_sugars_100g]" class="np-input" placeholder="2.2" value="<?php echo e(old('meta_data.nutr_sugars_100g', data_get($npMeta,'nutr_sugars_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_sugars_srv]" class="np-input" placeholder="0.4" value="<?php echo e(old('meta_data.nutr_sugars_srv', data_get($npMeta,'nutr_sugars_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Added Sugars</td>
-                    <td><input type="text" name="meta_data[nutr_added_sugars_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_added_sugars_100g', data_get($npMeta,'nutr_added_sugars_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_added_sugars_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_added_sugars_srv', data_get($npMeta,'nutr_added_sugars_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_added_sugars_100g]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_added_sugars_100g', data_get($npMeta,'nutr_added_sugars_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_added_sugars_srv]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_added_sugars_srv', data_get($npMeta,'nutr_added_sugars_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Dietary Fibre</td>
-                    <td><input type="text" name="meta_data[nutr_fibre_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_fibre_100g', data_get($npMeta,'nutr_fibre_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_fibre_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_fibre_srv', data_get($npMeta,'nutr_fibre_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_fibre_100g]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_fibre_100g', data_get($npMeta,'nutr_fibre_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_fibre_srv]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_fibre_srv', data_get($npMeta,'nutr_fibre_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Protein</td>
-                    <td><input type="text" name="meta_data[nutr_protein_100g]" class="np-input" placeholder="7.8" value="{{ old('meta_data.nutr_protein_100g', data_get($npMeta,'nutr_protein_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_protein_srv]" class="np-input" placeholder="1.4" value="{{ old('meta_data.nutr_protein_srv', data_get($npMeta,'nutr_protein_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_protein_100g]" class="np-input" placeholder="7.8" value="<?php echo e(old('meta_data.nutr_protein_100g', data_get($npMeta,'nutr_protein_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_protein_srv]" class="np-input" placeholder="1.4" value="<?php echo e(old('meta_data.nutr_protein_srv', data_get($npMeta,'nutr_protein_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Salt</td>
-                    <td><input type="text" name="meta_data[nutr_salt_100g]" class="np-input" placeholder="1.2" value="{{ old('meta_data.nutr_salt_100g', data_get($npMeta,'nutr_salt_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_salt_srv]" class="np-input" placeholder="0.2" value="{{ old('meta_data.nutr_salt_srv', data_get($npMeta,'nutr_salt_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_salt_100g]" class="np-input" placeholder="1.2" value="<?php echo e(old('meta_data.nutr_salt_100g', data_get($npMeta,'nutr_salt_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_salt_srv]" class="np-input" placeholder="0.2" value="<?php echo e(old('meta_data.nutr_salt_srv', data_get($npMeta,'nutr_salt_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td class="np-ind">Sodium</td>
-                    <td><input type="text" name="meta_data[nutr_sodium_100g]" class="np-input" placeholder="0.47" value="{{ old('meta_data.nutr_sodium_100g', data_get($npMeta,'nutr_sodium_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_sodium_srv]" class="np-input" placeholder="0.08" value="{{ old('meta_data.nutr_sodium_srv', data_get($npMeta,'nutr_sodium_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_sodium_100g]" class="np-input" placeholder="0.47" value="<?php echo e(old('meta_data.nutr_sodium_100g', data_get($npMeta,'nutr_sodium_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_sodium_srv]" class="np-input" placeholder="0.08" value="<?php echo e(old('meta_data.nutr_sodium_srv', data_get($npMeta,'nutr_sodium_srv',''))); ?>"></td>
                     <td>g</td>
                   </tr>
                   <tr>
                     <td>Calcium</td>
-                    <td><input type="text" name="meta_data[nutr_calcium_100g]" class="np-input" placeholder="100" value="{{ old('meta_data.nutr_calcium_100g', data_get($npMeta,'nutr_calcium_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_calcium_srv]" class="np-input" placeholder="18" value="{{ old('meta_data.nutr_calcium_srv', data_get($npMeta,'nutr_calcium_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_calcium_100g]" class="np-input" placeholder="100" value="<?php echo e(old('meta_data.nutr_calcium_100g', data_get($npMeta,'nutr_calcium_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_calcium_srv]" class="np-input" placeholder="18" value="<?php echo e(old('meta_data.nutr_calcium_srv', data_get($npMeta,'nutr_calcium_srv',''))); ?>"></td>
                     <td>mg</td>
                   </tr>
                   <tr>
                     <td>Vitamin A</td>
-                    <td><input type="text" name="meta_data[nutr_vita_100g]" class="np-input" placeholder="180" value="{{ old('meta_data.nutr_vita_100g', data_get($npMeta,'nutr_vita_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_vita_srv]" class="np-input" placeholder="32" value="{{ old('meta_data.nutr_vita_srv', data_get($npMeta,'nutr_vita_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_vita_100g]" class="np-input" placeholder="180" value="<?php echo e(old('meta_data.nutr_vita_100g', data_get($npMeta,'nutr_vita_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_vita_srv]" class="np-input" placeholder="32" value="<?php echo e(old('meta_data.nutr_vita_srv', data_get($npMeta,'nutr_vita_srv',''))); ?>"></td>
                     <td>µg</td>
                   </tr>
                   <tr>
                     <td>Vitamin D</td>
-                    <td><input type="text" name="meta_data[nutr_vitd_100g]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_vitd_100g', data_get($npMeta,'nutr_vitd_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_vitd_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_vitd_srv', data_get($npMeta,'nutr_vitd_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_vitd_100g]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_vitd_100g', data_get($npMeta,'nutr_vitd_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_vitd_srv]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_vitd_srv', data_get($npMeta,'nutr_vitd_srv',''))); ?>"></td>
                     <td>µg</td>
                   </tr>
                   <tr>
                     <td>Cholesterol</td>
-                    <td><input type="text" name="meta_data[nutr_chol_100g]" class="np-input" placeholder="70" value="{{ old('meta_data.nutr_chol_100g', data_get($npMeta,'nutr_chol_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_chol_srv]" class="np-input" placeholder="13" value="{{ old('meta_data.nutr_chol_srv', data_get($npMeta,'nutr_chol_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_chol_100g]" class="np-input" placeholder="70" value="<?php echo e(old('meta_data.nutr_chol_100g', data_get($npMeta,'nutr_chol_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_chol_srv]" class="np-input" placeholder="13" value="<?php echo e(old('meta_data.nutr_chol_srv', data_get($npMeta,'nutr_chol_srv',''))); ?>"></td>
                     <td>mg</td>
                   </tr>
                   <tr>
                     <td>Iron</td>
-                    <td><input type="text" name="meta_data[nutr_iron_100g]" class="np-input" placeholder="0.1" value="{{ old('meta_data.nutr_iron_100g', data_get($npMeta,'nutr_iron_100g','')) }}"></td>
-                    <td><input type="text" name="meta_data[nutr_iron_srv]" class="np-input" placeholder="0" value="{{ old('meta_data.nutr_iron_srv', data_get($npMeta,'nutr_iron_srv','')) }}"></td>
+                    <td><input type="text" name="meta_data[nutr_iron_100g]" class="np-input" placeholder="0.1" value="<?php echo e(old('meta_data.nutr_iron_100g', data_get($npMeta,'nutr_iron_100g',''))); ?>"></td>
+                    <td><input type="text" name="meta_data[nutr_iron_srv]" class="np-input" placeholder="0" value="<?php echo e(old('meta_data.nutr_iron_srv', data_get($npMeta,'nutr_iron_srv',''))); ?>"></td>
                     <td>mg</td>
                   </tr>
                 </tbody>
@@ -1233,11 +1232,11 @@
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Serving Size</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[serving_size]" class="np-input"
-                      placeholder="18" step="0.5" value="{{ old('meta_data.serving_size', data_get($npMeta,'serving_size','')) }}"><span class="np-isfx">g</span></div>
+                      placeholder="18" step="0.5" value="<?php echo e(old('meta_data.serving_size', data_get($npMeta,'serving_size',''))); ?>"><span class="np-isfx">g</span></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Servings per
                     Container</label><input type="number" name="meta_data[servings_per_container]" class="np-input"
-                    placeholder="48" value="{{ old('meta_data.servings_per_container', data_get($npMeta,'servings_per_container','')) }}"></div>
+                    placeholder="48" value="<?php echo e(old('meta_data.servings_per_container', data_get($npMeta,'servings_per_container',''))); ?>"></div>
               </div>
             </div>
           </div>
@@ -1249,43 +1248,43 @@
             <div class="np-card-body">
               <div class="np-sec-head">Contains</div>
               <div class="np-chk-grid">
-                <label class="np-chk-item {{ in_array('milk',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="milk" @checked(in_array('milk',$npAllergen))> 🥛 Milk</label>
-                <label class="np-chk-item {{ in_array('gluten',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="gluten" @checked(in_array('gluten',$npAllergen))> 🌾 Gluten/Wheat</label>
-                <label class="np-chk-item {{ in_array('eggs',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="eggs" @checked(in_array('eggs',$npAllergen))> 🥚 Eggs</label>
-                <label class="np-chk-item {{ in_array('fish',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="fish" @checked(in_array('fish',$npAllergen))> 🐟 Fish</label>
-                <label class="np-chk-item {{ in_array('crustaceans',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="crustaceans" @checked(in_array('crustaceans',$npAllergen))> 🦐 Crustaceans</label>
-                <label class="np-chk-item {{ in_array('peanuts',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="peanuts" @checked(in_array('peanuts',$npAllergen))> 🥜 Peanuts</label>
-                <label class="np-chk-item {{ in_array('tree_nuts',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="tree_nuts" @checked(in_array('tree_nuts',$npAllergen))> 🌰 Tree Nuts</label>
-                <label class="np-chk-item {{ in_array('soybeans',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="soybeans" @checked(in_array('soybeans',$npAllergen))> 🫘 Soybeans</label>
-                <label class="np-chk-item {{ in_array('sesame',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="sesame" @checked(in_array('sesame',$npAllergen))> 🌱 Sesame</label>
-                <label class="np-chk-item {{ in_array('mustard',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="mustard" @checked(in_array('mustard',$npAllergen))> 🌻 Mustard</label>
-                <label class="np-chk-item {{ in_array('celery',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="celery" @checked(in_array('celery',$npAllergen))> 🥬 Celery</label>
-                <label class="np-chk-item {{ in_array('sulphites',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="sulphites" @checked(in_array('sulphites',$npAllergen))> 🍇 Sulphites</label>
-                <label class="np-chk-item {{ in_array('molluscs',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="molluscs" @checked(in_array('molluscs',$npAllergen))> 🦑 Molluscs</label>
-                <label class="np-chk-item {{ in_array('lupin',$npAllergen) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
-                    value="lupin" @checked(in_array('lupin',$npAllergen))> 🫘 Lupin</label>
+                <label class="np-chk-item <?php echo e(in_array('milk',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="milk" <?php if(in_array('milk',$npAllergen)): echo 'checked'; endif; ?>> 🥛 Milk</label>
+                <label class="np-chk-item <?php echo e(in_array('gluten',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="gluten" <?php if(in_array('gluten',$npAllergen)): echo 'checked'; endif; ?>> 🌾 Gluten/Wheat</label>
+                <label class="np-chk-item <?php echo e(in_array('eggs',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="eggs" <?php if(in_array('eggs',$npAllergen)): echo 'checked'; endif; ?>> 🥚 Eggs</label>
+                <label class="np-chk-item <?php echo e(in_array('fish',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="fish" <?php if(in_array('fish',$npAllergen)): echo 'checked'; endif; ?>> 🐟 Fish</label>
+                <label class="np-chk-item <?php echo e(in_array('crustaceans',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="crustaceans" <?php if(in_array('crustaceans',$npAllergen)): echo 'checked'; endif; ?>> 🦐 Crustaceans</label>
+                <label class="np-chk-item <?php echo e(in_array('peanuts',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="peanuts" <?php if(in_array('peanuts',$npAllergen)): echo 'checked'; endif; ?>> 🥜 Peanuts</label>
+                <label class="np-chk-item <?php echo e(in_array('tree_nuts',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="tree_nuts" <?php if(in_array('tree_nuts',$npAllergen)): echo 'checked'; endif; ?>> 🌰 Tree Nuts</label>
+                <label class="np-chk-item <?php echo e(in_array('soybeans',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="soybeans" <?php if(in_array('soybeans',$npAllergen)): echo 'checked'; endif; ?>> 🫘 Soybeans</label>
+                <label class="np-chk-item <?php echo e(in_array('sesame',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="sesame" <?php if(in_array('sesame',$npAllergen)): echo 'checked'; endif; ?>> 🌱 Sesame</label>
+                <label class="np-chk-item <?php echo e(in_array('mustard',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="mustard" <?php if(in_array('mustard',$npAllergen)): echo 'checked'; endif; ?>> 🌻 Mustard</label>
+                <label class="np-chk-item <?php echo e(in_array('celery',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="celery" <?php if(in_array('celery',$npAllergen)): echo 'checked'; endif; ?>> 🥬 Celery</label>
+                <label class="np-chk-item <?php echo e(in_array('sulphites',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="sulphites" <?php if(in_array('sulphites',$npAllergen)): echo 'checked'; endif; ?>> 🍇 Sulphites</label>
+                <label class="np-chk-item <?php echo e(in_array('molluscs',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="molluscs" <?php if(in_array('molluscs',$npAllergen)): echo 'checked'; endif; ?>> 🦑 Molluscs</label>
+                <label class="np-chk-item <?php echo e(in_array('lupin',$npAllergen) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[allergen][]"
+                    value="lupin" <?php if(in_array('lupin',$npAllergen)): echo 'checked'; endif; ?>> 🫘 Lupin</label>
               </div>
               <div class="np-sec-head" style="margin-top:14px">May Contain (Cross-contamination)</div>
               <div class="np-tag-wrap" id="npMcWrap" onclick="this.querySelector('input').focus()">
-                @foreach($npMayContain as $t)
-                  @php($t = is_string($t) ? trim($t) : '')
-                  @if(filled($t))
-                    <span class="np-tag t-orange">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[may_contain][]" value="{{ $t }}"></span>
-                  @endif
-                @endforeach
+                <?php $__currentLoopData = $npMayContain; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <?php ($t = is_string($t) ? trim($t) : ''); ?>
+                  <?php if(filled($t)): ?>
+                    <span class="np-tag t-orange"><?php echo e($t); ?> <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[may_contain][]" value="<?php echo e($t); ?>"></span>
+                  <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <input type="text" id="npMcInput" class="np-input" placeholder="e.g. Tree Nuts, Soy… press Enter"
                   onkeydown="npAddTag(event,'npMcWrap','npMcInput','t-orange','meta_data[may_contain][]')">
               </div>
@@ -1296,22 +1295,22 @@
                 Information</span></div>
             <div class="np-card-body">
               <div class="np-chk-grid">
-                <label class="np-chk-item {{ in_array('halal',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="halal" @checked(in_array('halal',$npDietary))> ✅ Halal</label>
-                <label class="np-chk-item {{ in_array('kosher',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="kosher" @checked(in_array('kosher',$npDietary))> ✡️ Kosher</label>
-                <label class="np-chk-item {{ in_array('vegetarian',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="vegetarian" @checked(in_array('vegetarian',$npDietary))> 🌱 Vegetarian</label>
-                <label class="np-chk-item {{ in_array('vegan',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="vegan" @checked(in_array('vegan',$npDietary))> 🌿 Vegan</label>
-                <label class="np-chk-item {{ in_array('gluten_free',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="gluten_free" @checked(in_array('gluten_free',$npDietary))> 🚫🌾 Gluten-Free</label>
-                <label class="np-chk-item {{ in_array('dairy_free',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="dairy_free" @checked(in_array('dairy_free',$npDietary))> 🚫🥛 Dairy-Free</label>
-                <label class="np-chk-item {{ in_array('low_sugar',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="low_sugar" @checked(in_array('low_sugar',$npDietary))> 🍬 Low Sugar</label>
-                <label class="np-chk-item {{ in_array('no_preservatives',$npDietary) ? 'on' : '' }}" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
-                    value="no_preservatives" @checked(in_array('no_preservatives',$npDietary))> 🫀 No Preservatives</label>
+                <label class="np-chk-item <?php echo e(in_array('halal',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="halal" <?php if(in_array('halal',$npDietary)): echo 'checked'; endif; ?>> ✅ Halal</label>
+                <label class="np-chk-item <?php echo e(in_array('kosher',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="kosher" <?php if(in_array('kosher',$npDietary)): echo 'checked'; endif; ?>> ✡️ Kosher</label>
+                <label class="np-chk-item <?php echo e(in_array('vegetarian',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="vegetarian" <?php if(in_array('vegetarian',$npDietary)): echo 'checked'; endif; ?>> 🌱 Vegetarian</label>
+                <label class="np-chk-item <?php echo e(in_array('vegan',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="vegan" <?php if(in_array('vegan',$npDietary)): echo 'checked'; endif; ?>> 🌿 Vegan</label>
+                <label class="np-chk-item <?php echo e(in_array('gluten_free',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="gluten_free" <?php if(in_array('gluten_free',$npDietary)): echo 'checked'; endif; ?>> 🚫🌾 Gluten-Free</label>
+                <label class="np-chk-item <?php echo e(in_array('dairy_free',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="dairy_free" <?php if(in_array('dairy_free',$npDietary)): echo 'checked'; endif; ?>> 🚫🥛 Dairy-Free</label>
+                <label class="np-chk-item <?php echo e(in_array('low_sugar',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="low_sugar" <?php if(in_array('low_sugar',$npDietary)): echo 'checked'; endif; ?>> 🍬 Low Sugar</label>
+                <label class="np-chk-item <?php echo e(in_array('no_preservatives',$npDietary) ? 'on' : ''); ?>" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[dietary][]"
+                    value="no_preservatives" <?php if(in_array('no_preservatives',$npDietary)): echo 'checked'; endif; ?>> 🫀 No Preservatives</label>
               </div>
             </div>
           </div>
@@ -1320,12 +1319,12 @@
                 E-Numbers</span></div>
             <div class="np-card-body">
               <div class="np-tag-wrap" id="npENumWrap" onclick="this.querySelector('input').focus()">
-                @foreach($npENumbers as $t)
-                  @php($t = is_string($t) ? trim($t) : '')
-                  @if(filled($t))
-                    <span class="np-tag t-blue">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[e_numbers][]" value="{{ $t }}"></span>
-                  @endif
-                @endforeach
+                <?php $__currentLoopData = $npENumbers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <?php ($t = is_string($t) ? trim($t) : ''); ?>
+                  <?php if(filled($t)): ?>
+                    <span class="np-tag t-blue"><?php echo e($t); ?> <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[e_numbers][]" value="<?php echo e($t); ?>"></span>
+                  <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <input type="text" id="npENumInput" class="np-input"
                   placeholder="Add E-number, press Enter… (e.g. E330)"
                   onkeydown="npAddTag(event,'npENumWrap','npENumInput','t-blue','meta_data[e_numbers][]')">
@@ -1337,15 +1336,15 @@
       </div>
     </div>
 
-    {{-- ══ TAB 4: VARIANTS ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-variants">
       <div class="np-grid">
         <div>
-          @if (Config::get('module.current_module_type') == 'food')
-            @includeif('admin-views.product.partials._food_variations')
-          @else
-            {{-- Moved into Colour/Flavour section below --}}
-          @endif
+          <?php if(Config::get('module.current_module_type') == 'food'): ?>
+            <?php if ($__env->exists('admin-views.product.partials._food_variations')) echo $__env->make('admin-views.product.partials._food_variations', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+          <?php else: ?>
+            
+          <?php endif; ?>
           <div class="np-card" style="margin-top:18px">
             <div class="np-card-header"><span class="np-card-icon">🎨</span><span class="np-card-title">Colour / Flavour
                 Variants</span></div>
@@ -1357,16 +1356,16 @@
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('variant_type')">+</button>
                   </label>
                   <select name="meta_data[variant_type]" id="npVariantType" class="np-select js-select2-custom">
-                    @php($savedVt = old('meta_data.variant_type', data_get($npMeta,'variant_type','Flavour')))
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','variant_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                        <option value="{{ $opt->name }}" @selected($savedVt == $opt->name)>{{ $opt->name }}</option>
-                      @endforeach
-                    @else
-                      @foreach(['Flavour','Colour','Scent','Style'] as $vt)
-                        <option value="{{ $vt }}" @selected($savedVt==$vt)>{{ $vt }}</option>
-                      @endforeach
-                    @endif
+                    <?php ($savedVt = old('meta_data.variant_type', data_get($npMeta,'variant_type','Flavour'))); ?>
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','variant_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($opt->name); ?>" <?php if($savedVt == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                      <?php $__currentLoopData = ['Flavour','Colour','Scent','Style']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $vt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($vt); ?>" <?php if($savedVt==$vt): echo 'selected'; endif; ?>><?php echo e($vt); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
                   </select>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0;flex:1">
@@ -1375,26 +1374,26 @@
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('variant_color')">+</button>
                   </label>
                   <div class="np-swatches" id="npSwatchesWrap">
-                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options') && \Illuminate\Support\Facades\Schema::hasColumn('product_select_options','value'))
-                      @foreach(\App\Models\ProductSelectOption::where('type','variant_color')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','value']) as $opt)
-                        @php($hex = is_string($opt->value) ? trim($opt->value) : '')
-                        @if(filled($hex))
-                          <div class="np-swatch {{ in_array($hex,$npSwatches) ? 'sel' : '' }}"
-                            data-hex="{{ $hex }}"
-                            style="background:{{ $hex }}{{ strtolower($hex) === '#f9fafb' ? ';border:1.5px solid #d1d5db' : '' }}"
-                            title="{{ $opt->name }}"
+                    <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options') && \Illuminate\Support\Facades\Schema::hasColumn('product_select_options','value')): ?>
+                      <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','variant_color')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','value']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php ($hex = is_string($opt->value) ? trim($opt->value) : ''); ?>
+                        <?php if(filled($hex)): ?>
+                          <div class="np-swatch <?php echo e(in_array($hex,$npSwatches) ? 'sel' : ''); ?>"
+                            data-hex="<?php echo e($hex); ?>"
+                            style="background:<?php echo e($hex); ?><?php echo e(strtolower($hex) === '#f9fafb' ? ';border:1.5px solid #d1d5db' : ''); ?>"
+                            title="<?php echo e($opt->name); ?>"
                             onclick="npToggleSwatch(this)"></div>
-                        @endif
-                      @endforeach
-                    @else
-                      @foreach(['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey'] as $hex => $name)
-                        <div class="np-swatch {{ in_array($hex,$npSwatches) ? 'sel' : '' }}"
-                          data-hex="{{ $hex }}"
-                          style="background:{{ $hex }}{{ $hex === '#f9fafb' ? ';border:1.5px solid #d1d5db' : '' }}"
-                          title="{{ $name }}"
+                        <?php endif; ?>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php else: ?>
+                      <?php $__currentLoopData = ['#006161' => 'Teal', '#2563eb' => 'Blue', '#16a34a' => 'Green', '#f59e0b' => 'Amber', '#7c3aed' => 'Purple', '#0d1b2a' => 'Black', '#f9fafb' => 'White', '#d97706' => 'Orange', '#ec4899' => 'Pink', '#9ca3af' => 'Grey']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $hex => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="np-swatch <?php echo e(in_array($hex,$npSwatches) ? 'sel' : ''); ?>"
+                          data-hex="<?php echo e($hex); ?>"
+                          style="background:<?php echo e($hex); ?><?php echo e($hex === '#f9fafb' ? ';border:1.5px solid #d1d5db' : ''); ?>"
+                          title="<?php echo e($name); ?>"
                           onclick="npToggleSwatch(this)"></div>
-                      @endforeach
-                    @endif
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    <?php endif; ?>
                   </div>
                 </div>
               </div>
@@ -1402,28 +1401,28 @@
               <div class="np-form-group" style="margin-bottom:0;margin-top:12px">
                 <label class="np-label">Custom Flavour / Colour Names</label>
                 <div class="np-tag-wrap" id="npFlavWrap" onclick="this.querySelector('input').focus()">
-                  @foreach($npFlavorNames as $t)
-                    @php($t = is_string($t) ? trim($t) : '')
-                    @if(filled($t))
-                      <span class="np-tag t-green">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[flavor_names][]" value="{{ $t }}"></span>
-                    @endif
-                  @endforeach
+                  <?php $__currentLoopData = $npFlavorNames; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php ($t = is_string($t) ? trim($t) : ''); ?>
+                    <?php if(filled($t)): ?>
+                      <span class="np-tag t-green"><?php echo e($t); ?> <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[flavor_names][]" value="<?php echo e($t); ?>"></span>
+                    <?php endif; ?>
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   <input type="text" id="npFlavInput" class="np-input" placeholder="Add variant, press Enter…"
                     onkeydown="npAddTag(event,'npFlavWrap','npFlavInput','t-green','meta_data[flavor_names][]')">
                 </div>
               </div>
 
-              @if (Config::get('module.current_module_type') != 'food')
+              <?php if(Config::get('module.current_module_type') != 'food'): ?>
                 <div style="margin-top:16px">
                   <div class="np-sec-head" style="margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
                     <span>Attribute</span>
                     <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenAttributeQuickAdd()">+</button>
                   </div>
                   <div id="npAttrEmbed">
-                    @includeif('admin-views.product.partials._other_variations')
+                    <?php if ($__env->exists('admin-views.product.partials._other_variations')) echo $__env->make('admin-views.product.partials._other_variations', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                   </div>
                 </div>
-              @endif
+              <?php endif; ?>
             </div>
           </div>
 
@@ -1432,12 +1431,12 @@
                 Variants</span></div>
             <div class="np-card-body">
               <div class="np-tag-wrap" id="npSizeWrap" onclick="this.querySelector('input').focus()">
-                @foreach($npSizeVariants as $t)
-                  @php($t = is_string($t) ? trim($t) : '')
-                  @if(filled($t))
-                    <span class="np-tag t-purple">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[size_variants][]" value="{{ $t }}"></span>
-                  @endif
-                @endforeach
+                <?php $__currentLoopData = $npSizeVariants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <?php ($t = is_string($t) ? trim($t) : ''); ?>
+                  <?php if(filled($t)): ?>
+                    <span class="np-tag t-purple"><?php echo e($t); ?> <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[size_variants][]" value="<?php echo e($t); ?>"></span>
+                  <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 <input type="text" id="npSizeInput" class="np-input" placeholder="Add size/weight, press Enter…"
                   onkeydown="npAddTag(event,'npSizeWrap','npSizeInput','t-purple','meta_data[size_variants][]')">
               </div>
@@ -1460,38 +1459,38 @@
                   </tr>
                 </thead>
                 <tbody id="npVariantBody">
-                  @php($npVarName = old('meta_data.var_name', data_get($npMeta,'var_name', [])))
-                  @php($npVarSku = old('meta_data.var_sku', data_get($npMeta,'var_sku', [])))
-                  @php($npVarPrice = old('meta_data.var_price', data_get($npMeta,'var_price', [])))
-                  @php($npVarStock = old('meta_data.var_stock', data_get($npMeta,'var_stock', [])))
-                  @php($npVarStatus = old('meta_data.var_status', data_get($npMeta,'var_status', [])))
-                  @php($npVarName = is_array($npVarName) ? $npVarName : [])
-                  @php($npVarSku = is_array($npVarSku) ? $npVarSku : [])
-                  @php($npVarPrice = is_array($npVarPrice) ? $npVarPrice : [])
-                  @php($npVarStock = is_array($npVarStock) ? $npVarStock : [])
-                  @php($npVarStatus = is_array($npVarStatus) ? $npVarStatus : [])
-                  @php($npVarRows = max(count($npVarName), count($npVarSku), count($npVarPrice), count($npVarStock), count($npVarStatus), 1))
-                  @for($i=0;$i<$npVarRows;$i++)
+                  <?php ($npVarName = old('meta_data.var_name', data_get($npMeta,'var_name', []))); ?>
+                  <?php ($npVarSku = old('meta_data.var_sku', data_get($npMeta,'var_sku', []))); ?>
+                  <?php ($npVarPrice = old('meta_data.var_price', data_get($npMeta,'var_price', []))); ?>
+                  <?php ($npVarStock = old('meta_data.var_stock', data_get($npMeta,'var_stock', []))); ?>
+                  <?php ($npVarStatus = old('meta_data.var_status', data_get($npMeta,'var_status', []))); ?>
+                  <?php ($npVarName = is_array($npVarName) ? $npVarName : []); ?>
+                  <?php ($npVarSku = is_array($npVarSku) ? $npVarSku : []); ?>
+                  <?php ($npVarPrice = is_array($npVarPrice) ? $npVarPrice : []); ?>
+                  <?php ($npVarStock = is_array($npVarStock) ? $npVarStock : []); ?>
+                  <?php ($npVarStatus = is_array($npVarStatus) ? $npVarStatus : []); ?>
+                  <?php ($npVarRows = max(count($npVarName), count($npVarSku), count($npVarPrice), count($npVarStock), count($npVarStatus), 1)); ?>
+                  <?php for($i=0;$i<$npVarRows;$i++): ?>
                     <tr>
                       <td><input type="text" name="meta_data[var_name][]" class="np-input"
-                          placeholder="e.g. Original / 864g" value="{{ $npVarName[$i] ?? '' }}"></td>
+                          placeholder="e.g. Original / 864g" value="<?php echo e($npVarName[$i] ?? ''); ?>"></td>
                       <td><input type="text" name="meta_data[var_sku][]" class="np-input np-mono" placeholder="SKU-001"
-                          value="{{ $npVarSku[$i] ?? '' }}"></td>
+                          value="<?php echo e($npVarSku[$i] ?? ''); ?>"></td>
                       <td><input type="number" name="meta_data[var_price][]" class="np-input" placeholder="0.00"
-                          step="0.01" value="{{ $npVarPrice[$i] ?? '' }}"></td>
+                          step="0.01" value="<?php echo e($npVarPrice[$i] ?? ''); ?>"></td>
                       <td><input type="number" name="meta_data[var_stock][]" class="np-input" placeholder="0"
-                          value="{{ $npVarStock[$i] ?? '' }}"></td>
+                          value="<?php echo e($npVarStock[$i] ?? ''); ?>"></td>
                       <td>
-                        @php($st = $npVarStatus[$i] ?? 'Active')
+                        <?php ($st = $npVarStatus[$i] ?? 'Active'); ?>
                         <select name="meta_data[var_status][]" class="np-select" style="font-size:11.5px;padding:5px 28px 5px 8px">
-                          <option value="Active" @selected($st==='Active')>Active</option>
-                          <option value="Out of Stock" @selected($st==='Out of Stock')>Out of Stock</option>
-                          <option value="Disabled" @selected($st==='Disabled')>Disabled</option>
+                          <option value="Active" <?php if($st==='Active'): echo 'selected'; endif; ?>>Active</option>
+                          <option value="Out of Stock" <?php if($st==='Out of Stock'): echo 'selected'; endif; ?>>Out of Stock</option>
+                          <option value="Disabled" <?php if($st==='Disabled'): echo 'selected'; endif; ?>>Disabled</option>
                         </select>
                       </td>
                       <td><button type="button" class="np-btn-tiny del" onclick="this.closest('tr').remove()">✕</button></td>
                     </tr>
-                  @endfor
+                  <?php endfor; ?>
                 </tbody>
               </table>
               <div style="padding:12px 16px"><button type="button" class="np-btn-add" onclick="npAddVariantRow()">+ Add
@@ -1505,17 +1504,17 @@
                 Products</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Upsell Products</label><input type="text"
-                  name="meta_data[upsell]" class="np-input" placeholder="Search by name or SKU…" value="{{ old('meta_data.upsell', data_get($npMeta,'upsell','')) }}"></div>
+                  name="meta_data[upsell]" class="np-input" placeholder="Search by name or SKU…" value="<?php echo e(old('meta_data.upsell', data_get($npMeta,'upsell',''))); ?>"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Cross-Sell
                   Products</label><input type="text" name="meta_data[crosssell]" class="np-input"
-                  placeholder="Search by name or SKU…" value="{{ old('meta_data.crosssell', data_get($npMeta,'crosssell','')) }}"></div>
+                  placeholder="Search by name or SKU…" value="<?php echo e(old('meta_data.crosssell', data_get($npMeta,'crosssell',''))); ?>"></div>
             </div>
           </div>
           <div class="np-card">
             <div class="np-card-header"><span class="np-card-icon">🎁</span><span class="np-card-title">Bundle /
                 Multipack</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
-              @php($npIsBundle = (string) old('meta_data.is_bundle', data_get($npMeta,'is_bundle','0')) === '1')
+              <?php ($npIsBundle = (string) old('meta_data.is_bundle', data_get($npMeta,'is_bundle','0')) === '1'); ?>
               <div class="np-trow" style="padding-top:0">
                 <div>
                   <div class="np-tlbl">Is Bundle / Multipack</div>
@@ -1523,21 +1522,21 @@
                 </div>
                 <label class="np-tog">
                   <input type="checkbox" id="npBundleToggle" name="meta_data[is_bundle]" value="1"
-                    @checked($npIsBundle)>
+                    <?php if($npIsBundle): echo 'checked'; endif; ?>>
                   <span class="np-tog-track"></span>
                 </label>
               </div>
-              <div id="npBundleFields" style="display:{{ $npIsBundle ? 'block' : 'none' }};margin-top:14px">
+              <div id="npBundleFields" style="display:<?php echo e($npIsBundle ? 'block' : 'none'); ?>;margin-top:14px">
                 <div class="np-form-group">
                   <label class="np-label">Bundle Components</label>
                   <textarea rows="2" name="meta_data[bundle_components]" class="np-textarea"
-                    placeholder="e.g. 2× Kiri Cheese 24 portions pack">{{ old('meta_data.bundle_components', data_get($npMeta,'bundle_components','')) }}</textarea>
+                    placeholder="e.g. 2× Kiri Cheese 24 portions pack"><?php echo e(old('meta_data.bundle_components', data_get($npMeta,'bundle_components',''))); ?></textarea>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Bundle Discount %</label>
                   <div class="np-iw sfx">
                     <input type="number" name="meta_data[bundle_discount]" class="np-input" placeholder="10" min="0"
-                      max="100" value="{{ old('meta_data.bundle_discount', data_get($npMeta,'bundle_discount','')) }}">
+                      max="100" value="<?php echo e(old('meta_data.bundle_discount', data_get($npMeta,'bundle_discount',''))); ?>">
                     <span class="np-isfx">%</span>
                   </div>
                 </div>
@@ -1549,17 +1548,17 @@
                 Limits</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Min. Order Quantity</label><input type="number"
-                  name="meta_data[min_order_qty]" class="np-input" placeholder="1" min="1" value="{{ old('meta_data.min_order_qty', data_get($npMeta,'min_order_qty','1')) }}"></div>
+                  name="meta_data[min_order_qty]" class="np-input" placeholder="1" min="1" value="<?php echo e(old('meta_data.min_order_qty', data_get($npMeta,'min_order_qty','1'))); ?>"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Max. Order Quantity per
                   Customer</label><input type="number" name="meta_data[max_order_qty]" class="np-input" placeholder="10"
-                  min="1" value="{{ old('meta_data.max_order_qty', data_get($npMeta,'max_order_qty','')) }}"></div>
+                  min="1" value="<?php echo e(old('meta_data.max_order_qty', data_get($npMeta,'max_order_qty',''))); ?>"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    {{-- ══ TAB 5: SEO & META ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-seo">
       <div class="np-grid">
         <div>
@@ -1568,8 +1567,8 @@
                 Preview</span></div>
             <div class="np-card-body">
               <div class="np-seo-preview">
-                <div class="np-seo-url" id="npSeoUrl">https://{{ request()->getHost() }}/p/your-product-slug</div>
-                <div class="np-seo-title" id="npSeoTitle">Product Name — {{ config('app.name') }}</div>
+                <div class="np-seo-url" id="npSeoUrl">https://<?php echo e(request()->getHost()); ?>/p/your-product-slug</div>
+                <div class="np-seo-title" id="npSeoTitle">Product Name — <?php echo e(config('app.name')); ?></div>
                 <div class="np-seo-desc" id="npSeoDesc">Add a meta description to preview it here…</div>
               </div>
             </div>
@@ -1581,8 +1580,8 @@
               <div class="np-form-group">
                 <label class="np-label">SEO Title <span class="np-req">*</span></label>
                 <input type="text" name="meta_title" id="npSeoTitleInp" class="np-input"
-                  placeholder="e.g. Cream Cheese 864g — Buy Online | {{ config('app.name') }}" oninput="npUpdateSEO()"
-                  value="{{ $npSeoTitle }}">
+                  placeholder="e.g. Cream Cheese 864g — Buy Online | <?php echo e(config('app.name')); ?>" oninput="npUpdateSEO()"
+                  value="<?php echo e($npSeoTitle); ?>">
                 <div style="display:flex;justify-content:space-between;margin-top:4px">
                   <span class="np-hint">Recommended: 50–60 characters</span>
                   <span id="npSeoTitleCC" class="np-cc np-cc-ok">0 chars</span>
@@ -1591,7 +1590,7 @@
               <div class="np-form-group">
                 <label class="np-label">Meta Description <span class="np-req">*</span></label>
                 <textarea name="meta_description" id="npSeoDescInp" class="np-textarea" rows="3"
-                  placeholder="Concise product description for search engines…" oninput="npUpdateSEO()">{{ $npSeoDesc }}</textarea>
+                  placeholder="Concise product description for search engines…" oninput="npUpdateSEO()"><?php echo e($npSeoDesc); ?></textarea>
                 <div style="display:flex;justify-content:space-between;margin-top:4px">
                   <span class="np-hint">Recommended: 150–160 characters</span>
                   <span id="npSeoDescCC" class="np-cc np-cc-ok">0 chars</span>
@@ -1602,7 +1601,7 @@
                 <div class="np-iw">
                   <span class="np-ipfx" style="font-size:11px">/p/</span>
                   <input type="text" name="slug" id="npSeoSlug" class="np-input np-mono" placeholder="product-name-slug"
-                    oninput="npUpdateSEO()" value="{{ $npSeoSlug }}">
+                    oninput="npUpdateSEO()" value="<?php echo e($npSeoSlug); ?>">
                 </div>
                 <div class="np-hint">Auto-generated from product name. Lowercase, hyphens only.</div>
               </div>
@@ -1617,13 +1616,13 @@
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">GTIN (for Google Shopping)</label>
                   <input type="text" name="meta_data[gtin]" class="np-input np-mono" placeholder="e.g. 3073781039180"
-                    value="{{ old('meta_data.gtin', data_get($npMeta,'gtin','')) }}">
+                    value="<?php echo e(old('meta_data.gtin', data_get($npMeta,'gtin',''))); ?>">
                 </div>
                 <div class="np-form-group" style="margin-bottom:0">
                   <label class="np-label">Google Product Category</label>
                   <input type="text" name="meta_data[google_category]" class="np-input"
                     placeholder="e.g. Food &amp; Drink > Dairy > Cheese"
-                    value="{{ old('meta_data.google_category', data_get($npMeta,'google_category','')) }}">
+                    value="<?php echo e(old('meta_data.google_category', data_get($npMeta,'google_category',''))); ?>">
                 </div>
               </div>
               <div class="np-form-group" style="margin-bottom:0;margin-top:12px">
@@ -1632,16 +1631,16 @@
                   <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('schema_type')">+</button>
                 </label>
                 <select name="meta_data[schema_type]" id="npSchemaType" class="np-select js-select2-custom">
-                  @php($savedSchema = old('meta_data.schema_type', data_get($npMeta,'schema_type','Product')))
-                  @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
-                    @foreach(\App\Models\ProductSelectOption::where('type','schema_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
-                      <option value="{{ $opt->name }}" @selected($savedSchema == $opt->name)>{{ $opt->name }}</option>
-                    @endforeach
-                  @else
-                    @foreach(['Product','FoodProduct','IndividualProduct'] as $st)
-                      <option value="{{ $st }}" @selected($savedSchema == $st)>{{ $st }}</option>
-                    @endforeach
-                  @endif
+                  <?php ($savedSchema = old('meta_data.schema_type', data_get($npMeta,'schema_type','Product'))); ?>
+                  <?php if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options')): ?>
+                    <?php $__currentLoopData = \App\Models\ProductSelectOption::where('type','schema_type')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $opt): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($opt->name); ?>" <?php if($savedSchema == $opt->name): echo 'selected'; endif; ?>><?php echo e($opt->name); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                  <?php else: ?>
+                    <?php $__currentLoopData = ['Product','FoodProduct','IndividualProduct']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $st): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                      <option value="<?php echo e($st); ?>" <?php if($savedSchema == $st): echo 'selected'; endif; ?>><?php echo e($st); ?></option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                  <?php endif; ?>
                 </select>
               </div>
             </div>
@@ -1652,15 +1651,15 @@
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">OG Title</label><input type="text"
                   name="meta_data[og_title]" class="np-input"
-                  placeholder="e.g. Great Product — {{ config('app.name') }}"
-                  value="{{ old('meta_data.og_title', data_get($npMeta,'og_title','')) }}"></div>
+                  placeholder="e.g. Great Product — <?php echo e(config('app.name')); ?>"
+                  value="<?php echo e(old('meta_data.og_title', data_get($npMeta,'og_title',''))); ?>"></div>
               <div class="np-form-group"><label class="np-label">OG Description</label><textarea
                   name="meta_data[og_desc]" class="np-textarea" rows="2"
-                  placeholder="Description for social media sharing…">{{ old('meta_data.og_desc', data_get($npMeta,'og_desc','')) }}</textarea></div>
+                  placeholder="Description for social media sharing…"><?php echo e(old('meta_data.og_desc', data_get($npMeta,'og_desc',''))); ?></textarea></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">OG Image URL</label><input
                   type="url" name="meta_data[og_image]" class="np-input"
                   placeholder="https://cdn.example.com/product-og.jpg"
-                  value="{{ old('meta_data.og_image', data_get($npMeta,'og_image','')) }}"></div>
+                  value="<?php echo e(old('meta_data.og_image', data_get($npMeta,'og_image',''))); ?>"></div>
             </div>
           </div>
         </div>
@@ -1671,15 +1670,15 @@
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Focus Keyword</label><input type="text"
                   name="meta_data[focus_keyword]" class="np-input" placeholder="e.g. cream cheese online"
-                  value="{{ old('meta_data.focus_keyword', data_get($npMeta,'focus_keyword','')) }}"></div>
+                  value="<?php echo e(old('meta_data.focus_keyword', data_get($npMeta,'focus_keyword',''))); ?>"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Additional Keywords</label>
                 <div class="np-tag-wrap" id="npSeoKWrap" onclick="this.querySelector('input').focus()">
-                  @foreach($npSeoKeywords as $t)
-                    @php($t = is_string($t) ? trim($t) : '')
-                    @if(filled($t))
-                      <span class="np-tag t-blue">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[seo_keywords][]" value="{{ $t }}"></span>
-                    @endif
-                  @endforeach
+                  <?php $__currentLoopData = $npSeoKeywords; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php ($t = is_string($t) ? trim($t) : ''); ?>
+                    <?php if(filled($t)): ?>
+                      <span class="np-tag t-blue"><?php echo e($t); ?> <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[seo_keywords][]" value="<?php echo e($t); ?>"></span>
+                    <?php endif; ?>
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                   <input type="text" id="npSeoKInput" class="np-input" placeholder="Add keyword, press Enter…"
                     onkeydown="npAddTag(event,'npSeoKWrap','npSeoKInput','t-blue','meta_data[seo_keywords][]')">
                 </div>
@@ -1690,15 +1689,15 @@
             <div class="np-card-header"><span class="np-card-icon">🤖</span><span class="np-card-title">Robots &amp;
                 Indexing</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
-              @php($seoIndex = (string) old('meta_data.seo_index', data_get($npMeta,'seo_index','1')) === '1')
-              @php($seoFollow = (string) old('meta_data.seo_follow', data_get($npMeta,'seo_follow','1')) === '1')
-              @php($seoCanonical = (string) old('meta_data.seo_canonical', data_get($npMeta,'seo_canonical','1')) === '1')
+              <?php ($seoIndex = (string) old('meta_data.seo_index', data_get($npMeta,'seo_index','1')) === '1'); ?>
+              <?php ($seoFollow = (string) old('meta_data.seo_follow', data_get($npMeta,'seo_follow','1')) === '1'); ?>
+              <?php ($seoCanonical = (string) old('meta_data.seo_canonical', data_get($npMeta,'seo_canonical','1')) === '1'); ?>
               <div class="np-trow" style="padding-top:0">
                 <div>
                   <div class="np-tlbl">Index this page</div>
                   <div class="np-tdsc">Allow search engines to index</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="meta_data[seo_index]" value="1" @checked($seoIndex)><span
+                <label class="np-tog"><input type="checkbox" name="meta_data[seo_index]" value="1" <?php if($seoIndex): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -1706,7 +1705,7 @@
                   <div class="np-tlbl">Follow Links</div>
                   <div class="np-tdsc">Allow crawlers to follow</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="meta_data[seo_follow]" value="1" @checked($seoFollow)><span
+                <label class="np-tog"><input type="checkbox" name="meta_data[seo_follow]" value="1" <?php if($seoFollow): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -1714,7 +1713,7 @@
                   <div class="np-tlbl">Canonical URL</div>
                   <div class="np-tdsc">Set as canonical version</div>
                 </div>
-                <label class="np-tog"><input type="checkbox" name="meta_data[seo_canonical]" value="1" @checked($seoCanonical)><span
+                <label class="np-tog"><input type="checkbox" name="meta_data[seo_canonical]" value="1" <?php if($seoCanonical): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
             </div>
@@ -1723,7 +1722,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 6: MEDIA ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-media">
       <div class="np-grid">
         <div>
@@ -1733,7 +1732,7 @@
             <div class="np-card-body">
               <label class="np-label">Main Thumbnail <span class="np-req">*</span></label>
               <label class="d-inline-block m-0 position-relative error-wrapper">
-                <img class="img--176 border" id="viewer" src="{{ asset('assets/admin/img/upload-img.png') }}"
+                <img class="img--176 border" id="viewer" src="<?php echo e(asset('assets/admin/img/upload-img.png')); ?>"
                   alt="thumbnail">
                 <div class="icon-file-group">
                   <div class="icon-file">
@@ -1763,7 +1762,7 @@
               </div>
               <div class="np-img-grid" id="npImagePreviews"></div>
 
-              {{-- Existing spartan multi-image picker for backend --}}
+              
               <div class="d-flex __gap-12px __new-coba overflow-x-auto pb-2 mt-3" id="coba"></div>
             </div>
           </div>
@@ -1842,7 +1841,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 7: LOGISTICS & SHIPPING ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-logistics">
       <div class="np-grid">
         <div>
@@ -1853,11 +1852,11 @@
               <div class="np-info-box">📌 Incoterms define who is responsible for shipping, insurance, and import duties
                 between seller and buyer.</div>
               <div class="np-inco-grid">
-                @foreach(['EXW' => 'Ex Works', 'FCA' => 'Free Carrier', 'CPT' => 'Carriage Paid To', 'CIP' => 'Carriage & Ins. Paid', 'FOB' => 'Free On Board', 'CFR' => 'Cost & Freight', 'CIF' => 'Cost, Ins. & Freight', 'DPU' => 'Delivered at Place Unloaded', 'DAP' => 'Delivered at Place', 'DDP' => 'Delivered Duty Paid', 'FAS' => 'Free Alongside Ship', 'DAT' => 'Delivered at Terminal'] as $code => $label)
-                  <div class="np-inco-pill" onclick="this.classList.toggle('sel')">{{ $code }}<span
-                      class="np-inco-sub">{{ $label }}</span><input type="hidden"
-                      name="meta_data[incoterm_{{ strtolower($code) }}]" value="0"></div>
-                @endforeach
+                <?php $__currentLoopData = ['EXW' => 'Ex Works', 'FCA' => 'Free Carrier', 'CPT' => 'Carriage Paid To', 'CIP' => 'Carriage & Ins. Paid', 'FOB' => 'Free On Board', 'CFR' => 'Cost & Freight', 'CIF' => 'Cost, Ins. & Freight', 'DPU' => 'Delivered at Place Unloaded', 'DAP' => 'Delivered at Place', 'DDP' => 'Delivered Duty Paid', 'FAS' => 'Free Alongside Ship', 'DAT' => 'Delivered at Terminal']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $code => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <div class="np-inco-pill" onclick="this.classList.toggle('sel')"><?php echo e($code); ?><span
+                      class="np-inco-sub"><?php echo e($label); ?></span><input type="hidden"
+                      name="meta_data[incoterm_<?php echo e(strtolower($code)); ?>]" value="0"></div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </div>
             </div>
           </div>
@@ -1901,25 +1900,25 @@
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Free Shipping Threshold</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[free_ship_threshold]" class="np-input" placeholder="150" step="0.01"></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Standard Shipping Fee</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[std_ship_fee]" class="np-input" placeholder="15.00" step="0.01"></div>
                 </div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Express Shipping Fee</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[exp_ship_fee]" class="np-input" placeholder="30.00" step="0.01"></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">International Shipping
                     Fee</label>
                   <div class="np-iw"><span
-                      class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
+                      class="np-ipfx"><?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?></span><input type="number"
                       name="meta_data[intl_ship_fee]" class="np-input" placeholder="60.00" step="0.01"></div>
                 </div>
               </div>
@@ -2071,7 +2070,7 @@
       </div>
     </div>
 
-    {{-- ══ TAB 8: REVIEWS & ANALYTICS ══ --}}
+    
     <div class="np-tab-panel" id="np-tab-reviews">
       <div class="np-stat-grid">
         <div class="np-stat-card">
@@ -2196,11 +2195,11 @@
       </div>
     </div>
 
-    {{-- ACTION BAR --}}
+    
     <div class="np-action-bar">
       <div class="np-action-info">Last saved: <strong id="npLastSaved">Never</strong></div>
       <div class="np-btn-row">
-        <a href="{{ route('admin.item.list') }}" class="np-btn np-btn-ghost">Cancel</a>
+        <a href="<?php echo e(route('admin.item.list')); ?>" class="np-btn np-btn-ghost">Cancel</a>
         <button type="button" class="np-btn np-btn-outline" onclick="npPrevTab()">Previous</button>
         <button type="button" class="np-btn np-btn-outline" onclick="npSaveDraft()">Save Draft</button>
         <button type="button" class="np-btn np-btn-outline" onclick="npNextTab()">Next</button>
@@ -2211,46 +2210,45 @@
 
   </form>
 
-  {{-- Brand modal must live OUTSIDE #item_form: global .custom-validation iterates ALL descendant inputs and calls .rules().
-       Inputs with form="npBrandForm" still matched .find() and broke jQuery Validate (element.form !== item_form). --}}
+  
   <div class="modal fade" id="npBrandModal" tabindex="-1" role="dialog" aria-labelledby="npBrandModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npBrandForm" enctype="multipart/form-data">
-          @csrf
+          <?php echo csrf_field(); ?>
           <div class="modal-header">
-            <h5 class="modal-title" id="npBrandModalLabel">{{ translate('messages.add_new_brand') }}</h5>
+            <h5 class="modal-title" id="npBrandModalLabel"><?php echo e(translate('messages.add_new_brand')); ?></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
-              <input type="text" name="name[]" class="form-control" placeholder="{{ translate('messages.new_brand') }}" required>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
+              <input type="text" name="name[]" class="form-control" placeholder="<?php echo e(translate('messages.new_brand')); ?>" required>
               <input type="hidden" name="lang[]" value="default">
             </div>
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.Brand Logo') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.Brand Logo')); ?> <small class="text-danger">*</small></label>
               <input type="file" name="image" class="form-control" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
             </div>
-            <small class="text-muted d-block mt-2">{{ translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)') }}</small>
+            <small class="text-muted d-block mt-2"><?php echo e(translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)')); ?></small>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Category modal (quick add) --}}
+  
   <div class="modal fade" id="npCategoryModal" tabindex="-1" role="dialog" aria-labelledby="npCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npCategoryForm" enctype="multipart/form-data">
-          @csrf
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="position" id="npCategoryPosition" value="0">
           <input type="hidden" name="parent_id" id="npCategoryParentId" value="">
           <div class="modal-header">
@@ -2261,59 +2259,59 @@
           </div>
           <div class="modal-body">
             <div class="form-group">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name[]" class="form-control" placeholder="Category name" required>
               <input type="hidden" name="lang[]" value="default">
             </div>
             <div class="form-group mb-0" id="npCategoryImageWrap" style="display:none">
-              <label class="input-label">{{ translate('messages.image') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.image')); ?> <small class="text-danger">*</small></label>
               <input type="file" name="image" id="npCategoryImage" class="form-control" accept="image/*">
-              <small class="text-muted d-block mt-2">{{ translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)') }}</small>
+              <small class="text-muted d-block mt-2"><?php echo e(translate('messages.JPG, JPEG, PNG Less Than 1MB (Ratio 1 : 1)')); ?></small>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Unit modal (quick add) --}}
+  
   <div class="modal fade" id="npUnitModal" tabindex="-1" role="dialog" aria-labelledby="npUnitModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npUnitForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <div class="modal-header">
-            <h5 class="modal-title" id="npUnitModalLabel">{{ translate('messages.add_new_unit') }}</h5>
+            <h5 class="modal-title" id="npUnitModalLabel"><?php echo e(translate('messages.add_new_unit')); ?></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.unit') }} <small class="text-danger">*</small></label>
-              <input type="text" name="unit[]" class="form-control" placeholder="{{ translate('messages.unit') }}" required>
+              <label class="input-label"><?php echo e(translate('messages.unit')); ?> <small class="text-danger">*</small></label>
+              <input type="text" name="unit[]" class="form-control" placeholder="<?php echo e(translate('messages.unit')); ?>" required>
               <input type="hidden" name="lang[]" value="default">
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Instacart option modal (quick add) --}}
+  
   <div class="modal fade" id="npInstacartOptionModal" tabindex="-1" role="dialog" aria-labelledby="npInstacartOptionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npInstacartOptionForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="type" id="npInstacartOptionType" value="">
           <div class="modal-header">
             <h5 class="modal-title" id="npInstacartOptionModalLabel">Add Option</h5>
@@ -2323,20 +2321,20 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name" class="form-control" placeholder="Option name" required>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Item type label modal (quick add) --}}
+  
   <div class="modal fade" id="npItemTypeModal" tabindex="-1" role="dialog" aria-labelledby="npItemTypeModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -2362,20 +2360,20 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Product select option modal (Origin & Seller quick add) --}}
+  
   <div class="modal fade" id="npProductSelectOptionModal" tabindex="-1" role="dialog" aria-labelledby="npProductSelectOptionModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npProductSelectOptionForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <input type="hidden" name="type" id="npProductSelectOptionType" value="">
           <div class="modal-header">
             <h5 class="modal-title" id="npProductSelectOptionModalLabel">Add Option</h5>
@@ -2385,7 +2383,7 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name" class="form-control" placeholder="Option name" required>
             </div>
             <div class="form-group mt-3 mb-0" id="npProductSelectOptionValueWrap" style="display:none">
@@ -2398,20 +2396,20 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Attribute quick add modal --}}
+  
   <div class="modal fade" id="npAttributeModal" tabindex="-1" role="dialog" aria-labelledby="npAttributeModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="npAttributeForm">
-          @csrf
+          <?php echo csrf_field(); ?>
           <div class="modal-header">
             <h5 class="modal-title" id="npAttributeModalLabel">Add Attribute</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -2420,20 +2418,20 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-0">
-              <label class="input-label">{{ translate('messages.name') }} <small class="text-danger">*</small></label>
+              <label class="input-label"><?php echo e(translate('messages.name')); ?> <small class="text-danger">*</small></label>
               <input type="text" name="name" id="npAttributeName" class="form-control" placeholder="e.g. Size, Colour, Material" required>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Custom tab modal --}}
+  
   <div class="modal fade" id="npCustomTabModal" tabindex="-1" role="dialog" aria-labelledby="npCustomTabModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -2456,15 +2454,15 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-            <button type="submit" class="btn btn-primary">{{ translate('messages.save') }}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+            <button type="submit" class="btn btn-primary"><?php echo e(translate('messages.save')); ?></button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  {{-- Manage tabs modal --}}
+  
   <div class="modal fade" id="npManageTabsModal" tabindex="-1" role="dialog" aria-labelledby="npManageTabsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -2492,14 +2490,14 @@
           <small class="text-muted d-block mt-2">Custom tab values/fields can be edited inside the tab. To remove a value, clear the field.</small>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-          <button type="button" class="btn btn-primary" onclick="npSaveManageTabsAndClose()">{{ translate('messages.save') }}</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+          <button type="button" class="btn btn-primary" onclick="npSaveManageTabsAndClose()"><?php echo e(translate('messages.save')); ?></button>
         </div>
       </div>
     </div>
   </div>
 
-  {{-- Manage sections modal (built-in tabs) --}}
+  
   <div class="modal fade" id="npManageSectionsModal" tabindex="-1" role="dialog" aria-labelledby="npManageSectionsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -2514,15 +2512,15 @@
           <div id="npManageSectionsBody"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ translate('messages.cancel') }}</button>
-          <button type="button" class="btn btn-primary" onclick="npSaveManageSectionsAndClose()">{{ translate('messages.save') }}</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"><?php echo e(translate('messages.cancel')); ?></button>
+          <button type="button" class="btn btn-primary" onclick="npSaveManageSectionsAndClose()"><?php echo e(translate('messages.save')); ?></button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<span id="message-enter-choice-values" data-text="{{ translate('enter_choice_values') }}"></span>
+<span id="message-enter-choice-values" data-text="<?php echo e(translate('enter_choice_values')); ?>"></span>
 
 <div class="modal" id="food-modal">
   <div class="modal-dialog modal-xl">
@@ -2547,27 +2545,27 @@
   </div>
 </div>
 
-@includeif('admin-views.product.partials._ai_sidebar')
-@endsection
+<?php if ($__env->exists('admin-views.product.partials._ai_sidebar')) echo $__env->make('admin-views.product.partials._ai_sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php $__env->stopSection(); ?>
 
-@push('script_2')
-  <script src="{{ asset('assets/admin') }}/js/tags-input.min.js"></script>
-  <script src="{{ asset('assets/admin/js/spartan-multi-image-picker.js') }}"></script>
-  {{-- Disabled legacy script: it builds broken URLs like /admin/item/NaN1add_on and conflicts with this new-product UI --}}
-  {{-- <script src="{{ asset('assets/admin') }}/js/view-pages/product-index.js"></script> --}}
-  <script src="{{ asset('assets/admin/js/AI/products/product-title-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/product-description-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/general-setup-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/product-others-autofill.js') }}"></script>
-  @if (Config::get('module.current_module_type') == 'food')
-    <script src="{{ asset('assets/admin/js/AI/products/variation-setup-auto-fill.js') }}"></script>
-  @else
-    <script src="{{ asset('assets/admin/js/AI/products/other-variation-setup-auto-fill.js') }}"></script>
-  @endif
-  <script src="{{ asset('assets/admin/js/AI/products/seo-section-autofill.js') }}"></script>
-  <script src="{{ asset('assets/admin/js/AI/products/ai-sidebar.js') }}"></script>
-  <script src="{{ asset('/assets/admin/js/AI/products/compressor/image-compressor.js') }}"></script>
-  <script src="{{ asset('/assets/admin/js/AI/products/compressor/compressor.min.js') }}"></script>
+<?php $__env->startPush('script_2'); ?>
+  <script src="<?php echo e(asset('assets/admin')); ?>/js/tags-input.min.js"></script>
+  <script src="<?php echo e(asset('assets/admin/js/spartan-multi-image-picker.js')); ?>"></script>
+  
+  
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-title-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-description-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/general-setup-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/product-others-autofill.js')); ?>"></script>
+  <?php if(Config::get('module.current_module_type') == 'food'): ?>
+    <script src="<?php echo e(asset('assets/admin/js/AI/products/variation-setup-auto-fill.js')); ?>"></script>
+  <?php else: ?>
+    <script src="<?php echo e(asset('assets/admin/js/AI/products/other-variation-setup-auto-fill.js')); ?>"></script>
+  <?php endif; ?>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/seo-section-autofill.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/admin/js/AI/products/ai-sidebar.js')); ?>"></script>
+  <script src="<?php echo e(asset('/assets/admin/js/AI/products/compressor/image-compressor.js')); ?>"></script>
+  <script src="<?php echo e(asset('/assets/admin/js/AI/products/compressor/compressor.min.js')); ?>"></script>
 
   <script>
     "use strict";
@@ -2793,10 +2791,10 @@
       const ti = document.getElementById('npSeoTitleInp')?.value || '';
       const di = document.getElementById('npSeoDescInp')?.value || '';
       const sl = document.getElementById('npSeoSlug')?.value || '';
-      if (document.getElementById('npSeoTitle')) document.getElementById('npSeoTitle').textContent = (ti || (name || 'Product Name') + ' — {{ config("app.name") }}').substring(0, 70);
+      if (document.getElementById('npSeoTitle')) document.getElementById('npSeoTitle').textContent = (ti || (name || 'Product Name') + ' — <?php echo e(config("app.name")); ?>').substring(0, 70);
       if (document.getElementById('npSeoDesc')) document.getElementById('npSeoDesc').textContent = (di || document.getElementById('npShortDesc')?.value || 'Add a meta description…').substring(0, 200);
       const slug = sl || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'your-product-slug';
-      if (document.getElementById('npSeoUrl')) document.getElementById('npSeoUrl').textContent = '{{ url("/") }}/p/' + slug;
+      if (document.getElementById('npSeoUrl')) document.getElementById('npSeoUrl').textContent = '<?php echo e(url("/")); ?>/p/' + slug;
       if (document.getElementById('npSeoTitleCC')) { const tl = ti.length; const tc = document.getElementById('npSeoTitleCC'); tc.textContent = tl + ' chars'; tc.className = 'np-cc ' + (tl > 60 ? 'np-cc-over' : tl > 50 ? 'np-cc-warn' : 'np-cc-ok'); }
       if (document.getElementById('npSeoDescCC')) { const dl = di.length; const dc = document.getElementById('npSeoDescCC'); dc.textContent = dl + ' chars'; dc.className = 'np-cc ' + (dl > 160 ? 'np-cc-over' : dl > 150 ? 'np-cc-warn' : 'np-cc-ok'); }
     }
@@ -3017,7 +3015,7 @@
 
     function npLoadFormDraft() {
       // Only for add-new experience; edit page should rely on DB prefill
-      const isEdit = {{ $isEdit ? 'true' : 'false' }};
+      const isEdit = <?php echo e($isEdit ? 'true' : 'false'); ?>;
       if (isEdit) return;
 
       let raw = null;
@@ -3302,7 +3300,7 @@
 
       const currentItemId = $('#item_id').val();
       const formData = new FormData(form);
-      const url = currentItemId ? ('{{ url("admin/item/update") }}/' + currentItemId) : '{{ route('admin.item.store') }}';
+      const url = currentItemId ? ('<?php echo e(url("admin/item/update")); ?>/' + currentItemId) : '<?php echo e(route('admin.item.store')); ?>';
 
       $.ajaxSetup({
         headers: {
@@ -3340,7 +3338,7 @@
             // Switch to edit URL so refresh loads from DB (not localStorage-only draft)
             if (wasNew) {
               try {
-                const base = "{{ route('admin.item.edit', [0]) }}";
+                const base = "<?php echo e(route('admin.item.edit', [0])); ?>";
                 const editUrl = base.replace(/\/0$/, '/' + data.item_id);
                 window.history.replaceState({}, '', editUrl);
               } catch (e) { }
@@ -3350,14 +3348,14 @@
           document.getElementById('npLastSaved').textContent = new Date().toLocaleTimeString();
 
           if (publish) {
-            toastr.success(data.success || "{{ translate('messages.product_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+            toastr.success(data.success || "<?php echo e(translate('messages.product_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
             try { localStorage.removeItem('np_custom_tabs_draft'); } catch (e) { }
             try { localStorage.removeItem('np_tabs_ui_draft'); } catch (e) { }
             try { localStorage.removeItem(npFormDraftKey()); } catch (e) { }
             try { localStorage.removeItem(`${npFormDraftKeyBase}:new`); } catch (e) { }
             try { localStorage.removeItem(npFormDraftLastKey); } catch (e) { }
             setTimeout(function () {
-              location.href = "{{ route('admin.item.list') }}";
+              location.href = "<?php echo e(route('admin.item.list')); ?>";
             }, 1000);
             return;
           }
@@ -3396,7 +3394,7 @@
 
     $(document).on('change', '#discount_type', function () {
       var discountType = document.getElementById("discount_type");
-      if (discountType.value === 'amount') { $('#symble').text("({{ \App\CentralLogics\Helpers::currency_symbol() }})"); }
+      if (discountType.value === 'amount') { $('#symble').text("(<?php echo e(\App\CentralLogics\Helpers::currency_symbol()); ?>)"); }
       else { $('#symble').text("(%)"); }
     });
 
@@ -3462,15 +3460,15 @@
           groupClassName: 'spartan_item_wrapper min-w-176px max-w-176px',
           maxFileSize: 1024 * 1024 * 2,
           placeholderImage: {
-            image: "{{ asset('assets/admin/img/upload-img.png') }}",
+            image: "<?php echo e(asset('assets/admin/img/upload-img.png')); ?>",
             width: '176px'
           },
           dropFileLabel: "Drop Here",
           onExtensionErr: function () {
-            toastr.error("{{ translate('messages.please_only_input_png_or_jpg_type_file') }}", { CloseButton: true, ProgressBar: true });
+            toastr.error("<?php echo e(translate('messages.please_only_input_png_or_jpg_type_file')); ?>", { CloseButton: true, ProgressBar: true });
           },
           onSizeErr: function () {
-            toastr.error("{{ translate('messages.file_size_too_big') }}", { CloseButton: true, ProgressBar: true });
+            toastr.error("<?php echo e(translate('messages.file_size_too_big')); ?>", { CloseButton: true, ProgressBar: true });
           }
         });
       }
@@ -3478,9 +3476,9 @@
       initImagePicker();
 
       // Category cascade (DB-backed via admin.item.get-categories)
-      const npModuleId = "{{ Config::get('module.current_module_id') }}";
+      const npModuleId = "<?php echo e(Config::get('module.current_module_id')); ?>";
       function npFetchChildCategories(parentId) {
-        return $.get("{{ route('admin.item.get-categories') }}", {
+        return $.get("<?php echo e(route('admin.item.get-categories')); ?>", {
           parent_id: parentId,
           module_id: npModuleId,
           sub_category: 1
@@ -3593,7 +3591,7 @@
         $('#unit').val(null).trigger('change');
         $('#veg').val(0).trigger('change');
         $('#discount_type').val('percent').trigger('change');
-        $('#viewer').attr('src', "{{ asset('assets/admin/img/upload-img.png') }}");
+        $('#viewer').attr('src', "<?php echo e(asset('assets/admin/img/upload-img.png')); ?>");
         $('#customFileEg1').val(null).trigger('change');
         $("#coba").empty();
         initImagePicker();
@@ -3621,7 +3619,7 @@
         const fd = new FormData(form);
 
         $.ajax({
-          url: "{{ route('admin.brand.store') }}",
+          url: "<?php echo e(route('admin.brand.store')); ?>",
           method: "POST",
           data: fd,
           processData: false,
@@ -3631,12 +3629,12 @@
               const opt = new Option(res.name, res.id, true, true);
               document.getElementById('npBrand')?.appendChild(opt);
               $('#npBrand').val(String(res.id)).trigger('change');
-              toastr.success(res.message || "{{ translate('messages.brand_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+              toastr.success(res.message || "<?php echo e(translate('messages.brand_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
               $('#npBrandModal').modal('hide');
               npUpdateQuality();
               return;
             }
-            toastr.success("{{ translate('messages.brand_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+            toastr.success("<?php echo e(translate('messages.brand_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
             $('#npBrandModal').modal('hide');
           },
           error: function (xhr) {
@@ -3669,33 +3667,33 @@
         if (position === 1) {
           parentId = $('#category_id').val() || '';
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
         if (position === 2) {
           parentId = $('#sub_category_id').val() || '';
           if (!($('#category_id').val() || '')) {
-            toastr.warning("{{ translate('messages.select_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_sub_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
         if (position === 3) {
           parentId = $('#sub_sub_category_id').val() || '';
           if (!($('#category_id').val() || '')) {
-            toastr.warning("{{ translate('messages.select_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
           if (!($('#sub_category_id').val() || '')) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_sub_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("<?php echo e(translate('messages.select_sub_category')); ?>", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
@@ -3729,7 +3727,7 @@
 
         // Use item-module category store to avoid module:category middleware
         $.ajax({
-          url: "{{ route('admin.item.category.store') }}/" + encodeURIComponent(position),
+          url: "<?php echo e(route('admin.item.category.store')); ?>/" + encodeURIComponent(position),
           method: "POST",
           dataType: "json",
           data: fd,
@@ -3803,7 +3801,7 @@
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
 
         $.ajax({
-          url: "{{ route('admin.item.unit.store') }}",
+          url: "<?php echo e(route('admin.item.unit.store')); ?>",
           method: "POST",
           dataType: "json",
           data: fd,
@@ -3816,7 +3814,7 @@
               $sel.val(String(res.id));
               if ($sel.hasClass('select2-hidden-accessible')) $sel.trigger('change.select2');
               else $sel.trigger('change');
-              toastr.success(res.message || "{{ translate('messages.unit_added_successfully') }}", { CloseButton: true, ProgressBar: true });
+              toastr.success(res.message || "<?php echo e(translate('messages.unit_added_successfully')); ?>", { CloseButton: true, ProgressBar: true });
               $('#npUnitModal').modal('hide');
               return;
             }
@@ -3870,7 +3868,7 @@
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
 
         $.ajax({
-          url: "{{ route('admin.item.instacart.options.store') }}",
+          url: "<?php echo e(route('admin.item.instacart.options.store')); ?>",
           method: "POST",
           dataType: "json",
           data: $(form).serialize(),
@@ -3945,7 +3943,7 @@
         if (!name) return;
 
         $.ajax({
-          url: "{{ route('admin.item.item-types.store') }}",
+          url: "<?php echo e(route('admin.item.item-types.store')); ?>",
           method: "POST",
           dataType: "json",
           data: {
@@ -4057,7 +4055,7 @@
         const form = this;
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
         $.ajax({
-          url: "{{ route('admin.attribute.ajax-store') }}",
+          url: "<?php echo e(route('admin.attribute.ajax-store')); ?>",
           method: "POST",
           dataType: "json",
           data: $(form).serialize(),
@@ -4098,7 +4096,7 @@
         if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
 
         $.ajax({
-          url: "{{ route('admin.item.product-select-options.store') }}",
+          url: "<?php echo e(route('admin.item.product-select-options.store')); ?>",
           method: "POST",
           dataType: "json",
           data: $(form).serialize(),
@@ -4835,4 +4833,6 @@
       npApplySectionsUi();
 
     </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.admin.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\6MartAdminpanel\resources\views/admin-views/product/index.blade.php ENDPATH**/ ?>
