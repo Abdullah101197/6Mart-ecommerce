@@ -14,7 +14,7 @@ class ProductSelectOptionController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:origin_country,seller,country_of_manufacture,packaging_type,recyclable,storage_type,condition,age_restriction,warranty,return_policy,product_type,variant_color,variant_type,schema_type',
+            'type' => 'required|in:origin_country,seller,country_of_manufacture,packaging_type,recyclable,storage_type,condition,age_restriction,warranty,return_policy,product_type,variant_color,variant_type,schema_type,dangerous_goods,air_restriction,temp_controlled',
             'name' => 'required|string|max:191',
             'value' => 'nullable|string|max:191',
         ]);
@@ -38,6 +38,8 @@ class ProductSelectOptionController extends Controller
         } elseif ($type === 'variant_type') {
             $value = null;
         } elseif ($type === 'schema_type') {
+            $value = null;
+        } elseif (in_array($type, ['dangerous_goods','air_restriction','temp_controlled'], true)) {
             $value = null;
         } else {
             $value = null;

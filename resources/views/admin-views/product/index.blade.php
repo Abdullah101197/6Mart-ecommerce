@@ -64,6 +64,20 @@
   $npSeoSlug = old('slug', $product?->slug ?? '');
   $npSeoKeywords = old('meta_data.seo_keywords', data_get($npMeta, 'seo_keywords', []));
   if (!is_array($npSeoKeywords)) { $npSeoKeywords = []; }
+  $npShip = old('meta_data.ship', data_get($npMeta, 'ship', []));
+  if (!is_array($npShip)) { $npShip = []; }
+  $npShipCustom = old('meta_data.ship_custom', data_get($npMeta, 'ship_custom', []));
+  if (!is_array($npShipCustom)) { $npShipCustom = []; }
+  $npIncoterms = old('meta_data.incoterms', data_get($npMeta, 'incoterms', []));
+  if (!is_array($npIncoterms)) { $npIncoterms = []; }
+  $npIncotermsCustom = old('meta_data.incoterms_custom', data_get($npMeta, 'incoterms_custom', []));
+  if (!is_array($npIncotermsCustom)) { $npIncotermsCustom = []; }
+  $npExport = old('meta_data.export', data_get($npMeta, 'export', []));
+  if (!is_array($npExport)) { $npExport = []; }
+  $npExportCustom = old('meta_data.export_custom', data_get($npMeta, 'export_custom', []));
+  if (!is_array($npExportCustom)) { $npExportCustom = []; }
+  $npRestricted = old('meta_data.restricted_countries', data_get($npMeta, 'restricted_countries', []));
+  if (!is_array($npRestricted)) { $npRestricted = []; }
   $npSellingPoints = data_get($npMeta, 'selling_points', []);
   if (!is_array($npSellingPoints)) { $npSellingPoints = []; }
   $npCert = data_get($npMeta, 'cert', []);
@@ -1733,23 +1747,25 @@
             <div class="np-card-body">
               <label class="np-label">Main Thumbnail <span class="np-req">*</span></label>
               <label class="d-inline-block m-0 position-relative error-wrapper">
-                <img class="img--176 border" id="viewer" src="{{ asset('assets/admin/img/upload-img.png') }}"
+                @php($npThumb = $isEdit && filled($product?->image) ? ($product?->image_full_url ?? \App\CentralLogics\Helpers::get_full_url('product', $product->image, 'public')) : asset('assets/admin/img/upload-img.png'))
+                <img class="img--176 border" id="viewer" src="{{ $npThumb }}"
                   alt="thumbnail">
                 <div class="icon-file-group">
                   <div class="icon-file">
                     <input type="file" name="image" id="customFileEg1" class="custom-file-input d-none"
-                      accept=".jpg,.png,.webp,.jpeg,.gif,.bmp|image/*" required>
+                      accept="{{ IMAGE_EXTENSION }}" {{ $isEdit && filled($product?->image) ? '' : 'required' }}>
                     <i class="tio-edit"></i>
                   </div>
                 </div>
               </label>
-              <div class="np-hint mt-2">JPG, PNG, WEBP — max 2MB — 1:1 ratio</div>
+              <div class="np-hint mt-2">JPG, PNG, WEBP, GIF — max 2MB — 1:1 ratio</div>
             </div>
           </div>
           <div class="np-card">
             <div class="np-card-header"><span class="np-card-icon">🖼️</span><span class="np-card-title">Product Gallery
                 Images</span><span class="np-card-subtitle">Max 8 · JPG/PNG/WEBP · 2MB each</span></div>
             <div class="np-card-body">
+              <input type="hidden" name="removedImageKeys" id="removedImageKeys" value="">
               <div class="np-upload-zone" id="npUploadZone" onclick="document.getElementById('npFileInput').click()"
                 ondragover="event.preventDefault();this.classList.add('drag')"
                 ondragleave="this.classList.remove('drag')" ondrop="npHandleDrop(event)">
@@ -1758,7 +1774,7 @@
                 <div class="np-upload-sub">or <span class="np-upload-link">browse from your computer</span></div>
                 <div class="np-upload-sub" style="margin-top:5px;font-size:11px;color:#b0bec5">First image = main
                   gallery image</div>
-                <input type="file" id="npFileInput" name="images[]" multiple accept="image/*" style="display:none"
+                <input type="file" id="npFileInput" name="images[]" multiple accept="{{ IMAGE_EXTENSION }}" style="display:none"
                   onchange="npHandleFiles(event)">
               </div>
               <div class="np-img-grid" id="npImagePreviews"></div>
@@ -1772,9 +1788,11 @@
                 Video</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Video URL (YouTube / Vimeo)</label><input type="url"
-                  name="meta_data[video_url]" class="np-input" placeholder="https://www.youtube.com/watch?v=…"></div>
+                  name="meta_data[video_url]" class="np-input" placeholder="https://www.youtube.com/watch?v=…"
+                  value="{{ old('meta_data.video_url', data_get($npMeta,'video_url','')) }}"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Video Title</label><input
-                  type="text" name="meta_data[video_title]" class="np-input" placeholder="e.g. Product Demo"></div>
+                  type="text" name="meta_data[video_title]" class="np-input" placeholder="e.g. Product Demo"
+                  value="{{ old('meta_data.video_title', data_get($npMeta,'video_title','')) }}"></div>
             </div>
           </div>
           <div class="np-card">
@@ -1782,12 +1800,15 @@
             </div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Product Datasheet URL</label><input type="url"
-                  name="meta_data[datasheet_url]" class="np-input" placeholder="https://…/datasheet.pdf"></div>
+                  name="meta_data[datasheet_url]" class="np-input" placeholder="https://…/datasheet.pdf"
+                  value="{{ old('meta_data.datasheet_url', data_get($npMeta,'datasheet_url','')) }}"></div>
               <div class="np-form-group"><label class="np-label">Certificate of Analysis</label><input type="url"
-                  name="meta_data[cert_url]" class="np-input" placeholder="https://…/cert.pdf"></div>
+                  name="meta_data[cert_url]" class="np-input" placeholder="https://…/cert.pdf"
+                  value="{{ old('meta_data.cert_url', data_get($npMeta,'cert_url','')) }}"></div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">User Manual / Recipe
                   Guide</label><input type="url" name="meta_data[manual_url]" class="np-input"
-                  placeholder="https://…/manual.pdf"></div>
+                  placeholder="https://…/manual.pdf"
+                  value="{{ old('meta_data.manual_url', data_get($npMeta,'manual_url','')) }}"></div>
             </div>
           </div>
         </div>
@@ -1819,23 +1840,26 @@
             <div class="np-card-header"><span class="np-card-icon">🔄</span><span class="np-card-title">360° View &amp;
                 AR Assets</span></div>
             <div class="np-card-body">
+              @php($np360 = (string) old('meta_data.enable_360', data_get($npMeta,'enable_360','0')) === '1')
+              @php($npAR = (string) old('meta_data.enable_ar', data_get($npMeta,'enable_ar','0')) === '1')
               <div class="np-trow" style="padding-top:0">
                 <div>
                   <div class="np-tlbl">Enable 360° View</div>
                   <div class="np-tdsc">Upload a sequence of images</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[enable_360]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[enable_360]" value="1" @checked($np360)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Enable AR</div>
                   <div class="np-tdsc">Requires USDZ / GLB 3D model</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[enable_ar]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[enable_ar]" value="1" @checked($npAR)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-form-group" style="margin-top:14px;margin-bottom:0"><label class="np-label">3D Model File
                   URL (.glb / .usdz)</label><input type="url" name="meta_data[model_3d_url]" class="np-input"
-                  placeholder="https://cdn.example.com/product.glb"></div>
+                  placeholder="https://cdn.example.com/product.glb"
+                  value="{{ old('meta_data.model_3d_url', data_get($npMeta,'model_3d_url','')) }}"></div>
             </div>
           </div>
         </div>
@@ -1846,7 +1870,7 @@
     <div class="np-tab-panel" id="np-tab-logistics">
       <div class="np-grid">
         <div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.incoterms">
             <div class="np-card-header"><span class="np-card-icon">⚖️</span><span class="np-card-title">Incoterms
                 (International Trade Terms)</span></div>
             <div class="np-card-body">
@@ -1854,47 +1878,83 @@
                 between seller and buyer.</div>
               <div class="np-inco-grid">
                 @foreach(['EXW' => 'Ex Works', 'FCA' => 'Free Carrier', 'CPT' => 'Carriage Paid To', 'CIP' => 'Carriage & Ins. Paid', 'FOB' => 'Free On Board', 'CFR' => 'Cost & Freight', 'CIF' => 'Cost, Ins. & Freight', 'DPU' => 'Delivered at Place Unloaded', 'DAP' => 'Delivered at Place', 'DDP' => 'Delivered Duty Paid', 'FAS' => 'Free Alongside Ship', 'DAT' => 'Delivered at Terminal'] as $code => $label)
-                  <div class="np-inco-pill" onclick="this.classList.toggle('sel')">{{ $code }}<span
-                      class="np-inco-sub">{{ $label }}</span><input type="hidden"
-                      name="meta_data[incoterm_{{ strtolower($code) }}]" value="0"></div>
+                  @php($k = 'incoterm_' . strtolower($code))
+                  @php($vLegacy = (string) old('meta_data.' . $k, data_get($npMeta, $k, '0')) === '1')
+                  @php($v = $vLegacy || in_array($code, $npIncoterms))
+                  <div class="np-inco-pill {{ $v ? 'sel' : '' }}" onclick="npToggleIncoterm(this)">{{ $code }}<span
+                      class="np-inco-sub">{{ $label }}</span>
+                    <input type="hidden" name="meta_data[{{ $k }}]" value="{{ $vLegacy ? '1' : '0' }}">
+                    <input type="checkbox" class="d-none" name="meta_data[incoterms][]" value="{{ $code }}" @checked($v)>
+                  </div>
                 @endforeach
+                @foreach($npIncotermsCustom as $code)
+                  @php($code = is_string($code) ? strtoupper(trim($code)) : '')
+                  @if(filled($code))
+                    @php($v = in_array($code, $npIncoterms))
+                    <div class="np-inco-pill {{ $v ? 'sel' : '' }}" onclick="npToggleIncoterm(this)">{{ $code }}
+                      <input type="hidden" name="meta_data[incoterms_custom][]" value="{{ $code }}">
+                      <input type="checkbox" class="d-none" name="meta_data[incoterms][]" value="{{ $code }}" @checked($v)>
+                    </div>
+                  @endif
+                @endforeach
+              </div>
+              <div class="np-form-row" style="margin-top:12px;align-items:center">
+                <div class="np-form-group" style="margin:0;flex:1">
+                  <label class="np-label">Add custom Incoterm code</label>
+                  <input type="text" id="npIncoCustomInput" class="np-input" placeholder="e.g. XYZ">
+                </div>
+                <button type="button" class="np-btn-add" style="margin-top:22px" onclick="npAddCustomIncoterm()">+ Add</button>
               </div>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.shipping_methods">
             <div class="np-card-header"><span class="np-card-icon">✈️</span><span class="np-card-title">Shipping
                 Methods</span></div>
             <div class="np-card-body">
               <div class="np-chk-grid">
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="sea_fcl"> 🚢 Sea Freight (FCL)</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="sea_lcl"> 📦 Sea Freight (LCL)</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="air"> ✈️ Air Freight</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="rail"> 🚂 Rail Freight</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="road"> 🚚 Road / Truck</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="express"> 📮 Express (DHL/FedEx)</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="same_day"> 🛵 Same-Day Local</label>
-                <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[ship][]"
-                    value="drone"> 🚁 Drone Delivery</label>
+                @foreach([
+                  'sea_fcl' => '🚢 Sea Freight (FCL)',
+                  'sea_lcl' => '📦 Sea Freight (LCL)',
+                  'air' => '✈️ Air Freight',
+                  'rail' => '🚂 Rail Freight',
+                  'road' => '🚚 Road / Truck',
+                  'express' => '📮 Express (DHL/FedEx)',
+                  'same_day' => '🛵 Same-Day Local',
+                  'drone' => '🚁 Drone Delivery',
+                ] as $key => $label)
+                  <label class="np-chk-item {{ in_array($key,$npShip) ? 'on' : '' }}"><input type="checkbox" name="meta_data[ship][]"
+                      value="{{ $key }}" @checked(in_array($key,$npShip))> {{ $label }}</label>
+                @endforeach
+                @foreach($npShipCustom as $nm)
+                  @php($nm = is_string($nm) ? trim($nm) : '')
+                  @if(filled($nm))
+                    @php($val = 'custom:' . $nm)
+                    <label class="np-chk-item {{ in_array($val,$npShip) ? 'on' : '' }}"><input type="checkbox" name="meta_data[ship][]"
+                        value="{{ $val }}" @checked(in_array($val,$npShip))> {{ $nm }}</label>
+                    <input type="hidden" name="meta_data[ship_custom][]" value="{{ $nm }}">
+                  @endif
+                @endforeach
+              </div>
+              <div class="np-form-row" style="margin-top:12px;align-items:center">
+                <div class="np-form-group" style="margin:0;flex:1">
+                  <label class="np-label">Add custom shipping method</label>
+                  <input type="text" id="npShipCustomInput" class="np-input" placeholder="e.g. Courier Bike">
+                </div>
+                <button type="button" class="np-btn-add" style="margin-top:22px" onclick="npAddCustomShipMethod()">+ Add</button>
               </div>
               <div class="np-divider"></div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Preferred
                     Carrier</label><input type="text" name="meta_data[preferred_carrier]" class="np-input"
-                    placeholder="e.g. DHL, FedEx, Aramex"></div>
+                    placeholder="e.g. DHL, FedEx, Aramex" value="{{ old('meta_data.preferred_carrier', data_get($npMeta,'preferred_carrier','')) }}"></div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Port of Loading</label><input
-                    type="text" name="meta_data[port_of_loading]" class="np-input" placeholder="e.g. Hamad Port, Doha">
+                    type="text" name="meta_data[port_of_loading]" class="np-input" placeholder="e.g. Hamad Port, Doha"
+                    value="{{ old('meta_data.port_of_loading', data_get($npMeta,'port_of_loading','')) }}">
                 </div>
               </div>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.shipping_rates">
             <div class="np-card-header"><span class="np-card-icon">💰</span><span class="np-card-title">Shipping
                 Rates</span></div>
             <div class="np-card-body">
@@ -1902,157 +1962,259 @@
                 <div class="np-form-group"><label class="np-label">Free Shipping Threshold</label>
                   <div class="np-iw"><span
                       class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
-                      name="meta_data[free_ship_threshold]" class="np-input" placeholder="150" step="0.01"></div>
+                      name="meta_data[free_ship_threshold]" class="np-input" placeholder="150" step="0.01"
+                      value="{{ old('meta_data.free_ship_threshold', data_get($npMeta,'free_ship_threshold','')) }}"></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Standard Shipping Fee</label>
                   <div class="np-iw"><span
                       class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
-                      name="meta_data[std_ship_fee]" class="np-input" placeholder="15.00" step="0.01"></div>
+                      name="meta_data[std_ship_fee]" class="np-input" placeholder="15.00" step="0.01"
+                      value="{{ old('meta_data.std_ship_fee', data_get($npMeta,'std_ship_fee','')) }}"></div>
                 </div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Express Shipping Fee</label>
                   <div class="np-iw"><span
                       class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
-                      name="meta_data[exp_ship_fee]" class="np-input" placeholder="30.00" step="0.01"></div>
+                      name="meta_data[exp_ship_fee]" class="np-input" placeholder="30.00" step="0.01"
+                      value="{{ old('meta_data.exp_ship_fee', data_get($npMeta,'exp_ship_fee','')) }}"></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">International Shipping
                     Fee</label>
                   <div class="np-iw"><span
                       class="np-ipfx">{{ \App\CentralLogics\Helpers::currency_symbol() }}</span><input type="number"
-                      name="meta_data[intl_ship_fee]" class="np-input" placeholder="60.00" step="0.01"></div>
+                      name="meta_data[intl_ship_fee]" class="np-input" placeholder="60.00" step="0.01"
+                      value="{{ old('meta_data.intl_ship_fee', data_get($npMeta,'intl_ship_fee','')) }}"></div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.multi_warehouse_inventory">
+            <div class="np-card-header"><span class="np-card-icon">🏭</span><span class="np-card-title">Multi-Warehouse
+                Inventory</span></div>
+            <div class="np-card-body">
+              <div class="np-info-box">🏬 Manage stock levels across multiple fulfilment centres and dark stores.</div>
+              @php($whName = old('meta_data.wh_name', data_get($npMeta,'wh_name', [])))
+              @php($whQty = old('meta_data.wh_qty', data_get($npMeta,'wh_qty', [])))
+              @php($whAlert = old('meta_data.wh_alert', data_get($npMeta,'wh_alert', [])))
+              @php($whStatus = old('meta_data.wh_status', data_get($npMeta,'wh_status', [])))
+              @php($whName = is_array($whName) ? $whName : [])
+              @php($whQty = is_array($whQty) ? $whQty : [])
+              @php($whAlert = is_array($whAlert) ? $whAlert : [])
+              @php($whStatus = is_array($whStatus) ? $whStatus : [])
+              @php($whRows = max(count($whName), count($whQty), count($whAlert), count($whStatus), 1))
+
+              <div id="npWhRows">
+                @for($i=0;$i<$whRows;$i++)
+                  <div class="np-form-row" style="align-items:center;margin-bottom:10px">
+                    <input type="text" name="meta_data[wh_name][]" class="np-input"
+                      placeholder="🏬 Warehouse name" value="{{ $whName[$i] ?? '' }}">
+                    <input type="number" name="meta_data[wh_qty][]" class="np-input" placeholder="Qty"
+                      style="max-width:110px;text-align:center" value="{{ $whQty[$i] ?? '' }}">
+                    <input type="number" name="meta_data[wh_alert][]" class="np-input" placeholder="Alert"
+                      style="max-width:110px;text-align:center" value="{{ $whAlert[$i] ?? '' }}">
+                    @php($st = $whStatus[$i] ?? 'Active')
+                    <select name="meta_data[wh_status][]" class="np-select"
+                      style="max-width:140px;font-size:12px;padding:7px 10px">
+                      <option value="Active" @selected($st==='Active')>Active</option>
+                      <option value="Inactive" @selected($st==='Inactive')>Inactive</option>
+                    </select>
+                    <button type="button" class="np-btn-tiny del" onclick="this.closest('.np-form-row').remove()">✕</button>
+                  </div>
+                @endfor
+              </div>
+              <button type="button" class="np-btn-add" onclick="npAddWarehouseRow()">+ Add Warehouse</button>
+            </div>
+          </div>
+
+          <div class="np-card" data-np-section="np-tab-logistics.dangerous_goods">
             <div class="np-card-header"><span class="np-card-icon">⚠️</span><span class="np-card-title">Dangerous Goods
                 &amp; Restrictions</span></div>
             <div class="np-card-body">
-              <div class="np-form-group"><label class="np-label">Dangerous Goods Classification</label><select
-                  name="meta_data[dangerous_goods]" class="np-select">
-                  <option>Not Dangerous</option>
-                  <option>Class 1 — Explosives</option>
-                  <option>Class 2 — Gases</option>
-                  <option>Class 3 — Flammable Liquids</option>
-                  <option>Class 4 — Flammable Solids</option>
-                  <option>Class 8 — Corrosives</option>
-                  <option>Class 9 — Miscellaneous</option>
-                </select></div>
+              <div class="np-form-group">
+                <label class="np-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                  <span>Dangerous Goods Classification</span>
+                  <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('dangerous_goods')">+</button>
+                </label>
+                <select name="meta_data[dangerous_goods]" id="npDangerousGoods" class="np-select js-select2-custom">
+                  @php($savedDG = old('meta_data.dangerous_goods', data_get($npMeta,'dangerous_goods','Not Dangerous')))
+                  @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                    @foreach(\App\Models\ProductSelectOption::where('type','dangerous_goods')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                      <option value="{{ $opt->name }}" @selected($savedDG == $opt->name)>{{ $opt->name }}</option>
+                    @endforeach
+                  @else
+                    @foreach(['Not Dangerous','Class 1 — Explosives','Class 2 — Gases','Class 3 — Flammable Liquids','Class 4 — Flammable Solids','Class 8 — Corrosives','Class 9 — Miscellaneous'] as $v)
+                      <option value="{{ $v }}" @selected($savedDG == $v)>{{ $v }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
               <div class="np-form-row">
-                <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Air Freight
-                    Restriction</label><select name="meta_data[air_restriction]" class="np-select">
-                    <option>No restriction</option>
-                    <option>Cargo aircraft only</option>
-                    <option>Prohibited</option>
-                  </select></div>
-                <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Temperature Controlled
-                    Shipping</label><select name="meta_data[temp_controlled]" class="np-select">
-                    <option>Not required</option>
-                    <option>Chilled (2–8°C)</option>
-                    <option>Frozen (−18°C)</option>
-                  </select></div>
+                <div class="np-form-group" style="margin-bottom:0">
+                  <label class="np-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <span>Air Freight Restriction</span>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('air_restriction')">+</button>
+                  </label>
+                  <select name="meta_data[air_restriction]" id="npAirRestriction" class="np-select js-select2-custom">
+                    @php($savedAir = old('meta_data.air_restriction', data_get($npMeta,'air_restriction','No restriction')))
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','air_restriction')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                        <option value="{{ $opt->name }}" @selected($savedAir == $opt->name)>{{ $opt->name }}</option>
+                      @endforeach
+                    @else
+                      @foreach(['No restriction','Cargo aircraft only','Prohibited'] as $v)
+                        <option value="{{ $v }}" @selected($savedAir == $v)>{{ $v }}</option>
+                      @endforeach
+                    @endif
+                  </select>
+                </div>
+                <div class="np-form-group" style="margin-bottom:0">
+                  <label class="np-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <span>Temperature Controlled Shipping</span>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenProductSelectOptionModal('temp_controlled')">+</button>
+                  </label>
+                  <select name="meta_data[temp_controlled]" id="npTempControlled" class="np-select js-select2-custom">
+                    @php($savedTemp = old('meta_data.temp_controlled', data_get($npMeta,'temp_controlled','Not required')))
+                    @if(\Illuminate\Support\Facades\Schema::hasTable('product_select_options'))
+                      @foreach(\App\Models\ProductSelectOption::where('type','temp_controlled')->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name']) as $opt)
+                        <option value="{{ $opt->name }}" @selected($savedTemp == $opt->name)>{{ $opt->name }}</option>
+                      @endforeach
+                    @else
+                      @foreach(['Not required','Chilled (2–8°C)','Frozen (−18°C)'] as $v)
+                        <option value="{{ $v }}" @selected($savedTemp == $v)>{{ $v }}</option>
+                      @endforeach
+                    @endif
+                  </select>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.export_markets">
             <div class="np-card-header"><span class="np-card-icon">🌐</span><span class="np-card-title">Export
                 Markets</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">Primary Export Regions</label>
                 <div class="np-chk-grid">
-                  <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[export][]"
-                      value="gcc"> 🌍 GCC</label>
-                  <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[export][]"
-                      value="me"> 🌍 Middle East</label>
-                  <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[export][]"
-                      value="africa"> 🌍 Africa</label>
-                  <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[export][]"
-                      value="europe"> 🌍 Europe</label>
-                  <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[export][]"
-                      value="na"> 🌎 North America</label>
-                  <label class="np-chk-item" onclick="npTogChk(this)"><input type="checkbox" name="meta_data[export][]"
-                      value="apac"> 🌏 Asia Pacific</label>
+                  @foreach([
+                    'gcc' => '🌍 GCC',
+                    'me' => '🌍 Middle East',
+                    'africa' => '🌍 Africa',
+                    'europe' => '🌍 Europe',
+                    'na' => '🌎 North America',
+                    'apac' => '🌏 Asia Pacific',
+                  ] as $key => $label)
+                    <label class="np-chk-item {{ in_array($key,$npExport) ? 'on' : '' }}"><input type="checkbox" name="meta_data[export][]"
+                        value="{{ $key }}" @checked(in_array($key,$npExport))> {{ $label }}</label>
+                  @endforeach
+                  @foreach($npExportCustom as $nm)
+                    @php($nm = is_string($nm) ? trim($nm) : '')
+                    @if(filled($nm))
+                      @php($val = 'custom:' . $nm)
+                      <label class="np-chk-item {{ in_array($val,$npExport) ? 'on' : '' }}"><input type="checkbox" name="meta_data[export][]"
+                          value="{{ $val }}" @checked(in_array($val,$npExport))> {{ $nm }}</label>
+                      <input type="hidden" name="meta_data[export_custom][]" value="{{ $nm }}">
+                    @endif
+                  @endforeach
+                </div>
+                <div class="np-form-row" style="margin-top:12px;align-items:center">
+                  <div class="np-form-group" style="margin:0;flex:1">
+                    <label class="np-label">Add custom export region</label>
+                    <input type="text" id="npExportCustomInput" class="np-input" placeholder="e.g. South America">
+                  </div>
+                  <button type="button" class="np-btn-add" style="margin-top:22px" onclick="npAddCustomExportRegion()">+ Add</button>
                 </div>
               </div>
               <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Restricted Countries</label>
                 <div class="np-tag-wrap" id="npRestrictWrap" onclick="this.querySelector('input').focus()">
+                  @foreach($npRestricted as $t)
+                    @php($t = is_string($t) ? trim($t) : '')
+                    @if(filled($t))
+                      <span class="np-tag t-orange">{{ $t }} <span class="np-tag-rm" onclick="this.parentElement.remove()">×</span><input type="hidden" name="meta_data[restricted_countries][]" value="{{ $t }}"></span>
+                    @endif
+                  @endforeach
                   <input type="text" id="npRestrictInput" class="np-input" placeholder="Add country, press Enter…"
                     onkeydown="npAddTag(event,'npRestrictWrap','npRestrictInput','t-orange','meta_data[restricted_countries][]')">
                 </div>
               </div>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.customs_import">
             <div class="np-card-header"><span class="np-card-icon">🛂</span><span class="np-card-title">Customs &amp;
                 Import Details</span></div>
             <div class="np-card-body">
               <div class="np-form-group"><label class="np-label">HS Tariff Code</label><input type="text"
-                  name="meta_data[hs_tariff]" class="np-input np-mono" placeholder="e.g. 0406.10.00"></div>
+                  name="meta_data[hs_tariff]" class="np-input np-mono" placeholder="e.g. 0406.10.00"
+                  value="{{ old('meta_data.hs_tariff', data_get($npMeta,'hs_tariff','')) }}"></div>
               <div class="np-form-group"><label class="np-label">Customs Description</label><input type="text"
-                  name="meta_data[customs_desc]" class="np-input" placeholder="e.g. Fresh cream cheese"></div>
+                  name="meta_data[customs_desc]" class="np-input" placeholder="e.g. Fresh cream cheese"
+                  value="{{ old('meta_data.customs_desc', data_get($npMeta,'customs_desc','')) }}"></div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Import Duty Rate</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[import_duty]" class="np-input"
-                      placeholder="5" step="0.1"><span class="np-isfx">%</span></div>
+                      placeholder="5" step="0.1" value="{{ old('meta_data.import_duty', data_get($npMeta,'import_duty','')) }}"><span class="np-isfx">%</span></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">VAT / GST Rate</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[vat_rate]" class="np-input"
-                      placeholder="5" step="0.1"><span class="np-isfx">%</span></div>
+                      placeholder="5" step="0.1" value="{{ old('meta_data.vat_rate', data_get($npMeta,'vat_rate','')) }}"><span class="np-isfx">%</span></div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.pallet_carton">
             <div class="np-card-header"><span class="np-card-icon">📦</span><span class="np-card-title">Pallet &amp;
                 Carton Details</span></div>
             <div class="np-card-body">
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Units per Carton</label><input type="number"
-                    name="meta_data[units_per_carton]" class="np-input" placeholder="12"></div>
+                    name="meta_data[units_per_carton]" class="np-input" placeholder="12"
+                    value="{{ old('meta_data.units_per_carton', data_get($npMeta,'units_per_carton','')) }}"></div>
                 <div class="np-form-group"><label class="np-label">Cartons per Pallet</label><input type="number"
-                    name="meta_data[cartons_per_pallet]" class="np-input" placeholder="48"></div>
+                    name="meta_data[cartons_per_pallet]" class="np-input" placeholder="48"
+                    value="{{ old('meta_data.cartons_per_pallet', data_get($npMeta,'cartons_per_pallet','')) }}"></div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group"><label class="np-label">Carton Length</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[carton_l]" class="np-input"
-                      placeholder="0.0"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" value="{{ old('meta_data.carton_l', data_get($npMeta,'carton_l','')) }}"><span class="np-isfx">cm</span></div>
                 </div>
                 <div class="np-form-group"><label class="np-label">Carton Width</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[carton_w]" class="np-input"
-                      placeholder="0.0"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" value="{{ old('meta_data.carton_w', data_get($npMeta,'carton_w','')) }}"><span class="np-isfx">cm</span></div>
                 </div>
               </div>
               <div class="np-form-row">
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Carton Height</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[carton_h]" class="np-input"
-                      placeholder="0.0"><span class="np-isfx">cm</span></div>
+                      placeholder="0.0" value="{{ old('meta_data.carton_h', data_get($npMeta,'carton_h','')) }}"><span class="np-isfx">cm</span></div>
                 </div>
                 <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Carton Gross Weight</label>
                   <div class="np-iw sfx"><input type="number" name="meta_data[carton_kg]" class="np-input"
-                      placeholder="0.0"><span class="np-isfx">kg</span></div>
+                      placeholder="0.0" value="{{ old('meta_data.carton_kg', data_get($npMeta,'carton_kg','')) }}"><span class="np-isfx">kg</span></div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-logistics.quality_inspection">
             <div class="np-card-header"><span class="np-card-icon">🔍</span><span class="np-card-title">Quality
                 Inspection</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
+              @php($preShip = (string) old('meta_data.pre_ship_inspection', data_get($npMeta,'pre_ship_inspection','1')) === '1')
+              @php($labTest = (string) old('meta_data.lab_testing', data_get($npMeta,'lab_testing','0')) === '1')
+              @php($factoryAudit = (string) old('meta_data.factory_audit', data_get($npMeta,'factory_audit','1')) === '1')
               <div class="np-trow" style="padding-top:8px">
                 <div>
                   <div class="np-tlbl">Pre-shipment Inspection</div>
                   <div class="np-tdsc">Third-party QC before dispatch</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[pre_ship_inspection]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    @checked($preShip)><span class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Lab Testing Available</div>
                   <div class="np-tdsc">SGS / Intertek / Bureau Veritas</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[lab_testing]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[lab_testing]" value="1" @checked($labTest)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -2060,11 +2222,12 @@
                   <div class="np-tlbl">Factory Audit Report</div>
                   <div class="np-tdsc">Available on request</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[factory_audit]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    @checked($factoryAudit)><span class="np-tog-track"></span></label>
               </div>
               <div class="np-form-group" style="margin-top:14px;margin-bottom:0"><label class="np-label">Inspection
                   Agency</label><input type="text" name="meta_data[inspection_agency]" class="np-input"
-                  placeholder="e.g. SGS, Intertek, QIMA"></div>
+                  placeholder="e.g. SGS, Intertek, QIMA"
+                  value="{{ old('meta_data.inspection_agency', data_get($npMeta,'inspection_agency','')) }}"></div>
             </div>
           </div>
         </div>
@@ -2708,6 +2871,116 @@
       el.querySelector('input').checked = el.classList.contains('on');
     }
 
+    // ═══ INCOTERM PILL TOGGLE (hidden input 1/0) ═══
+    function npToggleIncoterm(el) {
+      if (!el) return;
+      el.classList.toggle('sel');
+      const inp = el.querySelector('input[type="hidden"]');
+      if (inp) inp.value = el.classList.contains('sel') ? '1' : '0';
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = el.classList.contains('sel');
+    }
+
+    // Keep checkbox-card visuals in sync with actual inputs (so saving works reliably)
+    document.addEventListener('change', function (e) {
+      const t = e.target;
+      if (!t || t.tagName !== 'INPUT' || t.type !== 'checkbox') return;
+      const lab = t.closest('.np-chk-item');
+      if (!lab) return;
+      lab.classList.toggle('on', !!t.checked);
+    });
+
+    function npAddWarehouseRow() {
+      const wrap = document.getElementById('npWhRows');
+      if (!wrap) return;
+      const row = document.createElement('div');
+      row.className = 'np-form-row';
+      row.style.alignItems = 'center';
+      row.style.marginBottom = '10px';
+      row.innerHTML = `
+        <input type="text" name="meta_data[wh_name][]" class="np-input" placeholder="🏬 Warehouse name" value="">
+        <input type="number" name="meta_data[wh_qty][]" class="np-input" placeholder="Qty" style="max-width:110px;text-align:center" value="">
+        <input type="number" name="meta_data[wh_alert][]" class="np-input" placeholder="Alert" style="max-width:110px;text-align:center" value="">
+        <select name="meta_data[wh_status][]" class="np-select" style="max-width:140px;font-size:12px;padding:7px 10px">
+          <option value="Active" selected>Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <button type="button" class="np-btn-tiny del" onclick="this.closest('.np-form-row').remove()">✕</button>
+      `;
+      wrap.appendChild(row);
+    }
+
+    function npAddCustomIncoterm() {
+      const input = document.getElementById('npIncoCustomInput');
+      const grid = document.querySelector('#np-tab-logistics .np-inco-grid');
+      if (!input || !grid) return;
+      const code = String(input.value || '').trim().toUpperCase();
+      if (!code) return;
+      input.value = '';
+
+      // Prevent duplicates
+      const exists = Array.from(grid.querySelectorAll('.np-inco-pill')).some(p => String(p.childNodes?.[0]?.textContent || p.textContent || '').trim().startsWith(code));
+      if (exists) return;
+
+      const pill = document.createElement('div');
+      pill.className = 'np-inco-pill sel';
+      pill.setAttribute('onclick', 'npToggleIncoterm(this)');
+      pill.innerHTML = `
+        ${code}
+        <input type="hidden" name="meta_data[incoterms_custom][]" value="${code.replace(/"/g, '&quot;')}">
+        <input type="checkbox" class="d-none" name="meta_data[incoterms][]" value="${code.replace(/"/g, '&quot;')}" checked>
+      `;
+      grid.appendChild(pill);
+    }
+
+    function npAddCustomShipMethod() {
+      const input = document.getElementById('npShipCustomInput');
+      const grid = document.querySelector('#np-tab-logistics [data-np-section="np-tab-logistics.shipping_methods"] .np-chk-grid');
+      if (!input || !grid) return;
+      const name = String(input.value || '').trim();
+      if (!name) return;
+      input.value = '';
+
+      const val = 'custom:' + name;
+      const exists = Array.from(grid.querySelectorAll('input[type="checkbox"][name="meta_data[ship][]"]')).some(i => String(i.value) === val);
+      if (exists) return;
+
+      const label = document.createElement('label');
+      label.className = 'np-chk-item on';
+      label.innerHTML = `<input type="checkbox" name="meta_data[ship][]" value="${val.replace(/"/g, '&quot;')}" checked> ${name}`;
+      grid.appendChild(label);
+
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'meta_data[ship_custom][]';
+      hidden.value = name;
+      grid.appendChild(hidden);
+    }
+
+    function npAddCustomExportRegion() {
+      const input = document.getElementById('npExportCustomInput');
+      const grid = document.querySelector('#np-tab-logistics [data-np-section="np-tab-logistics.export_markets"] .np-chk-grid');
+      if (!input || !grid) return;
+      const name = String(input.value || '').trim();
+      if (!name) return;
+      input.value = '';
+
+      const val = 'custom:' + name;
+      const exists = Array.from(grid.querySelectorAll('input[type="checkbox"][name="meta_data[export][]"]')).some(i => String(i.value) === val);
+      if (exists) return;
+
+      const label = document.createElement('label');
+      label.className = 'np-chk-item on';
+      label.innerHTML = `<input type="checkbox" name="meta_data[export][]" value="${val.replace(/"/g, '&quot;')}" checked> ${name}`;
+      grid.appendChild(label);
+
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'meta_data[export_custom][]';
+      hidden.value = name;
+      grid.appendChild(hidden);
+    }
+
     function npToggleDeliveryCard(cardEl) {
       if (!cardEl) return;
       cardEl.classList.toggle('sel');
@@ -2747,21 +3020,41 @@
 
     // ═══ IMAGES ═══
     let npImgs = [];
+    let npRemovedImageKeys = [];
     function npHandleFiles(e) { Array.from(e.target.files).forEach(npAddImg); }
     function npHandleDrop(e) { e.preventDefault(); document.getElementById('npUploadZone').classList.remove('drag'); Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(npAddImg); }
     function npAddImg(file) {
       if (npImgs.length >= 8) return;
       const r = new FileReader();
-      r.onload = ev => { npImgs.push({ src: ev.target.result, alt: file.name.replace(/\.[^.]+$/, '') }); npRenderImgs(); npRenderAlt(); npUpdateQuality(); };
+      r.onload = ev => { npImgs.push({ src: ev.target.result, alt: file.name.replace(/\.[^.]+$/, ''), key: '' }); npRenderImgs(); npRenderAlt(); npUpdateQuality(); };
       r.readAsDataURL(file);
+    }
+    function npSyncRemovedImageKeys() {
+      try {
+        const el = document.getElementById('removedImageKeys');
+        if (el) el.value = (npRemovedImageKeys || []).join(',');
+      } catch (e) { }
     }
     function npRenderImgs() {
       document.getElementById('npImagePreviews').innerHTML = npImgs.map((img, i) => `
               <div class="np-img-thumb"><img src="${img.src}">
               <span class="np-th-rm" onclick="npRmImg(${i})">×</span>
               ${i === 0 ? '<span class="np-th-main">MAIN</span>' : ''}</div>`).join('');
+      npSyncRemovedImageKeys();
     }
-    function npRmImg(i) { npImgs.splice(i, 1); npRenderImgs(); npRenderAlt(); npUpdateQuality(); }
+    function npRmImg(i) {
+      try {
+        const img = npImgs[i];
+        if (img && img.key) {
+          npRemovedImageKeys = npRemovedImageKeys || [];
+          if (!npRemovedImageKeys.includes(img.key)) npRemovedImageKeys.push(img.key);
+        }
+      } catch (e) { }
+      npImgs.splice(i, 1);
+      npRenderImgs();
+      npRenderAlt();
+      npUpdateQuality();
+    }
     function npRenderAlt() {
       const c = document.getElementById('npAltTagsContainer');
       if (!npImgs.length) { c.innerHTML = '<div class="np-hint" style="font-size:12px">Upload images above to add alt tags.</div>'; return; }
@@ -3268,6 +3561,10 @@
       if (!form) return;
 
       npClearFieldErrors();
+      // Ensure Logistics dynamic controls are represented as real inputs (FormData)
+      try {
+        if (typeof npAddCustomIncoterm === 'function') { /* noop - only to ensure function exists */ }
+      } catch (e) { }
       const activeTabIdAtStart = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
       const startTabIndex = Math.max(npTabIds.indexOf(activeTabIdAtStart), 0);
       const nextTabIdAtStart = moveNext ? (npTabIds[startTabIndex + 1] || '') : '';
@@ -3404,7 +3701,39 @@
       $("#add_new_option_button").click(function (e) { if (typeof add_new_option_button === 'function') add_new_option_button(); });
       // Restore saved draft (add-new only) before select2 init
       try { npLoadFormDraft(); } catch (e) { }
+
+      // If we already have an item_id but are still on add-new URL, jump to edit so DB-prefill works (Media needs this)
+      try {
+        const id = ($('#item_id').val() || '').toString().trim();
+        const isAddNew = /\/admin\/item\/add-new$/.test(window.location.pathname || '');
+        if (id && isAddNew) {
+          const base = "{{ route('admin.item.edit', [0]) }}";
+          const editUrl = base.replace(/\/0$/, '/' + id);
+          window.location.replace(editUrl);
+          return;
+        }
+      } catch (e) { }
       $('.js-select2-custom').each(function () { if ($.HSCore && $.HSCore.components && $.HSCore.components.HSSelect2) $.HSCore.components.HSSelect2.init($(this)); });
+
+      // Prefill Media tab previews for edit mode (existing images)
+      try {
+        const isEdit = {{ $isEdit ? 'true' : 'false' }};
+        if (isEdit) {
+          const existing = {!! json_encode(is_array($product?->images) ? $product->images : []) !!};
+          const existingUrls = {!! json_encode(is_array($product?->images_full_url) ? $product->images_full_url : []) !!};
+          const alts = {!! json_encode(is_array(old('alt_text', data_get($npMeta,'alt_text', []))) ? old('alt_text', data_get($npMeta,'alt_text', [])) : []) !!};
+          if (Array.isArray(existing) && existing.length) {
+            npImgs = existing.map((v, idx) => {
+              const img = (v && typeof v === 'object') ? (v.img || '') : (v || '');
+              const url = (Array.isArray(existingUrls) && existingUrls[idx]) ? String(existingUrls[idx]) : ("{{ \App\CentralLogics\Helpers::get_full_url('product', '___IMG___', 'public') }}".replace('___IMG___', img));
+              const alt = (Array.isArray(alts) && typeof alts[idx] === 'string' && alts[idx].trim()) ? alts[idx].trim() : (img ? String(img).replace(/\.[^.]+$/, '') : '');
+              return { src: url, alt: alt, key: img };
+            }).filter(x => !!x.key);
+            npRenderImgs();
+            npRenderAlt();
+          }
+        }
+      } catch (e) { }
 
       // Prefill item type select from hidden meta_data[item_type_id]
       try {
@@ -4024,6 +4353,9 @@
           variant_color: 'Add Colour',
           variant_type: 'Add Variant Type',
           schema_type: 'Add Schema Type',
+          dangerous_goods: 'Add Dangerous Goods Option',
+          air_restriction: 'Add Air Restriction Option',
+          temp_controlled: 'Add Temperature Shipping Option',
         };
         document.getElementById('npProductSelectOptionModalLabel').textContent = titleMap[type] || 'Add Option';
         modal.modal('show');
@@ -4122,6 +4454,9 @@
               product_type: '#npProductType',
               variant_type: '#npVariantType',
               schema_type: '#npSchemaType',
+              dangerous_goods: '#npDangerousGoods',
+              air_restriction: '#npAirRestriction',
+              temp_controlled: '#npTempControlled',
             };
             const sel = map[res.type];
             const $sel = sel ? $(sel) : $();

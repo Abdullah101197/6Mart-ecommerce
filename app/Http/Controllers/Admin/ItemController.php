@@ -386,6 +386,26 @@ class ItemController extends Controller
         if (is_array($requestMeta) && count($requestMeta) > 0) {
             $metaData = array_merge($metaData, $requestMeta);
         }
+        // Media tab: alt texts for gallery images (same order as submitted)
+        $altText = $request->input('alt_text', []);
+        if (is_array($altText)) {
+            $altText = array_values(array_map(fn($v) => is_string($v) ? trim($v) : $v, $altText));
+            if (count($altText) > 0) {
+                $metaData['alt_text'] = $altText;
+            } else {
+                unset($metaData['alt_text']);
+            }
+        }
+        // Media tab: alt texts for gallery images (same order as submitted)
+        $altText = $request->input('alt_text', []);
+        if (is_array($altText)) {
+            $altText = array_values(array_map(fn($v) => is_string($v) ? trim($v) : $v, $altText));
+            if (count($altText) > 0) {
+                $metaData['alt_text'] = $altText;
+            } else {
+                unset($metaData['alt_text']);
+            }
+        }
         // Normalize custom attributes rows (keep only filled rows)
         $attrNames = $request->input('meta_data.custom_attr_name', []);
         $attrVals = $request->input('meta_data.custom_attr_val', []);

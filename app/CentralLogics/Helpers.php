@@ -4707,6 +4707,11 @@ class Helpers
             $extension = self::extensionFromMimeType($image->getMimeType());
         }
 
+        // Some cameras/browsers upload JPEGs as .jfif (mime is still image/jpeg).
+        if ($extension === 'jfif') {
+            $extension = 'jpg';
+        }
+
         if (!in_array($extension, $allowedExtensions)) {
             throw new InvalidUploadException('File type not allowed.');
         }
