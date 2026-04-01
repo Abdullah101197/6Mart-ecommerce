@@ -2236,69 +2236,258 @@
 
     {{-- ══ TAB 8: REVIEWS & ANALYTICS ══ --}}
     <div class="np-tab-panel" id="np-tab-reviews">
+      <?php
+        $npAcceptInq = (string) old('meta_data.accept_inquiries', data_get($npMeta,'accept_inquiries','1')) === '1';
+        $npAutoReply = (string) old('meta_data.auto_reply', data_get($npMeta,'auto_reply','1')) === '1';
+        $npBulkInq = (string) old('meta_data.bulk_inquiry', data_get($npMeta,'bulk_inquiry','0')) === '1';
+        $npAutoReplyMsg = old('meta_data.auto_reply_msg', data_get($npMeta,'auto_reply_msg',''));
+        $npAllowReviews = (string) old('meta_data.allow_reviews', data_get($npMeta,'allow_reviews','1')) === '1';
+        $npVerifiedOnly = (string) old('meta_data.verified_only', data_get($npMeta,'verified_only','0')) === '1';
+        $npAutoPublishReviews = (string) old('meta_data.auto_publish_reviews', data_get($npMeta,'auto_publish_reviews','1')) === '1';
+
+        // Optional: seed reviews (stored in item meta_data) – internal admin-only data.
+        $npSeedName = old('meta_data.seed_review_name', data_get($npMeta,'seed_review_name', []));
+        $npSeedTitle = old('meta_data.seed_review_title', data_get($npMeta,'seed_review_title', []));
+        $npSeedBody = old('meta_data.seed_review_body', data_get($npMeta,'seed_review_body', []));
+        $npSeedDate = old('meta_data.seed_review_date', data_get($npMeta,'seed_review_date', []));
+        $npSeedRating = old('meta_data.seed_review_rating', data_get($npMeta,'seed_review_rating', []));
+        $npSeedVerified = old('meta_data.seed_review_verified', data_get($npMeta,'seed_review_verified', []));
+        foreach (['npSeedName','npSeedTitle','npSeedBody','npSeedDate','npSeedRating','npSeedVerified'] as $__k) {
+          if (!is_array($$__k)) { $$__k = []; }
+        }
+        $npSeedRows = max(count($npSeedName), count($npSeedTitle), count($npSeedBody), count($npSeedDate), count($npSeedRating), count($npSeedVerified), 1);
+
+        // Live reviews (from DB) – shown in edit mode only.
+        $npReviewStats = ['avg' => null, 'count' => 0, 'by' => [1=>0,2=>0,3=>0,4=>0,5=>0], 'latest' => collect()];
+        if ($isEdit && filled($product?->id)) {
+          try {
+            $q = \App\Models\Review::with('customer')->where('item_id', $product->id);
+            $npReviewStats['count'] = (clone $q)->count();
+            $npReviewStats['avg'] = $npReviewStats['count'] ? round((clone $q)->avg('rating') ?: 0, 1) : null;
+            for ($r=1;$r<=5;$r++) { $npReviewStats['by'][$r] = (clone $q)->where('rating', $r)->count(); }
+            $npReviewStats['latest'] = (clone $q)->latest()->limit(3)->get();
+          } catch (\Throwable $e) { /* ignore */ }
+        }
+
+        // Analytics inputs (stored in meta_data for now; project doesn't expose tracking sources here)
+        $npPis = (float) old('meta_data.pis_score', data_get($npMeta,'pis_score','0'));
+        $npViews30 = (int) old('meta_data.page_views_30d', data_get($npMeta,'page_views_30d','0'));
+        $npATC30 = (int) old('meta_data.add_to_cart_30d', data_get($npMeta,'add_to_cart_30d','0'));
+        $npOrders30 = (int) old('meta_data.orders_30d', data_get($npMeta,'orders_30d','0'));
+        $npRevenue30 = (string) old('meta_data.revenue_30d', data_get($npMeta,'revenue_30d',''));
+        $npConv = $npViews30 > 0 ? round(($npOrders30 / max($npViews30,1))*100, 1) : null;
+      ?>
+
       <div class="np-stat-grid">
         <div class="np-stat-card">
-          <div class="np-stat-val">—</div>
+          <div class="np-stat-val">{{ $npReviewStats['avg'] !== null ? number_format($npReviewStats['avg'], 1) : '—' }}</div>
+          @php($avgInt = $npReviewStats['avg'] !== null ? (int) round((float) $npReviewStats['avg']) : 0)
+          <div class="np-star-row" style="justify-content:center;margin-bottom:4px">
+            @for($i=1;$i<=5;$i++)
+              <span class="np-star {{ $i <= $avgInt ? 'lit' : '' }}">★</span>
+            @endfor
+          </div>
           <div class="np-stat-lbl">Avg. Rating</div>
         </div>
         <div class="np-stat-card">
-          <div class="np-stat-val" style="color:var(--np-success)">0</div>
+          <div class="np-stat-val" style="color:var(--np-success)">{{ (int) $npReviewStats['count'] }}</div>
           <div class="np-stat-lbl">Total Reviews</div>
         </div>
         <div class="np-stat-card">
-          <div class="np-stat-val" style="color:#0ea5e9">0</div>
+          <div class="np-stat-val" style="color:#0ea5e9">{{ number_format($npViews30) }}</div>
           <div class="np-stat-lbl">Product Views</div>
         </div>
         <div class="np-stat-card">
-          <div class="np-stat-val" style="color:var(--np-warn)">—</div>
+          <div class="np-stat-val" style="color:var(--np-warn)">{{ $npConv !== null ? ($npConv . '%') : '—' }}</div>
           <div class="np-stat-lbl">Conversion Rate</div>
         </div>
       </div>
-      <div class="np-grid">
-        <div>
-          <div class="np-card">
+      <div class="np-grid np-grid--reviews-balanced">
+        <div class="np-reviews-col np-reviews-col--main">
+          <div class="np-card" data-np-section="np-tab-reviews.rating_breakdown">
             <div class="np-card-header"><span class="np-card-icon">📊</span><span class="np-card-title">Rating
                 Breakdown</span></div>
             <div class="np-card-body">
-              <div class="np-chart-row"><span class="np-chart-lbl">5 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#00a550"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">4 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#34d399"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">3 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#f59e0b"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">2 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#f97316"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">1 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#e2001a"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-hint mt-2">Reviews will appear here after the product is published.</div>
+              @php($rc = (int) $npReviewStats['count'])
+              @foreach([5=>'#00a550',4=>'#34d399',3=>'#f59e0b',2=>'#f97316',1=>'#e2001a'] as $r => $clr)
+                @php($cnt = (int) data_get($npReviewStats['by'], $r, 0))
+                @php($pct = $rc > 0 ? round(($cnt / $rc) * 100) : 0)
+                <div class="np-chart-row">
+                  <span class="np-chart-lbl">{{ $r }} ★</span>
+                  <div class="np-chart-bar-wrap">
+                    <div class="np-chart-bar-fill" style="width:{{ $pct }}%;background:{{ $clr }}"></div>
+                  </div>
+                  <span class="np-chart-count">{{ $cnt }}</span>
+                </div>
+              @endforeach
+              @if(!$rc)
+                <div class="np-hint mt-2">Reviews will appear here after the product is published.</div>
+              @endif
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-reviews.customer_reviews">
             <div class="np-card-header"><span class="np-card-icon">💬</span><span class="np-card-title">Customer
-                Reviews</span><span class="np-card-subtitle">Will appear after publishing</span></div>
+                Reviews</span><span class="np-card-subtitle">Most recent first</span></div>
             <div class="np-card-body">
-              <div class="np-hint">No reviews yet. Reviews will appear here after the product is published and customers
-                leave feedback.</div>
+              <?php if(($npReviewStats['latest'] ?? collect())->count()): ?>
+                <?php foreach(($npReviewStats['latest'] ?? collect()) as $rev): ?>
+                  <?php
+                    $nm = trim(($rev?->customer?->f_name ?? '') . ' ' . ($rev?->customer?->l_name ?? ''));
+                    $nm = $nm ?: ('User #' . ((int) ($rev?->user_id ?? 0)));
+                    $av = strtoupper(substr(trim($rev?->customer?->f_name ?? 'U'),0,1) . substr(trim($rev?->customer?->l_name ?? 'S'),0,1));
+                    $stars = (int) ($rev?->rating ?? 0);
+                  ?>
+                  <div class="np-review-card">
+                    <div class="np-review-meta">
+                      <div class="np-reviewer-avatar">{{ $av }}</div>
+                      <div>
+                        <div class="np-reviewer-name">{{ $nm }}</div>
+                        <div class="np-review-stars">
+                          @for($i=1;$i<=5;$i++)
+                            <span style="color:{{ $i <= $stars ? '#f59e0b' : '#d1d5db' }}">★</span>
+                          @endfor
+                        </div>
+                      </div>
+                      <div class="np-reviewer-date">{{ optional($rev?->created_at)->format('M d, Y') }}</div>
+                    </div>
+                    <div class="np-review-body">{{ $rev?->comment ?? '' }}</div>
+                    <div class="np-review-actions">
+                      <span class="np-review-badge {{ ((int) ($rev?->status ?? 1)) === 1 ? 'rb-pub' : 'rb-flag' }}">
+                        {{ ((int) ($rev?->status ?? 1)) === 1 ? '✅ Published' : '🙈 Hidden' }}
+                      </span>
+                      <a class="np-btn-tiny" href="{{ route('admin.item.reviews') }}" target="_blank" rel="noopener">Manage</a>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+                <a class="np-btn-add" style="margin-top:10px;display:inline-flex" href="{{ route('admin.item.reviews') }}" target="_blank"
+                  rel="noopener">Load More Reviews…</a>
+              <?php else: ?>
+                <div class="np-hint">No reviews yet. Reviews will appear here after the product is published and customers
+                  leave feedback.</div>
+              <?php endif; ?>
             </div>
           </div>
         </div>
-        <div>
-          <div class="np-card">
+        <div class="np-reviews-col np-reviews-col--side">
+          <div class="np-card" data-np-section="np-tab-reviews.add_seed_review">
+            <div class="np-card-header"><span class="np-card-icon">✍️</span><span class="np-card-title">Add / Seed
+                Review</span></div>
+            <div class="np-card-body">
+              <div class="np-hint" style="margin-bottom:10px">Optional admin-only seed reviews (stored in product meta).
+                Use for demos; real customer reviews appear automatically after publish.</div>
+
+              <div id="npSeedReviewRows">
+                @for($i=0;$i<$npSeedRows;$i++)
+                  @php($rt = (int) ($npSeedRating[$i] ?? 5))
+                  <div class="np-card" style="margin:0 0 12px;border-style:dashed">
+                    <div class="np-card-body">
+                      <div class="np-form-group"><label class="np-label">Reviewer Name</label>
+                        <input type="text" name="meta_data[seed_review_name][]" class="np-input"
+                          placeholder="e.g. Mohammed Al-Farsi" value="{{ $npSeedName[$i] ?? '' }}">
+                      </div>
+                      <div class="np-form-group">
+                        <label class="np-label">Star Rating</label>
+                        <div class="np-star-row" data-np-stars="seed">
+                          <input type="hidden" name="meta_data[seed_review_rating][]" value="{{ $rt }}">
+                          @for($s=1;$s<=5;$s++)
+                            <span class="np-star {{ $s <= $rt ? 'lit' : '' }}" onclick="npSetSeedStars(this, {{ $s }})">★</span>
+                          @endfor
+                          <span style="font-size:12px;color:var(--np-muted);margin-left:6px" class="np-star-label">{{ $rt }}
+                            / 5</span>
+                        </div>
+                      </div>
+                      <div class="np-form-group"><label class="np-label">Review Title</label>
+                        <input type="text" name="meta_data[seed_review_title][]" class="np-input"
+                          placeholder="e.g. Great product!" value="{{ $npSeedTitle[$i] ?? '' }}">
+                      </div>
+                      <div class="np-form-group"><label class="np-label">Review Body</label>
+                        <textarea name="meta_data[seed_review_body][]" class="np-textarea" rows="3"
+                          placeholder="Write review text…">{{ $npSeedBody[$i] ?? '' }}</textarea>
+                      </div>
+                      <div class="np-form-row" style="align-items:flex-end">
+                        <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Review Date</label>
+                          <input type="date" name="meta_data[seed_review_date][]" class="np-input"
+                            value="{{ $npSeedDate[$i] ?? '' }}">
+                        </div>
+                        @php($vv = (string) ($npSeedVerified[$i] ?? '1') === '1')
+                        <div class="np-form-group" style="margin-bottom:0">
+                          <label class="np-label">Verified Purchase?</label>
+                          <label class="np-tog" style="margin-top:6px"><input type="checkbox"
+                              onchange="this.closest('.np-form-group').querySelector('input[type=hidden]').value = this.checked ? '1':'0'"
+                              @checked($vv)><span class="np-tog-track"></span></label>
+                          <input type="hidden" name="meta_data[seed_review_verified][]" value="{{ $vv ? '1' : '0' }}">
+                        </div>
+                      </div>
+                      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+                        <button type="button" class="np-btn-tiny del" onclick="this.closest('.np-card').remove()">Remove</button>
+                      </div>
+                    </div>
+                  </div>
+                @endfor
+              </div>
+
+              <button type="button" class="np-btn np-btn-outline" style="width:100%;justify-content:center"
+                onclick="npAddSeedReviewRow()">+ Add Review</button>
+            </div>
+          </div>
+
+          <div class="np-card" data-np-section="np-tab-reviews.product_analytics">
+            <div class="np-card-header"><span class="np-card-icon">📈</span><span class="np-card-title">Product
+                Analytics</span></div>
+            <div class="np-card-body">
+              <div class="np-form-group">
+                <label class="np-label">Product Information Score (PIS)</label>
+                <div class="np-pis-row">
+                  <div class="np-mini-bar"><div class="np-mini-fill"
+                      style="width:{{ max(0, min(100, round(($npPis/5)*100))) }}%;background:var(--np-success)"></div></div>
+                  <span style="font-size:13px;font-weight:700;color:var(--np-success);white-space:nowrap">{{ number_format($npPis, 1) }} / 5.0</span>
+                </div>
+                <div class="np-pis-input-row">
+                  <label class="np-label" for="npPisScoreInput">Score</label>
+                  <input id="npPisScoreInput" type="number" step="0.1" min="0" max="5" name="meta_data[pis_score]" class="np-input"
+                    value="{{ old('meta_data.pis_score', data_get($npMeta,'pis_score','0')) }}">
+                </div>
+                <div class="np-hint">Premium product threshold: 4.0+</div>
+              </div>
+              <div class="np-divider"></div>
+              <div class="np-analytics-metric-grid">
+                <div class="np-analytics-metric">
+                  <div class="np-analytics-metric-label">Page Views (30d)</div>
+                  <div class="np-analytics-metric-row">
+                    <span class="np-analytics-metric-display">{{ number_format($npViews30) }}</span>
+                    <input type="number" min="0" name="meta_data[page_views_30d]" class="np-input"
+                      value="{{ old('meta_data.page_views_30d', data_get($npMeta,'page_views_30d','0')) }}">
+                  </div>
+                </div>
+                <div class="np-analytics-metric">
+                  <div class="np-analytics-metric-label">Add to Cart (30d)</div>
+                  <div class="np-analytics-metric-row">
+                    <span class="np-analytics-metric-display info">{{ number_format($npATC30) }}</span>
+                    <input type="number" min="0" name="meta_data[add_to_cart_30d]" class="np-input"
+                      value="{{ old('meta_data.add_to_cart_30d', data_get($npMeta,'add_to_cart_30d','0')) }}">
+                  </div>
+                </div>
+                <div class="np-analytics-metric">
+                  <div class="np-analytics-metric-label">Orders (30d)</div>
+                  <div class="np-analytics-metric-row">
+                    <span class="np-analytics-metric-display success">{{ number_format($npOrders30) }}</span>
+                    <input type="number" min="0" name="meta_data[orders_30d]" class="np-input"
+                      value="{{ old('meta_data.orders_30d', data_get($npMeta,'orders_30d','0')) }}">
+                  </div>
+                </div>
+                <div class="np-analytics-metric">
+                  <div class="np-analytics-metric-label">Revenue (30d)</div>
+                  <div class="np-analytics-metric-row">
+                    <span class="np-analytics-metric-display warn">{{ filled($npRevenue30) ? $npRevenue30 : '—' }}</span>
+                    <input type="text" name="meta_data[revenue_30d]" class="np-input"
+                      value="{{ old('meta_data.revenue_30d', data_get($npMeta,'revenue_30d','')) }}" placeholder="e.g. QAR 7,980">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="np-card" data-np-section="np-tab-reviews.inquiry_rfq_settings">
             <div class="np-card-header"><span class="np-card-icon">📩</span><span class="np-card-title">Inquiry / RFQ
                 Settings</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
@@ -2307,29 +2496,29 @@
                   <div class="np-tlbl">Accept Inquiries</div>
                   <div class="np-tdsc">Allow buyers to send RFQs</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[accept_inquiries]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    @checked($npAcceptInq)><span class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Auto-Reply Enabled</div>
                   <div class="np-tdsc">Respond instantly to new inquiries</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[auto_reply]" value="1" checked><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[auto_reply]" value="1" @checked($npAutoReply)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Bulk Inquiry Form</div>
                   <div class="np-tdsc">Show bulk order form on page</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[bulk_inquiry]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[bulk_inquiry]" value="1" @checked($npBulkInq)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-form-group" style="margin-top:14px;margin-bottom:0"><label class="np-label">Auto-Reply
                   Message</label><textarea name="meta_data[auto_reply_msg]" class="np-textarea" rows="2"
-                  placeholder="Thank you for your inquiry! We will get back to you within 24 hours…"></textarea></div>
+                  placeholder="Thank you for your inquiry! We will get back to you within 24 hours…">{{ $npAutoReplyMsg }}</textarea></div>
             </div>
           </div>
-          <div class="np-card">
-            <div class="np-card-header"><span class="np-card-icon">📈</span><span class="np-card-title">Review
+          <div class="np-card" data-np-section="np-tab-reviews.review_settings">
+            <div class="np-card-header"><span class="np-card-icon">🧩</span><span class="np-card-title">Review
                 Settings</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
               <div class="np-trow" style="padding-top:8px">
@@ -2337,13 +2526,13 @@
                   <div class="np-tlbl">Allow Reviews</div>
                   <div class="np-tdsc">Customers can leave reviews</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[allow_reviews]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    @checked($npAllowReviews)><span class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Verified Purchase Only</div>
                   <div class="np-tdsc">Only buyers can review</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[verified_only]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[verified_only]" value="1" @checked($npVerifiedOnly)><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -2351,7 +2540,7 @@
                   <div class="np-tlbl">Auto-publish Reviews</div>
                   <div class="np-tdsc">No manual moderation needed</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[auto_publish_reviews]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    @checked($npAutoPublishReviews)><span class="np-tog-track"></span></label>
               </div>
             </div>
           </div>
@@ -2739,6 +2928,15 @@
 
     function npIsTabHidden(tabId) {
       try {
+        let mem = null;
+        try {
+          mem = npTabsUi?.built_in?.[tabId];
+        } catch (e) {
+          mem = null;
+        }
+        if (mem && Object.prototype.hasOwnProperty.call(mem, 'hidden')) {
+          return !!mem.hidden;
+        }
         const raw = document.getElementById('custom_tabs_ui_json')?.value || '';
         if (!raw) return false;
         const ui = JSON.parse(raw);
@@ -2979,6 +3177,66 @@
       hidden.name = 'meta_data[export_custom][]';
       hidden.value = name;
       grid.appendChild(hidden);
+    }
+
+    // ═══ REVIEWS & ANALYTICS: Seed reviews UI helpers (meta_data only) ═══
+    function npSetSeedStars(el, stars) {
+      const row = el?.closest?.('.np-star-row');
+      if (!row) return;
+      const hidden = row.querySelector('input[type="hidden"][name="meta_data[seed_review_rating][]"]');
+      if (hidden) hidden.value = String(stars);
+      row.querySelectorAll('.np-star').forEach((s, idx) => s.classList.toggle('lit', (idx + 1) <= stars));
+      const label = row.querySelector('.np-star-label');
+      if (label) label.textContent = `${stars} / 5`;
+    }
+
+    function npAddSeedReviewRow() {
+      const wrap = document.getElementById('npSeedReviewRows');
+      if (!wrap) return;
+      const card = document.createElement('div');
+      card.className = 'np-card';
+      card.style.margin = '0 0 12px';
+      card.style.borderStyle = 'dashed';
+      card.innerHTML = `
+        <div class="np-card-body">
+          <div class="np-form-group"><label class="np-label">Reviewer Name</label>
+            <input type="text" name="meta_data[seed_review_name][]" class="np-input" placeholder="e.g. Mohammed Al-Farsi" value="">
+          </div>
+          <div class="np-form-group">
+            <label class="np-label">Star Rating</label>
+            <div class="np-star-row" data-np-stars="seed">
+              <input type="hidden" name="meta_data[seed_review_rating][]" value="5">
+              <span class="np-star lit" onclick="npSetSeedStars(this, 1)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 2)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 3)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 4)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 5)">★</span>
+              <span style="font-size:12px;color:var(--np-muted);margin-left:6px" class="np-star-label">5 / 5</span>
+            </div>
+          </div>
+          <div class="np-form-group"><label class="np-label">Review Title</label>
+            <input type="text" name="meta_data[seed_review_title][]" class="np-input" placeholder="e.g. Great product!" value="">
+          </div>
+          <div class="np-form-group"><label class="np-label">Review Body</label>
+            <textarea name="meta_data[seed_review_body][]" class="np-textarea" rows="3" placeholder="Write review text…"></textarea>
+          </div>
+          <div class="np-form-row" style="align-items:flex-end">
+            <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Review Date</label>
+              <input type="date" name="meta_data[seed_review_date][]" class="np-input" value="">
+            </div>
+            <div class="np-form-group" style="margin-bottom:0">
+              <label class="np-label">Verified Purchase?</label>
+              <label class="np-tog" style="margin-top:6px"><input type="checkbox"
+                onchange="this.closest('.np-form-group').querySelector('input[type=hidden]').value = this.checked ? '1':'0'" checked><span class="np-tog-track"></span></label>
+              <input type="hidden" name="meta_data[seed_review_verified][]" value="1">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px">
+            <button type="button" class="np-btn-tiny del" onclick="this.closest('.np-card').remove()">Remove</button>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(card);
     }
 
     function npToggleDeliveryCard(cardEl) {
@@ -4816,7 +5074,7 @@
         };
         document.querySelectorAll('.np-tab-nav .np-tab-btn').forEach(btn => {
           const on = btn.getAttribute('onclick') || '';
-          const m = on.match(/npSwitchTab\\(this,'([^']+)'\\)/);
+          const m = on.match(/npSwitchTab\(this,'([^']+)'\)/);
           if (!m) return;
           const panelId = m[1];
           const ov = npTabsUi?.built_in?.[panelId];
@@ -4831,6 +5089,34 @@
             btn.textContent = map[panelId].defaultTitle;
           }
         });
+        // Built-in panels: keep hidden tabs out of the layout and inactive (matches Manage Tabs → Visible)
+        Object.keys(map).forEach(panelId => {
+          const panel = document.getElementById(panelId);
+          if (!panel) return;
+          const hide = !!npTabsUi?.built_in?.[panelId]?.hidden;
+          if (hide) {
+            panel.classList.remove('active');
+            panel.setAttribute('hidden', 'hidden');
+            panel.setAttribute('aria-hidden', 'true');
+          } else {
+            panel.removeAttribute('hidden');
+            panel.setAttribute('aria-hidden', 'false');
+          }
+        });
+        const active = document.querySelector('.np-tab-panel.active');
+        const aid = active?.id;
+        if (!aid || (map[aid] && npTabsUi?.built_in?.[aid]?.hidden)) {
+          const firstId = Object.keys(map).find(id => !npTabsUi?.built_in?.[id]?.hidden);
+          if (firstId) {
+            document.querySelectorAll('.np-tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.np-tab-nav .np-tab-btn').forEach(b => b.classList.remove('active'));
+            const p = document.getElementById(firstId);
+            const b = document.querySelector(`.np-tab-btn[data-tab="${firstId}"]`);
+            if (p) p.classList.add('active');
+            if (b) b.classList.add('active');
+          }
+        }
+        if (typeof npSetActionButtons === 'function') npSetActionButtons();
         // Custom tabs are rendered by npRenderCustomTabs() using tab.title/icon
       }
 
@@ -5096,12 +5382,12 @@
         builtIns.forEach(t => {
           const ov = npTabsUi.built_in?.[t.id] || {};
           const title = ov.title || '';
-          const hidden = !!ov.hidden;
+          const visible = !ov.hidden;
           rows.push(`
             <tr>
               <td><strong>${t.label}</strong> <span class="text-muted">(built-in)</span></td>
               <td><input type="text" class="form-control" data-np-tab-title="${t.id}" value="${title.replace(/"/g,'&quot;')}" placeholder="Leave empty to keep default"></td>
-              <td class="text-center"><input type="checkbox" data-np-tab-hidden="${t.id}" ${hidden ? 'checked' : ''}></td>
+              <td class="text-center"><input type="checkbox" data-np-tab-visible="${t.id}" title="Show this tab in the product form" ${visible ? 'checked' : ''}></td>
               <td>
                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="npOpenManageSectionsModal('${t.id}')">Sections</button>
               </td>
@@ -5141,10 +5427,10 @@
           built[id] = built[id] || {};
           if (title) built[id].title = title;
         });
-        document.querySelectorAll('[data-np-tab-hidden]').forEach(chk => {
-          const id = chk.getAttribute('data-np-tab-hidden');
+        document.querySelectorAll('[data-np-tab-visible]').forEach(chk => {
+          const id = chk.getAttribute('data-np-tab-visible');
           built[id] = built[id] || {};
-          built[id].hidden = !!chk.checked;
+          built[id].hidden = !chk.checked;
         });
         // collect custom tab titles
         document.querySelectorAll('[data-np-custom-tab-title]').forEach(inp => {

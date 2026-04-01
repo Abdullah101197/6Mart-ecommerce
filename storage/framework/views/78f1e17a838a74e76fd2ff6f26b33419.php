@@ -2236,69 +2236,250 @@
 
     
     <div class="np-tab-panel" id="np-tab-reviews">
+      <?php
+        $npAcceptInq = (string) old('meta_data.accept_inquiries', data_get($npMeta,'accept_inquiries','1')) === '1';
+        $npAutoReply = (string) old('meta_data.auto_reply', data_get($npMeta,'auto_reply','1')) === '1';
+        $npBulkInq = (string) old('meta_data.bulk_inquiry', data_get($npMeta,'bulk_inquiry','0')) === '1';
+        $npAutoReplyMsg = old('meta_data.auto_reply_msg', data_get($npMeta,'auto_reply_msg',''));
+        $npAllowReviews = (string) old('meta_data.allow_reviews', data_get($npMeta,'allow_reviews','1')) === '1';
+        $npVerifiedOnly = (string) old('meta_data.verified_only', data_get($npMeta,'verified_only','0')) === '1';
+        $npAutoPublishReviews = (string) old('meta_data.auto_publish_reviews', data_get($npMeta,'auto_publish_reviews','1')) === '1';
+
+        // Optional: seed reviews (stored in item meta_data) – internal admin-only data.
+        $npSeedName = old('meta_data.seed_review_name', data_get($npMeta,'seed_review_name', []));
+        $npSeedTitle = old('meta_data.seed_review_title', data_get($npMeta,'seed_review_title', []));
+        $npSeedBody = old('meta_data.seed_review_body', data_get($npMeta,'seed_review_body', []));
+        $npSeedDate = old('meta_data.seed_review_date', data_get($npMeta,'seed_review_date', []));
+        $npSeedRating = old('meta_data.seed_review_rating', data_get($npMeta,'seed_review_rating', []));
+        $npSeedVerified = old('meta_data.seed_review_verified', data_get($npMeta,'seed_review_verified', []));
+        foreach (['npSeedName','npSeedTitle','npSeedBody','npSeedDate','npSeedRating','npSeedVerified'] as $__k) {
+          if (!is_array($$__k)) { $$__k = []; }
+        }
+        $npSeedRows = max(count($npSeedName), count($npSeedTitle), count($npSeedBody), count($npSeedDate), count($npSeedRating), count($npSeedVerified), 1);
+
+        // Live reviews (from DB) – shown in edit mode only.
+        $npReviewStats = ['avg' => null, 'count' => 0, 'by' => [1=>0,2=>0,3=>0,4=>0,5=>0], 'latest' => collect()];
+        if ($isEdit && filled($product?->id)) {
+          try {
+            $q = \App\Models\Review::with('customer')->where('item_id', $product->id);
+            $npReviewStats['count'] = (clone $q)->count();
+            $npReviewStats['avg'] = $npReviewStats['count'] ? round((clone $q)->avg('rating') ?: 0, 1) : null;
+            for ($r=1;$r<=5;$r++) { $npReviewStats['by'][$r] = (clone $q)->where('rating', $r)->count(); }
+            $npReviewStats['latest'] = (clone $q)->latest()->limit(3)->get();
+          } catch (\Throwable $e) { /* ignore */ }
+        }
+
+        // Analytics inputs (stored in meta_data for now; project doesn't expose tracking sources here)
+        $npPis = (float) old('meta_data.pis_score', data_get($npMeta,'pis_score','0'));
+        $npViews30 = (int) old('meta_data.page_views_30d', data_get($npMeta,'page_views_30d','0'));
+        $npATC30 = (int) old('meta_data.add_to_cart_30d', data_get($npMeta,'add_to_cart_30d','0'));
+        $npOrders30 = (int) old('meta_data.orders_30d', data_get($npMeta,'orders_30d','0'));
+        $npRevenue30 = (string) old('meta_data.revenue_30d', data_get($npMeta,'revenue_30d',''));
+        $npConv = $npViews30 > 0 ? round(($npOrders30 / max($npViews30,1))*100, 1) : null;
+      ?>
+
       <div class="np-stat-grid">
         <div class="np-stat-card">
-          <div class="np-stat-val">—</div>
+          <div class="np-stat-val"><?php echo e($npReviewStats['avg'] !== null ? number_format($npReviewStats['avg'], 1) : '—'); ?></div>
+          <?php ($avgInt = $npReviewStats['avg'] !== null ? (int) round((float) $npReviewStats['avg']) : 0); ?>
+          <div class="np-star-row" style="justify-content:center;margin-bottom:4px">
+            <?php for($i=1;$i<=5;$i++): ?>
+              <span class="np-star <?php echo e($i <= $avgInt ? 'lit' : ''); ?>">★</span>
+            <?php endfor; ?>
+          </div>
           <div class="np-stat-lbl">Avg. Rating</div>
         </div>
         <div class="np-stat-card">
-          <div class="np-stat-val" style="color:var(--np-success)">0</div>
+          <div class="np-stat-val" style="color:var(--np-success)"><?php echo e((int) $npReviewStats['count']); ?></div>
           <div class="np-stat-lbl">Total Reviews</div>
         </div>
         <div class="np-stat-card">
-          <div class="np-stat-val" style="color:#0ea5e9">0</div>
+          <div class="np-stat-val" style="color:#0ea5e9"><?php echo e(number_format($npViews30)); ?></div>
           <div class="np-stat-lbl">Product Views</div>
         </div>
         <div class="np-stat-card">
-          <div class="np-stat-val" style="color:var(--np-warn)">—</div>
+          <div class="np-stat-val" style="color:var(--np-warn)"><?php echo e($npConv !== null ? ($npConv . '%') : '—'); ?></div>
           <div class="np-stat-lbl">Conversion Rate</div>
         </div>
       </div>
       <div class="np-grid">
         <div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-reviews.rating_breakdown">
             <div class="np-card-header"><span class="np-card-icon">📊</span><span class="np-card-title">Rating
                 Breakdown</span></div>
             <div class="np-card-body">
-              <div class="np-chart-row"><span class="np-chart-lbl">5 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#00a550"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">4 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#34d399"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">3 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#f59e0b"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">2 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#f97316"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-chart-row"><span class="np-chart-lbl">1 ★</span>
-                <div class="np-chart-bar-wrap">
-                  <div class="np-chart-bar-fill" style="width:0%;background:#e2001a"></div>
-                </div><span class="np-chart-count">0</span>
-              </div>
-              <div class="np-hint mt-2">Reviews will appear here after the product is published.</div>
+              <?php ($rc = (int) $npReviewStats['count']); ?>
+              <?php $__currentLoopData = [5=>'#00a550',4=>'#34d399',3=>'#f59e0b',2=>'#f97316',1=>'#e2001a']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r => $clr): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php ($cnt = (int) data_get($npReviewStats['by'], $r, 0)); ?>
+                <?php ($pct = $rc > 0 ? round(($cnt / $rc) * 100) : 0); ?>
+                <div class="np-chart-row">
+                  <span class="np-chart-lbl"><?php echo e($r); ?> ★</span>
+                  <div class="np-chart-bar-wrap">
+                    <div class="np-chart-bar-fill" style="width:<?php echo e($pct); ?>%;background:<?php echo e($clr); ?>"></div>
+                  </div>
+                  <span class="np-chart-count"><?php echo e($cnt); ?></span>
+                </div>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              <?php if(!$rc): ?>
+                <div class="np-hint mt-2">Reviews will appear here after the product is published.</div>
+              <?php endif; ?>
             </div>
           </div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-reviews.customer_reviews">
             <div class="np-card-header"><span class="np-card-icon">💬</span><span class="np-card-title">Customer
-                Reviews</span><span class="np-card-subtitle">Will appear after publishing</span></div>
+                Reviews</span><span class="np-card-subtitle">Most recent first</span></div>
             <div class="np-card-body">
-              <div class="np-hint">No reviews yet. Reviews will appear here after the product is published and customers
-                leave feedback.</div>
+              <?php if(($npReviewStats['latest'] ?? collect())->count()): ?>
+                <?php foreach(($npReviewStats['latest'] ?? collect()) as $rev): ?>
+                  <?php
+                    $nm = trim(($rev?->customer?->f_name ?? '') . ' ' . ($rev?->customer?->l_name ?? ''));
+                    $nm = $nm ?: ('User #' . ((int) ($rev?->user_id ?? 0)));
+                    $av = strtoupper(substr(trim($rev?->customer?->f_name ?? 'U'),0,1) . substr(trim($rev?->customer?->l_name ?? 'S'),0,1));
+                    $stars = (int) ($rev?->rating ?? 0);
+                  ?>
+                  <div class="np-review-card">
+                    <div class="np-review-meta">
+                      <div class="np-reviewer-avatar"><?php echo e($av); ?></div>
+                      <div>
+                        <div class="np-reviewer-name"><?php echo e($nm); ?></div>
+                        <div class="np-review-stars">
+                          <?php for($i=1;$i<=5;$i++): ?>
+                            <span style="color:<?php echo e($i <= $stars ? '#f59e0b' : '#d1d5db'); ?>">★</span>
+                          <?php endfor; ?>
+                        </div>
+                      </div>
+                      <div class="np-reviewer-date"><?php echo e(optional($rev?->created_at)->format('M d, Y')); ?></div>
+                    </div>
+                    <div class="np-review-body"><?php echo e($rev?->comment ?? ''); ?></div>
+                    <div class="np-review-actions">
+                      <span class="np-review-badge <?php echo e(((int) ($rev?->status ?? 1)) === 1 ? 'rb-pub' : 'rb-flag'); ?>">
+                        <?php echo e(((int) ($rev?->status ?? 1)) === 1 ? '✅ Published' : '🙈 Hidden'); ?>
+
+                      </span>
+                      <a class="np-btn-tiny" href="<?php echo e(route('admin.item.reviews')); ?>" target="_blank" rel="noopener">Manage</a>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+                <a class="np-btn-add" style="margin-top:10px;display:inline-flex" href="<?php echo e(route('admin.item.reviews')); ?>" target="_blank"
+                  rel="noopener">Load More Reviews…</a>
+              <?php else: ?>
+                <div class="np-hint">No reviews yet. Reviews will appear here after the product is published and customers
+                  leave feedback.</div>
+              <?php endif; ?>
             </div>
           </div>
         </div>
         <div>
-          <div class="np-card">
+          <div class="np-card" data-np-section="np-tab-reviews.add_seed_review">
+            <div class="np-card-header"><span class="np-card-icon">✍️</span><span class="np-card-title">Add / Seed
+                Review</span></div>
+            <div class="np-card-body">
+              <div class="np-hint" style="margin-bottom:10px">Optional admin-only seed reviews (stored in product meta).
+                Use for demos; real customer reviews appear automatically after publish.</div>
+
+              <div id="npSeedReviewRows">
+                <?php for($i=0;$i<$npSeedRows;$i++): ?>
+                  <?php ($rt = (int) ($npSeedRating[$i] ?? 5)); ?>
+                  <div class="np-card" style="margin:0 0 12px;border-style:dashed">
+                    <div class="np-card-body">
+                      <div class="np-form-group"><label class="np-label">Reviewer Name</label>
+                        <input type="text" name="meta_data[seed_review_name][]" class="np-input"
+                          placeholder="e.g. Mohammed Al-Farsi" value="<?php echo e($npSeedName[$i] ?? ''); ?>">
+                      </div>
+                      <div class="np-form-group">
+                        <label class="np-label">Star Rating</label>
+                        <div class="np-star-row" data-np-stars="seed">
+                          <input type="hidden" name="meta_data[seed_review_rating][]" value="<?php echo e($rt); ?>">
+                          <?php for($s=1;$s<=5;$s++): ?>
+                            <span class="np-star <?php echo e($s <= $rt ? 'lit' : ''); ?>" onclick="npSetSeedStars(this, <?php echo e($s); ?>)">★</span>
+                          <?php endfor; ?>
+                          <span style="font-size:12px;color:var(--np-muted);margin-left:6px" class="np-star-label"><?php echo e($rt); ?>
+
+                            / 5</span>
+                        </div>
+                      </div>
+                      <div class="np-form-group"><label class="np-label">Review Title</label>
+                        <input type="text" name="meta_data[seed_review_title][]" class="np-input"
+                          placeholder="e.g. Great product!" value="<?php echo e($npSeedTitle[$i] ?? ''); ?>">
+                      </div>
+                      <div class="np-form-group"><label class="np-label">Review Body</label>
+                        <textarea name="meta_data[seed_review_body][]" class="np-textarea" rows="3"
+                          placeholder="Write review text…"><?php echo e($npSeedBody[$i] ?? ''); ?></textarea>
+                      </div>
+                      <div class="np-form-row">
+                        <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Review Date</label>
+                          <input type="date" name="meta_data[seed_review_date][]" class="np-input"
+                            value="<?php echo e($npSeedDate[$i] ?? ''); ?>">
+                        </div>
+                        <?php ($vv = (string) ($npSeedVerified[$i] ?? '1') === '1'); ?>
+                        <div class="np-form-group" style="margin-bottom:0">
+                          <label class="np-label">Verified Purchase?</label>
+                          <label class="np-tog" style="margin-top:6px"><input type="checkbox"
+                              onchange="this.closest('.np-form-group').querySelector('input[type=hidden]').value = this.checked ? '1':'0'"
+                              <?php if($vv): echo 'checked'; endif; ?>><span class="np-tog-track"></span></label>
+                          <input type="hidden" name="meta_data[seed_review_verified][]" value="<?php echo e($vv ? '1' : '0'); ?>">
+                        </div>
+                      </div>
+                      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+                        <button type="button" class="np-btn-tiny del" onclick="this.closest('.np-card').remove()">Remove</button>
+                      </div>
+                    </div>
+                  </div>
+                <?php endfor; ?>
+              </div>
+
+              <button type="button" class="np-btn np-btn-outline" style="width:100%;justify-content:center"
+                onclick="npAddSeedReviewRow()">+ Add Review</button>
+            </div>
+          </div>
+
+          <div class="np-card" data-np-section="np-tab-reviews.product_analytics">
+            <div class="np-card-header"><span class="np-card-icon">📈</span><span class="np-card-title">Product
+                Analytics</span></div>
+            <div class="np-card-body">
+              <div class="np-form-group">
+                <label class="np-label">Product Information Score (PIS)</label>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+                  <div style="flex:1">
+                    <div class="np-mini-bar"><div class="np-mini-fill"
+                        style="width:<?php echo e(max(0, min(100, round(($npPis/5)*100)))); ?>%;background:var(--np-success)"></div></div>
+                  </div>
+                  <span style="font-size:13px;font-weight:700;color:var(--np-success)"><?php echo e(number_format($npPis, 1)); ?> / 5.0</span>
+                </div>
+                <div class="np-form-row" style="margin-top:10px">
+                  <div class="np-form-group" style="margin-bottom:0">
+                    <input type="number" step="0.1" min="0" max="5" name="meta_data[pis_score]" class="np-input" value="<?php echo e(old('meta_data.pis_score', data_get($npMeta,'pis_score','0'))); ?>">
+                  </div>
+                </div>
+                <div class="np-hint">Premium product threshold: 4.0+</div>
+              </div>
+              <div class="np-divider"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="np-mini-stat">
+                  <div class="np-mini-stat-val"><?php echo e(number_format($npViews30)); ?></div>
+                  <div class="np-mini-stat-lbl">Page Views (30d)</div>
+                  <input type="number" name="meta_data[page_views_30d]" class="np-input" value="<?php echo e(old('meta_data.page_views_30d', data_get($npMeta,'page_views_30d','0'))); ?>" style="margin-top:8px">
+                </div>
+                <div class="np-mini-stat">
+                  <div class="np-mini-stat-val" style="color:var(--np-info)"><?php echo e(number_format($npATC30)); ?></div>
+                  <div class="np-mini-stat-lbl">Add to Cart (30d)</div>
+                  <input type="number" name="meta_data[add_to_cart_30d]" class="np-input" value="<?php echo e(old('meta_data.add_to_cart_30d', data_get($npMeta,'add_to_cart_30d','0'))); ?>" style="margin-top:8px">
+                </div>
+                <div class="np-mini-stat">
+                  <div class="np-mini-stat-val" style="color:var(--np-success)"><?php echo e(number_format($npOrders30)); ?></div>
+                  <div class="np-mini-stat-lbl">Orders (30d)</div>
+                  <input type="number" name="meta_data[orders_30d]" class="np-input" value="<?php echo e(old('meta_data.orders_30d', data_get($npMeta,'orders_30d','0'))); ?>" style="margin-top:8px">
+                </div>
+                <div class="np-mini-stat">
+                  <div class="np-mini-stat-val" style="color:var(--np-warn)"><?php echo e(filled($npRevenue30) ? $npRevenue30 : '0'); ?></div>
+                  <div class="np-mini-stat-lbl">Revenue (30d)</div>
+                  <input type="text" name="meta_data[revenue_30d]" class="np-input" value="<?php echo e(old('meta_data.revenue_30d', data_get($npMeta,'revenue_30d',''))); ?>" placeholder="e.g. QAR 7,980" style="margin-top:8px">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="np-card" data-np-section="np-tab-reviews.inquiry_rfq_settings">
             <div class="np-card-header"><span class="np-card-icon">📩</span><span class="np-card-title">Inquiry / RFQ
                 Settings</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
@@ -2307,29 +2488,29 @@
                   <div class="np-tlbl">Accept Inquiries</div>
                   <div class="np-tdsc">Allow buyers to send RFQs</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[accept_inquiries]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    <?php if($npAcceptInq): echo 'checked'; endif; ?>><span class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Auto-Reply Enabled</div>
                   <div class="np-tdsc">Respond instantly to new inquiries</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[auto_reply]" value="1" checked><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[auto_reply]" value="1" <?php if($npAutoReply): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Bulk Inquiry Form</div>
                   <div class="np-tdsc">Show bulk order form on page</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[bulk_inquiry]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[bulk_inquiry]" value="1" <?php if($npBulkInq): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-form-group" style="margin-top:14px;margin-bottom:0"><label class="np-label">Auto-Reply
                   Message</label><textarea name="meta_data[auto_reply_msg]" class="np-textarea" rows="2"
-                  placeholder="Thank you for your inquiry! We will get back to you within 24 hours…"></textarea></div>
+                  placeholder="Thank you for your inquiry! We will get back to you within 24 hours…"><?php echo e($npAutoReplyMsg); ?></textarea></div>
             </div>
           </div>
-          <div class="np-card">
-            <div class="np-card-header"><span class="np-card-icon">📈</span><span class="np-card-title">Review
+          <div class="np-card" data-np-section="np-tab-reviews.review_settings">
+            <div class="np-card-header"><span class="np-card-icon">🧩</span><span class="np-card-title">Review
                 Settings</span></div>
             <div class="np-card-body" style="padding:6px 20px 12px">
               <div class="np-trow" style="padding-top:8px">
@@ -2337,13 +2518,13 @@
                   <div class="np-tlbl">Allow Reviews</div>
                   <div class="np-tdsc">Customers can leave reviews</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[allow_reviews]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    <?php if($npAllowReviews): echo 'checked'; endif; ?>><span class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
                 <div>
                   <div class="np-tlbl">Verified Purchase Only</div>
                   <div class="np-tdsc">Only buyers can review</div>
-                </div><label class="np-tog"><input type="checkbox" name="meta_data[verified_only]" value="1"><span
+                </div><label class="np-tog"><input type="checkbox" name="meta_data[verified_only]" value="1" <?php if($npVerifiedOnly): echo 'checked'; endif; ?>><span
                     class="np-tog-track"></span></label>
               </div>
               <div class="np-trow">
@@ -2351,7 +2532,7 @@
                   <div class="np-tlbl">Auto-publish Reviews</div>
                   <div class="np-tdsc">No manual moderation needed</div>
                 </div><label class="np-tog"><input type="checkbox" name="meta_data[auto_publish_reviews]" value="1"
-                    checked><span class="np-tog-track"></span></label>
+                    <?php if($npAutoPublishReviews): echo 'checked'; endif; ?>><span class="np-tog-track"></span></label>
               </div>
             </div>
           </div>
@@ -2978,6 +3159,66 @@
       hidden.name = 'meta_data[export_custom][]';
       hidden.value = name;
       grid.appendChild(hidden);
+    }
+
+    // ═══ REVIEWS & ANALYTICS: Seed reviews UI helpers (meta_data only) ═══
+    function npSetSeedStars(el, stars) {
+      const row = el?.closest?.('.np-star-row');
+      if (!row) return;
+      const hidden = row.querySelector('input[type="hidden"][name="meta_data[seed_review_rating][]"]');
+      if (hidden) hidden.value = String(stars);
+      row.querySelectorAll('.np-star').forEach((s, idx) => s.classList.toggle('lit', (idx + 1) <= stars));
+      const label = row.querySelector('.np-star-label');
+      if (label) label.textContent = `${stars} / 5`;
+    }
+
+    function npAddSeedReviewRow() {
+      const wrap = document.getElementById('npSeedReviewRows');
+      if (!wrap) return;
+      const card = document.createElement('div');
+      card.className = 'np-card';
+      card.style.margin = '0 0 12px';
+      card.style.borderStyle = 'dashed';
+      card.innerHTML = `
+        <div class="np-card-body">
+          <div class="np-form-group"><label class="np-label">Reviewer Name</label>
+            <input type="text" name="meta_data[seed_review_name][]" class="np-input" placeholder="e.g. Mohammed Al-Farsi" value="">
+          </div>
+          <div class="np-form-group">
+            <label class="np-label">Star Rating</label>
+            <div class="np-star-row" data-np-stars="seed">
+              <input type="hidden" name="meta_data[seed_review_rating][]" value="5">
+              <span class="np-star lit" onclick="npSetSeedStars(this, 1)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 2)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 3)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 4)">★</span>
+              <span class="np-star lit" onclick="npSetSeedStars(this, 5)">★</span>
+              <span style="font-size:12px;color:var(--np-muted);margin-left:6px" class="np-star-label">5 / 5</span>
+            </div>
+          </div>
+          <div class="np-form-group"><label class="np-label">Review Title</label>
+            <input type="text" name="meta_data[seed_review_title][]" class="np-input" placeholder="e.g. Great product!" value="">
+          </div>
+          <div class="np-form-group"><label class="np-label">Review Body</label>
+            <textarea name="meta_data[seed_review_body][]" class="np-textarea" rows="3" placeholder="Write review text…"></textarea>
+          </div>
+          <div class="np-form-row">
+            <div class="np-form-group" style="margin-bottom:0"><label class="np-label">Review Date</label>
+              <input type="date" name="meta_data[seed_review_date][]" class="np-input" value="">
+            </div>
+            <div class="np-form-group" style="margin-bottom:0">
+              <label class="np-label">Verified Purchase?</label>
+              <label class="np-tog" style="margin-top:6px"><input type="checkbox"
+                onchange="this.closest('.np-form-group').querySelector('input[type=hidden]').value = this.checked ? '1':'0'" checked><span class="np-tog-track"></span></label>
+              <input type="hidden" name="meta_data[seed_review_verified][]" value="1">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px">
+            <button type="button" class="np-btn-tiny del" onclick="this.closest('.np-card').remove()">Remove</button>
+          </div>
+        </div>
+      `;
+      wrap.appendChild(card);
     }
 
     function npToggleDeliveryCard(cardEl) {
