@@ -184,6 +184,130 @@
       <div class="np-grid">
         {{-- LEFT --}}
         <div>
+          {{-- Category & Classification (Top) --}}
+          <div class="np-card" data-np-section="general.categories">
+            <div class="np-card-header">
+              <span class="np-card-icon">🗂️</span>
+              <span class="np-card-title">Category &amp; Classification</span>
+              <span class="np-card-subtitle">Amazon-style deep tree</span>
+            </div>
+            <div class="np-card-body">
+              <div class="np-info-box">🗂️ Select the deepest (leaf) category whenever possible. Leaf selection can auto-fill Amazon backend fields like Browse Node.</div>
+              <div class="np-form-row">
+                <div class="np-form-group">
+                  <label class="np-label">{{ translate('messages.store') }} <span class="np-req">*</span></label>
+                  <select name="store_id" id="store_id" class="np-select js-select2-custom" required>
+                    <option value="">{{ translate('messages.select_store') }}</option>
+                    @foreach(\App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
+                      $query->where('module_id', $moduleId);
+                    })->orderBy('name')->get(['id', 'name']) as $store)
+                      <option value="{{ $store->id }}" @selected(old('store_id', $product?->store_id ?? '') == $store->id)>{{ $store->name }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="np-form-group">
+                  <label class="np-label">Main Category <span class="np-req">*</span></label>
+                  <div class="np-inline-add">
+                    <select name="category_id" id="category_id" class="np-select js-select2-custom"
+                      onchange="npUpdateQuality()">
+                      <option value="">— Select Category —</option>
+                      @foreach(\App\Models\Category::where('position', 0)->where('status', 1)->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', Config::get('module.current_module_id')); })->get() as $cat)
+                        <option value="{{ $cat->id }}" @selected(old('category_id', $npCatPos1 ?? '') == $cat->id)>{{ $cat->name }}</option>
+                      @endforeach
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(0)">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="np-form-row">
+                <div class="np-form-group">
+                  <label class="np-label">Sub Category (Level 2)</label>
+                  <div class="np-inline-add">
+                    <select name="sub_category_id" id="sub_category_id" class="np-select js-select2-custom"
+                      data-selected="{{ old('sub_category_id', $npCatPos2 ?? '') }}">
+                      <option value="">Select main first…</option>
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(1)">+</button>
+                  </div>
+                </div>
+                <div class="np-form-group">
+                  <label class="np-label">Sub-Sub Category (Level 3)</label>
+                  <div class="np-inline-add">
+                    <select name="sub_sub_category_id" id="sub_sub_category_id" class="np-select js-select2-custom"
+                      data-selected="{{ old('sub_sub_category_id', $npCatPos3 ?? '') }}">
+                      <option value="">Select Level 2 first…</option>
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(2)">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="np-form-row">
+                <div class="np-form-group">
+                  <label class="np-label">Level 4 (Leaf Node)</label>
+                  <div class="np-inline-add">
+                    <select name="sub_sub_sub_category_id" id="sub_sub_sub_category_id" class="np-select js-select2-custom"
+                      data-selected="{{ old('sub_sub_sub_category_id', $npCatPos4 ?? '') }}">
+                      <option value="">Select Level 3 first…</option>
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(3)">+</button>
+                  </div>
+                </div>
+                <div class="np-form-group">
+                  <label class="np-label">{{ translate('messages.unit') }}</label>
+                  <div class="np-inline-add">
+                    <select name="unit" id="unit" class="np-select js-select2-custom">
+                      <option value="">{{ translate('messages.select_unit') }}</option>
+                      @foreach(\App\Models\Unit::get(['id', 'unit']) as $unit)
+                        <option value="{{ $unit->id }}" @selected(old('unit', $product?->unit_id ?? '') == $unit->id)>{{ $unit->unit }}</option>
+                      @endforeach
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenUnitModal()">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="np-form-row">
+                <div class="np-form-group">
+                  <label class="np-label">Browse Node ID <span class="np-opt">(Amazon)</span></label>
+                  <input type="text" id="npBrowseNodeId" name="meta_data[browse_node_id]" class="np-input"
+                    placeholder="e.g. 16310101" readonly style="background:var(--np-bg)">
+                  <div class="np-hint">Auto-populated from category selection</div>
+                </div>
+                <div class="np-form-group">
+                  <label class="np-label">Product Type Keyword <span class="np-opt">(Amazon backend)</span></label>
+                  <input type="text" id="npProductTypeKeyword" name="meta_data[product_type_keyword]" class="np-input"
+                    placeholder="e.g. CHEESE, CREAM_CHEESE">
+                </div>
+              </div>
+              <div class="np-form-row">
+                <div class="np-form-group">
+                  <label class="np-label">{{ translate('messages.item_type') }}</label>
+                  <div class="np-inline-add">
+                    <select id="npItemTypeSelect" class="np-select js-select2-custom">
+                      <option value="">— Select —</option>
+                      @if(\Illuminate\Support\Facades\Schema::hasTable('item_types'))
+                        @foreach(\App\Models\ItemType::where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','is_veg']) as $t)
+                          <option value="{{ $t->id }}" data-is-veg="{{ (int)$t->is_veg }}">{{ $t->name }}</option>
+                        @endforeach
+                      @else
+                        <option value="" disabled>(Run migration to enable item types)</option>
+                      @endif
+                    </select>
+                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenItemTypeModal()">+</button>
+                  </div>
+                  {{-- Keep backend compatibility: ItemController expects veg=0/1 --}}
+                  <input type="hidden" name="veg" id="veg" value="{{ old('veg', $product?->veg ?? 0) }}">
+                  <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="{{ old('meta_data.item_type_id', data_get($npMeta,'item_type_id','')) }}">
+                  <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="{{ old('meta_data.item_type_name', data_get($npMeta,'item_type_name','')) }}">
+                </div>
+                <div class="np-form-group">
+                  <label class="np-label">Tags</label>
+                  <input type="text" id="np_tags_input" name="tags" class="np-input"
+                    placeholder="Enter tags, comma separated">
+                </div>
+              </div>
+            </div>
+          </div>
+
           {{-- Basic Information --}}
           <div class="np-card">
             <div class="np-card-header">
@@ -264,6 +388,30 @@
                   <label class="np-label">Pack / Weight <span class="np-req">*</span></label>
                   <input type="text" name="pack_weight" id="npWeight" class="np-input"
                     placeholder="e.g. 864g, 2×24 portions" oninput="npUpdateQuality()">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {{-- Status (part of Basic Information) --}}
+          <div class="np-card">
+            <div class="np-card-header">
+              <span class="np-card-icon">🚦</span>
+              <span class="np-card-title">Status</span>
+            </div>
+            <div class="np-card-body">
+              <div class="np-pill-row">
+                <div class="np-pill {{ (int)$npStatus === 1 ? 'sel' : '' }}" onclick="npSelStatus(this,'active')">
+                  <span class="np-sdot"></span>Active
+                  <input type="radio" name="status" value="1" @checked((int)$npStatus === 1) style="display:none">
+                </div>
+                <div class="np-pill {{ (int)$npStatus === 0 ? 'sel out' : '' }}" onclick="npSelStatus(this,'out')">
+                  <span class="np-sdot"></span>Out of Stock
+                  <input type="radio" name="status" value="0" @checked((int)$npStatus === 0) style="display:none">
+                </div>
+                <div class="np-pill {{ (int)$npStatus === 2 ? 'sel draft' : '' }}" onclick="npSelStatus(this,'draft')">
+                  <span class="np-sdot"></span>Draft
+                  <input type="radio" name="status" value="2" @checked((int)$npStatus === 2) style="display:none">
                 </div>
               </div>
             </div>
@@ -423,157 +571,10 @@
             </div>
           </div>
 
-          {{-- Categories --}}
-          <div class="np-card" data-np-section="general.categories">
-            <div class="np-card-header">
-              <span class="np-card-icon">🗂️</span>
-              <span class="np-card-title">Categories &amp; Classification</span>
-              <span class="np-card-subtitle">Amazon-style deep tree</span>
-            </div>
-            <div class="np-card-body">
-              <div class="np-info-box">🗂️ Select the deepest (leaf) category whenever possible. Leaf selection can auto-fill Amazon backend fields like Browse Node.</div>
-              <div class="np-form-row">
-                <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.store') }} <span class="np-req">*</span></label>
-                  <select name="store_id" id="store_id" class="np-select js-select2-custom" required>
-                    <option value="">{{ translate('messages.select_store') }}</option>
-                    @foreach(\App\Models\Store::when(Config::get('module.current_module_id'), function ($query, $moduleId) {
-                      $query->where('module_id', $moduleId);
-                    })->orderBy('name')->get(['id', 'name']) as $store)
-                      <option value="{{ $store->id }}" @selected(old('store_id', $product?->store_id ?? '') == $store->id)>{{ $store->name }}</option>
-                    @endforeach
-                  </select>
-                </div>
-                <div class="np-form-group">
-                  <label class="np-label">Main Category <span class="np-req">*</span></label>
-                  <div class="np-inline-add">
-                    <select name="category_id" id="category_id" class="np-select js-select2-custom"
-                      onchange="npUpdateQuality()">
-                      <option value="">— Select Category —</option>
-                      @foreach(\App\Models\Category::where('position', 0)->where('status', 1)->where(function($q){ $q->whereNull('module_id')->orWhere('module_id', Config::get('module.current_module_id')); })->get() as $cat)
-                        <option value="{{ $cat->id }}" @selected(old('category_id', $npCatPos1 ?? '') == $cat->id)>{{ $cat->name }}</option>
-                      @endforeach
-                    </select>
-                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(0)">+</button>
-                  </div>
-                </div>
-              </div>
-              <div class="np-form-row">
-                <div class="np-form-group">
-                  <label class="np-label">Sub Category (Level 2)</label>
-                  <div class="np-inline-add">
-                    <select name="sub_category_id" id="sub_category_id" class="np-select js-select2-custom"
-                      data-selected="{{ old('sub_category_id', $npCatPos2 ?? '') }}">
-                      <option value="">Select main first…</option>
-                    </select>
-                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(1)">+</button>
-                  </div>
-                </div>
-                <div class="np-form-group">
-                  <label class="np-label">Sub-Sub Category (Level 3)</label>
-                  <div class="np-inline-add">
-                    <select name="sub_sub_category_id" id="sub_sub_category_id" class="np-select js-select2-custom"
-                      data-selected="{{ old('sub_sub_category_id', $npCatPos3 ?? '') }}">
-                      <option value="">Select Level 2 first…</option>
-                    </select>
-                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(2)">+</button>
-                  </div>
-                </div>
-              </div>
-              <div class="np-form-row">
-                <div class="np-form-group">
-                  <label class="np-label">Level 4 (Leaf Node)</label>
-                  <div class="np-inline-add">
-                    <select name="sub_sub_sub_category_id" id="sub_sub_sub_category_id" class="np-select js-select2-custom"
-                      data-selected="{{ old('sub_sub_sub_category_id', $npCatPos4 ?? '') }}">
-                      <option value="">Select Level 3 first…</option>
-                    </select>
-                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenCategoryModal(3)">+</button>
-                  </div>
-                </div>
-                <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.unit') }}</label>
-                  <div class="np-inline-add">
-                    <select name="unit" id="unit" class="np-select js-select2-custom">
-                      <option value="">{{ translate('messages.select_unit') }}</option>
-                      @foreach(\App\Models\Unit::get(['id', 'unit']) as $unit)
-                        <option value="{{ $unit->id }}" @selected(old('unit', $product?->unit_id ?? '') == $unit->id)>{{ $unit->unit }}</option>
-                      @endforeach
-                    </select>
-                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenUnitModal()">+</button>
-                  </div>
-                </div>
-              </div>
-              <div class="np-form-row">
-                <div class="np-form-group">
-                  <label class="np-label">Browse Node ID <span class="np-opt">(Amazon)</span></label>
-                  <input type="text" id="npBrowseNodeId" name="meta_data[browse_node_id]" class="np-input"
-                    placeholder="e.g. 16310101" readonly style="background:var(--np-bg)">
-                  <div class="np-hint">Auto-populated from category selection</div>
-                </div>
-                <div class="np-form-group">
-                  <label class="np-label">Product Type Keyword <span class="np-opt">(Amazon backend)</span></label>
-                  <input type="text" id="npProductTypeKeyword" name="meta_data[product_type_keyword]" class="np-input"
-                    placeholder="e.g. CHEESE, CREAM_CHEESE">
-                </div>
-              </div>
-              <div class="np-form-row">
-                <div class="np-form-group">
-                  <label class="np-label">{{ translate('messages.item_type') }}</label>
-                  <div class="np-inline-add">
-                    <select id="npItemTypeSelect" class="np-select js-select2-custom">
-                      <option value="">— Select —</option>
-                      @if(\Illuminate\Support\Facades\Schema::hasTable('item_types'))
-                        @foreach(\App\Models\ItemType::where(function($q){ $q->whereNull('module_id')->orWhere('module_id', \Illuminate\Support\Facades\Config::get('module.current_module_id')); })->orderBy('name')->get(['id','name','is_veg']) as $t)
-                          <option value="{{ $t->id }}" data-is-veg="{{ (int)$t->is_veg }}">{{ $t->name }}</option>
-                        @endforeach
-                      @else
-                        <option value="" disabled>(Run migration to enable item types)</option>
-                      @endif
-                    </select>
-                    <button type="button" class="np-btn-add np-btn-add-quick" onclick="npOpenItemTypeModal()">+</button>
-                  </div>
-                  {{-- Keep backend compatibility: ItemController expects veg=0/1 --}}
-                  <input type="hidden" name="veg" id="veg" value="{{ old('veg', $product?->veg ?? 0) }}">
-                  <input type="hidden" name="meta_data[item_type_id]" id="npItemTypeId" value="{{ old('meta_data.item_type_id', data_get($npMeta,'item_type_id','')) }}">
-                  <input type="hidden" name="meta_data[item_type_name]" id="npItemTypeName" value="{{ old('meta_data.item_type_name', data_get($npMeta,'item_type_name','')) }}">
-                </div>
-                <div class="np-form-group">
-                  <label class="np-label">Tags</label>
-                  <input type="text" id="np_tags_input" name="tags" class="np-input"
-                    placeholder="Enter tags, comma separated">
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {{-- RIGHT COLUMN --}}
         <div>
-          {{-- Status --}}
-          <div class="np-card">
-            <div class="np-card-header">
-              <span class="np-card-icon">🚦</span>
-              <span class="np-card-title">Status</span>
-            </div>
-            <div class="np-card-body">
-              <div class="np-pill-row">
-                <div class="np-pill {{ (int)$npStatus === 1 ? 'sel' : '' }}" onclick="npSelStatus(this,'active')">
-                  <span class="np-sdot"></span>Active
-                  <input type="radio" name="status" value="1" @checked((int)$npStatus === 1) style="display:none">
-                </div>
-                <div class="np-pill {{ (int)$npStatus === 0 ? 'sel out' : '' }}" onclick="npSelStatus(this,'out')">
-                  <span class="np-sdot"></span>Out of Stock
-                  <input type="radio" name="status" value="0" @checked((int)$npStatus === 0) style="display:none">
-                </div>
-                <div class="np-pill {{ (int)$npStatus === 2 ? 'sel draft' : '' }}" onclick="npSelStatus(this,'draft')">
-                  <span class="np-sdot"></span>Draft
-                  <input type="radio" name="status" value="2" @checked((int)$npStatus === 2) style="display:none">
-                </div>
-              </div>
-            </div>
-          </div>
-
           {{-- Origin & Seller --}}
           <div class="np-card" data-np-section="general.origin_seller">
             <div class="np-card-header">
