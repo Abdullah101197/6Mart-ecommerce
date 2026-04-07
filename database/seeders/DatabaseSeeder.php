@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         $seeders = [
             StoreDirectorySeeder::class,
+            StoreDirectoryToCategoriesSeeder::class,
         ];
 
         if (app()->environment(['local', 'testing'])) {
