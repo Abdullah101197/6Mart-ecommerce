@@ -17,10 +17,8 @@ class CategoryService
 
     public function getViewByPosition(int $position): string
     {
-        return match ($position) {
-            1 => CategoryViewPath::SUB_CATEGORY_INDEX['view'],
-            default => CategoryViewPath::INDEX['view'],
-        };
+        // Unified tree-based category UI (supports up to 4 levels).
+        return CategoryViewPath::INDEX['view'];
     }
 
     public function getAddData($request, string|null|Object $parentCategory): array
@@ -33,11 +31,17 @@ class CategoryService
             $moduleId = is_object($parentCategory) ? $parentCategory->module_id : $parentCategory['module_id'];
         }
 
+        $position = 0;
+        if ($parentId > 0 && $parentCategory) {
+            $parentPosition = (int) (is_object($parentCategory) ? $parentCategory->position : ($parentCategory['position'] ?? 0));
+            $position = $parentPosition + 1;
+        }
+
         return [
             'name' => $request->name[array_search('default', $request->lang)],
-            'image' => $this->upload('category/', 'png', $request->file('image')),
+            'image' => $request->hasFile('image') ? $this->upload('category/', 'png', $request->file('image')) : 'def.png',
             'parent_id' => $parentId,
-            'position' => $request->position,
+            'position' => $position,
             'priority' => $request->priority??0,
             'module_id' => $moduleId,
         ];
@@ -45,14 +49,21 @@ class CategoryService
 
     public function getUpdateData(CategoryUpdateRequest $request, object $object): array
     {
-
         $slug = Str::slug($request->name[array_search('default', $request->lang)]);
+        $parentIdRaw = $request->input('parent_id');
+        $parentId = (filled($parentIdRaw) && (int) $parentIdRaw > 0) ? (int) $parentIdRaw : 0;
+        $position = 0;
+        if ($parentId > 0) {
+            $parent = \App\Models\Category::withoutGlobalScope('translate')->find($parentId);
+            $position = $parent ? ((int) $parent->position + 1) : 0;
+        }
         return [
             'slug' => $object->slug ?? "{$slug}{$object->id}",
             'name' => $request->name[array_search('default', $request->lang)],
             'priority' => $request->priority??0,
             'status' => $request->status ?? 0,
-            'parent_id' =>$request->parent_id ?? 0,
+            'parent_id' => $parentId,
+            'position' => $position,
             'image' => $request->has('image') ? $this->updateAndUpload('category/', $object->image, 'png', $request->file('image')) : $object->image,
         ];
     }

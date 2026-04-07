@@ -103,6 +103,20 @@
                 </div>
 
                 <div class="form-group mb-3">
+                    <label class="input-label" for="parent_id">{{ translate('messages.parent_category') }}</label>
+                    <select id="parent_id" name="parent_id" class="form-control js-select2-custom1">
+                        <option value="0">{{ translate('messages.none') }}</option>
+                        @foreach(($categoryOptions ?? []) as $opt)
+                            <option value="{{ $opt['id'] }}" {{ $opt['disabled'] ? 'disabled' : '' }}
+                                {{ (int)($category->parent_id ?? 0) === (int)$opt['id'] ? 'selected' : '' }}>
+                                {{ $opt['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted d-block mt-1">Max 4 levels.</small>
+                </div>
+
+                <div class="form-group mb-3">
                     <label class="input-label" for="">
                         {{ translate('messages.Priority') }}
                     </label>

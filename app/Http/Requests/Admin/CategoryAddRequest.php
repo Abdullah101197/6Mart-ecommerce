@@ -31,7 +31,9 @@ class CategoryAddRequest extends FormRequest
         return [
             'name' => 'required|max:100',
             'name.0' => 'required',
-            'image' => 'required_if:position,==,0',
+            // Require image only for root categories (level 1).
+            'parent_id' => 'nullable|integer|min:0',
+            'image' => 'required_without:parent_id|required_if:parent_id,0',
         ];
     }
 

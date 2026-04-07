@@ -97,9 +97,35 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    public function children(): HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function isRoot(): bool
+    {
+        return empty($this->parent_id) || (int) $this->parent_id === 0;
+    }
+
+    public function depth(): int
+    {
+        $depth = 1;
+        $current = $this;
+        $guard = 0;
+        while ($current && !empty($current->parent_id) && (int) $current->parent_id > 0) {
+            $depth++;
+            $current = $current->parent;
+            $guard++;
+            if ($guard > 10) {
+                break;
+            }
+        }
+        return $depth;
     }
     public function storage()
     {

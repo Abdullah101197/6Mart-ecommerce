@@ -1,6 +1,6 @@
 @extends('layouts.admin.app')
 
-@section('title', translate('messages.Add new category'))
+@section('title', translate('messages.categories'))
 
 @push('css_or_js')
 @endpush
@@ -13,18 +13,14 @@
                 <span class="page-header-icon">
                     <img src="{{ asset('assets/admin/img/category.png') }}" class="w--20" alt="">
                 </span>
-                <span>
-                    {{ translate('add_new_category') }}
-                </span>
+                <span>{{ translate('messages.categories') }}</span>
             </h1>
         </div>
         <!-- End Page Header -->
 
         <div class="card">
             <div class="card-body">
-                <form
-                    action="{{ isset($category) ? route('admin.category.update', [$category['id']]) : route('admin.category.store') }}"
-                    method="post" enctype="multipart/form-data">
+                <form action="{{ route('admin.category.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     @if ($language)
                         <ul class="nav nav-tabs mb-4 border-0">
@@ -79,7 +75,20 @@
                                 </div>
                                 <input type="hidden" name="lang[]" value="default">
                             @endif
-                            <input name="position" value="0" class="initial-hidden">
+                            <div class="form-group">
+                                <label class="input-label" for="parent_id">
+                                    {{ translate('messages.parent_category') }}
+                                </label>
+                                <select id="parent_id" name="parent_id" class="form-control js-select2-custom">
+                                    <option value="0">{{ translate('messages.none') }}</option>
+                                    @foreach(($categoryOptions ?? []) as $opt)
+                                        <option value="{{ $opt['id'] }}" {{ $opt['disabled'] ? 'disabled' : '' }}>
+                                            {{ $opt['label'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted d-block mt-1">Max 4 levels.</small>
+                            </div>
 
                             <div class="form-group">
                                 <label class="input-label" for="">
@@ -145,7 +154,7 @@
             <div class="card-header py-2 border-0">
                 <div class="search--button-wrapper">
                     <h5 class="card-title">{{ translate('messages.category_list') }}<span
-                            class="badge badge-soft-dark ml-2" id="itemCount">{{ $categories->total() }}</span></h5>
+                            class="badge badge-soft-dark ml-2" id="itemCount">{{ count($treeRows ?? []) }}</span></h5>
 
                     <form class="search-form w-340-lg">
                         <!-- Search -->
@@ -153,7 +162,6 @@
                             <input type="search" name="search" value="{{ request()?->search ?? null }}"
                                 class="form-control h-40" placeholder="{{ translate('messages.search_categories') }}"
                                 aria-label="{{ translate('messages.ex_:_categories') }}">
-                            <input type="hidden" name="position" value="0">
                             <button type="submit" class="btn btn--primary h-40"><i class="tio-search"></i></button>
                         </div>
                         <!-- End Search -->
@@ -222,23 +230,28 @@
                         </thead>
 
                         <tbody id="table-div">
-                            @foreach ($categories as $key => $category)
+                            @foreach (($treeRows ?? []) as $key => $row)
+                                @php($category = ($allCategories ?? collect())->firstWhere('id', $row['id']))
                                 <tr>
-                                    <td>{{ $key + $categories->firstItem() }}</td>
-                                    <td>{{ $category->id }}</td>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td>{{ $category?->id }}</td>
                                     <td>
                                         <span class="d-block fs-14 d-block text-title max-w-250 min-w-160">
-                                            {{ Str::limit($category['name'], 20, '...') }}
+                                            {!! str_repeat('&nbsp;&nbsp;&nbsp;', max(0, ($row['depth'] ?? 1) - 1)) !!}
+                                            {{ Str::limit($category?->name, 40, '...') }}
                                         </span>
+                                        <small class="text-muted d-block">
+                                            Level {{ $row['depth'] ?? 1 }}
+                                        </small>
                                     </td>
                                     <td>
                                         <label class="toggle-switch toggle-switch-sm"
-                                            for="stocksCheckbox{{ $category->id }}">
+                                            for="stocksCheckbox{{ $category?->id }}">
                                             <input type="checkbox"
-                                                data-url="{{ route('admin.category.status', [$category['id'], $category->status ? 0 : 1]) }}"
+                                                data-url="{{ route('admin.category.status', [$category?->id, $category?->status ? 0 : 1]) }}"
                                                 class="toggle-switch-input redirect-url"
-                                                id="stocksCheckbox{{ $category->id }}"
-                                                {{ $category->status ? 'checked' : '' }}>
+                                                id="stocksCheckbox{{ $category?->id }}"
+                                                {{ $category?->status ? 'checked' : '' }}>
                                             <span class="toggle-switch-label mx-auto">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
@@ -246,8 +259,8 @@
                                     </td>
                                     <td>
                                         <label class="toggle-switch toggle-switch-sm"
-                                            for="featuredCheckbox{{ $category->id }}">
-                                            <input type="checkbox" data-id="featuredCheckbox{{ $category->id }}"
+                                            for="featuredCheckbox{{ $category?->id }}">
+                                            <input type="checkbox" data-id="featuredCheckbox{{ $category?->id }}"
                                                 data-type="status"
                                                 data-image-on="{{ asset('/assets/admin/img/status-ons.png') }}"
                                                 data-image-off="{{ asset('/assets/admin/img/off-danger.png') }}"
@@ -256,16 +269,16 @@
                                                 data-text-on="<p>{{ translate('If you turn on this category as a featured category it will show in customer app landing page.') }}"
                                                 data-text-off="<p>{{ translate('If you turn off this category from featured category it will not show in customer app landing page.') }}</p>"
                                                 class="toggle-switch-input dynamic-checkbox"
-                                                id="featuredCheckbox{{ $category->id }}"
-                                                {{ $category->featured ? 'checked' : '' }}>
+                                                id="featuredCheckbox{{ $category?->id }}"
+                                                {{ $category?->featured ? 'checked' : '' }}>
                                             <span class="toggle-switch-label mx-auto">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
                                         </label>
 
                                         <form
-                                            action="{{ route('admin.category.featured', [$category['id'], $category->featured ? 0 : 1]) }}"
-                                            method="get" id="featuredCheckbox{{ $category->id }}_form">
+                                            action="{{ route('admin.category.featured', [$category?->id, $category?->featured ? 0 : 1]) }}"
+                                            method="get" id="featuredCheckbox{{ $category?->id }}_form">
                                         </form>
                                     </td>
 
@@ -285,18 +298,18 @@
                                         </td>
                                     @endif
                                     <td>
-                                        <form action="{{ route('admin.category.priority', $category->id) }}"
+                                        <form action="{{ route('admin.category.priority', $category?->id) }}"
                                             class="priority-form">
                                             <select name="priority" id="priority"
-                                                class="form-control form--control-select  priority-select  mx-auto {{ $category->priority == 0 ? 'text-title' : '' }} {{ $category->priority == 1 ? 'text-info' : '' }} {{ $category->priority == 2 ? 'text-success' : '' }}">
+                                                class="form-control form--control-select  priority-select  mx-auto {{ $category?->priority == 0 ? 'text-title' : '' }} {{ $category?->priority == 1 ? 'text-info' : '' }} {{ $category?->priority == 2 ? 'text-success' : '' }}">
                                                 <option value="0" class="text--title"
-                                                    {{ $category->priority == 0 ? 'selected' : '' }}>
+                                                    {{ $category?->priority == 0 ? 'selected' : '' }}>
                                                     {{ translate('messages.normal') }}</option>
                                                 <option value="1" class="text--title"
-                                                    {{ $category->priority == 1 ? 'selected' : '' }}>
+                                                    {{ $category?->priority == 1 ? 'selected' : '' }}>
                                                     {{ translate('messages.medium') }}</option>
                                                 <option value="2" class="text--title"
-                                                    {{ $category->priority == 2 ? 'selected' : '' }}>
+                                                    {{ $category?->priority == 2 ? 'selected' : '' }}>
                                                     {{ translate('messages.high') }}</option>
                                             </select>
                                         </form>
@@ -306,19 +319,19 @@
                                         <div class="btn--container justify-content-center">
 
                                             <a class="btn action-btn btn-outline-theme-dark offcanvas-trigger data-info-show"
-                                                href="javascript:void(0)" data-id="{{ $category['id'] }}"
-                                                data-url="{{ route('admin.category.edit', [$category['id']]) }}"
+                                                href="javascript:void(0)" data-id="{{ $category?->id }}"
+                                                data-url="{{ route('admin.category.edit', [$category?->id]) }}"
                                                 data-target="#offcanvas__categoryBtn">
                                                 <i class="tio-edit"></i>
                                             </a>
                                             <a class="btn action-btn btn--danger btn-outline-danger form-alert"
-                                                href="javascript:" data-id="category-{{ $category['id'] }}"
+                                                href="javascript:" data-id="category-{{ $category?->id }}"
                                                 data-message="{{ translate('Want to delete this category') }}"
                                                 title="{{ translate('messages.delete_category') }}"><i
                                                     class="tio-delete-outlined"></i>
                                             </a>
-                                            <form action="{{ route('admin.category.delete', [$category['id']]) }}"
-                                                method="post" id="category-{{ $category['id'] }}">
+                                            <form action="{{ route('admin.category.delete', [$category?->id]) }}"
+                                                method="post" id="category-{{ $category?->id }}">
                                                 @csrf @method('delete')
                                             </form>
                                         </div>
@@ -329,11 +342,10 @@
                     </table>
                 </div>
             </div>
-            @if (count($categories) !== 0)
+            @if (count($treeRows ?? []) !== 0)
                 <hr>
             @endif
-
-            @if (count($categories) === 0)
+            @if (count($treeRows ?? []) === 0)
                 <div class="empty--data">
                     <img src="{{ asset('/assets/admin/svg/illustrations/sorry.svg') }}" alt="public">
                     <h5>
@@ -344,7 +356,6 @@
             <div class="page-area px-4 pb-3">
                 <div class="d-flex align-items-center justify-content-end">
                     <div>
-                        {!! $categories->withQueryString()->links() !!}
                     </div>
                 </div>
             </div>
@@ -377,7 +388,7 @@
         });
 
         $('#reset_btn').click(function() {
-            $('#exampleFormControlSelect1').val(null).trigger('change');
+            $('#parent_id').val(0).trigger('change');
             $('#viewer').attr('src', "{{ asset('assets/admin/img/upload-img.png') }}");
         })
 

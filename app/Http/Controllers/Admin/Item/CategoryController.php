@@ -17,6 +17,7 @@ use App\Services\CategoryService;
 use App\Traits\ImportExportTrait;
 use Brian2694\Toastr\Facades\Toastr;
 use Exception;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -52,32 +53,48 @@ class CategoryController extends BaseController
 
     private function getCategoryView(Request $request): View
     {
-        $categories = $this->categoryRepo->getListWhere(
-            searchValue: $request['search'],
-            filters: ['position' => $request['position'] ?? 0],
-            relations: ['module'],
-            dataLimit: config('default_pagination')
-        );
+        $moduleId = Config::get('module.current_module_id');
+        $allCategories = \App\Models\Category::withoutGlobalScope('translate')
+            ->with(['module'])
+            ->when($moduleId, fn ($q) => $q->where('module_id', $moduleId))
+            ->orderBy('parent_id')
+            ->orderBy('priority', 'desc')
+            ->orderBy('id')
+            ->get();
 
-        $mainCategories = $this->categoryRepo->getMainList(
-            filters: ['position' => 0],
-            relations: ['module'],
-        );
+        $categoryTree = $this->buildCategoryTree($allCategories);
+        $categoryOptions = $this->buildCategoryOptions($categoryTree);
+        $treeRows = $this->flattenCategoryTree($categoryTree);
 
         $language = getWebConfig('language');
         $taxData = Helpers::getTaxSystemType();
         $categoryWiseTax = $taxData['categoryWiseTax'];
         $taxVats = $taxData['taxVats'];
 
-        return view($this->categoryService->getViewByPosition($request['position'] ?? 0), compact('categories', 'language', 'mainCategories', 'categoryWiseTax', 'taxVats'));
+        return view($this->categoryService->getViewByPosition((int) ($request['position'] ?? 0)), compact(
+            'language',
+            'categoryWiseTax',
+            'taxVats',
+            'allCategories',
+            'categoryTree',
+            'categoryOptions',
+            'treeRows'
+        ));
     }
 
     public function add(CategoryAddRequest $request): RedirectResponse|JsonResponse
     {
         $parentCategory = null;
-        if (filled($request['parent_id']) && (int) $request['parent_id'] > 0) {
-            $parentCategory = $this->categoryRepo->getFirstWhere(params: ['id' => $request['parent_id']]);
+        $parentId = (filled($request['parent_id']) && (int) $request['parent_id'] > 0) ? (int) $request['parent_id'] : 0;
+        if ($parentId > 0) {
+            $parentCategory = $this->categoryRepo->getFirstWhere(params: ['id' => $parentId]);
+            $hierarchyError = $this->validateHierarchy(parent: $parentCategory, currentId: null);
+            if ($hierarchyError) {
+                Toastr::error($hierarchyError);
+                return back();
+            }
         }
+
         $category = $this->categoryRepo->add(
             data: $this->categoryService->getAddData(
                 request: $request,
@@ -104,7 +121,7 @@ class CategoryController extends BaseController
             }
         }
 
-        Toastr::success($request['position'] == 0 ? translate('messages.category_added_successfully') : translate('messages.Sub_category_added_successfully'));
+        Toastr::success(translate('messages.category_added_successfully'));
 
         if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
             return response()->json([
@@ -112,7 +129,7 @@ class CategoryController extends BaseController
                 'name' => $category->name,
                 'position' => $category->position,
                 'parent_id' => $category->parent_id,
-                'message' => $request['position'] == 0 ? translate('messages.category_added_successfully') : translate('messages.Sub_category_added_successfully'),
+                'message' => translate('messages.category_added_successfully'),
             ]);
         }
 
@@ -128,12 +145,19 @@ class CategoryController extends BaseController
         $categoryWiseTax = $taxData['categoryWiseTax'];
         $taxVats = $taxData['taxVats'];
         $taxVatIds = $categoryWiseTax ? $category->taxVats()->pluck('tax_id')->toArray() : [];
-        $mainCategories = $this->categoryRepo->getMainList(
-            filters: ['position' => 0],
-            relations: ['module'],
-        );
+        $moduleId = Config::get('module.current_module_id');
+        $allCategories = \App\Models\Category::withoutGlobalScope('translate')
+            ->with(['module'])
+            ->when($moduleId, fn ($q) => $q->where('module_id', $moduleId))
+            ->orderBy('parent_id')
+            ->orderBy('priority', 'desc')
+            ->orderBy('id')
+            ->get();
+
+        $categoryTree = $this->buildCategoryTree($allCategories);
+        $categoryOptions = $this->buildCategoryOptions($categoryTree, disabledIds: [$category->id]);
         return response()->json([
-            'view' => view('admin-views.category._edit', compact('mainCategories', 'category', 'taxVats', 'categoryWiseTax', 'language', 'taxVatIds'))->render(),
+            'view' => view('admin-views.category._edit', compact('category', 'taxVats', 'categoryWiseTax', 'language', 'taxVatIds', 'categoryOptions'))->render(),
         ]);
     }
 
@@ -154,6 +178,15 @@ class CategoryController extends BaseController
     public function update(CategoryUpdateRequest $request, string|int $id): RedirectResponse
     {
         $mainCategory = $this->categoryRepo->getFirstWhere(params: ['id' => $id]);
+        $parentId = (filled($request['parent_id']) && (int) $request['parent_id'] > 0) ? (int) $request['parent_id'] : 0;
+        if ($parentId > 0) {
+            $parentCategory = $this->categoryRepo->getFirstWhere(params: ['id' => $parentId]);
+            $hierarchyError = $this->validateHierarchy(parent: $parentCategory, currentId: (int) $id);
+            if ($hierarchyError) {
+                Toastr::error($hierarchyError);
+                return back();
+            }
+        }
         $category = $this->categoryRepo->update(id: $id, data: $this->categoryService->getUpdateData(request: $request, object: $mainCategory));
         $this->translationRepo->updateByModel(request: $request, model: $category, modelPath: 'App\Models\Category', attribute: 'name');
 
@@ -183,8 +216,120 @@ class CategoryController extends BaseController
         }
 
 
-        Toastr::success($category['position'] == 0 ? translate('messages.category_updated_successfully') : translate('messages.Sub_category_updated_successfully'));
-        return redirect()->route('admin.category.add', ['position' => $mainCategory->position]);
+        Toastr::success(translate('messages.category_updated_successfully'));
+        return redirect()->route('admin.category.add');
+    }
+
+    public function tree(Request $request): JsonResponse
+    {
+        $moduleId = Config::get('module.current_module_id');
+        $allCategories = \App\Models\Category::withoutGlobalScope('translate')
+            ->when($moduleId, fn ($q) => $q->where('module_id', $moduleId))
+            ->orderBy('parent_id')
+            ->orderBy('priority', 'desc')
+            ->orderBy('id')
+            ->get(['id', 'name', 'parent_id', 'position', 'status', 'priority', 'module_id', 'slug']);
+
+        $tree = $this->buildCategoryTree($allCategories);
+        return response()->json([
+            'max_level' => 4,
+            'tree' => $tree,
+        ]);
+    }
+
+    private function validateHierarchy($parent, ?int $currentId): ?string
+    {
+        if (!$parent) {
+            return 'Parent category not found.';
+        }
+
+        // Max 4 levels: parent depth cannot be >= 4.
+        $depth = 1;
+        $node = $parent;
+        $guard = 0;
+        while ($node && filled($node->parent_id) && (int) $node->parent_id > 0) {
+            if ($currentId && (int) $node->id === $currentId) {
+                return 'Invalid parent category (circular hierarchy).';
+            }
+            $node = \App\Models\Category::withoutGlobalScope('translate')->find((int) $node->parent_id);
+            $depth++;
+            $guard++;
+            if ($guard > 10) {
+                break;
+            }
+        }
+
+        if ($currentId && (int) $parent->id === $currentId) {
+            return 'Invalid parent category (cannot set itself as parent).';
+        }
+
+        if ($depth >= 4) {
+            return 'Max depth is 4 levels. You cannot add a child under a level 4 category.';
+        }
+
+        return null;
+    }
+
+    private function buildCategoryTree($categories): array
+    {
+        $items = [];
+        foreach ($categories as $category) {
+            $items[(int) $category->id] = [
+                'id' => (int) $category->id,
+                'name' => $category->name,
+                'parent_id' => $category->parent_id ? (int) $category->parent_id : null,
+                'position' => (int) ($category->position ?? 0),
+                'status' => (int) ($category->status ?? 1),
+                'priority' => (int) ($category->priority ?? 0),
+                'module_id' => (int) ($category->module_id ?? 0),
+                'slug' => $category->slug ?? null,
+                'children' => [],
+            ];
+        }
+
+        $tree = [];
+        foreach ($items as $id => &$item) {
+            $pid = $item['parent_id'];
+            if ($pid && isset($items[$pid])) {
+                $items[$pid]['children'][] = &$item;
+            } else {
+                $tree[] = &$item;
+            }
+        }
+        unset($item);
+
+        return $tree;
+    }
+
+    private function buildCategoryOptions(array $tree, int $depth = 1, array $options = [], array $disabledIds = []): array
+    {
+        foreach ($tree as $node) {
+            $options[] = [
+                'id' => $node['id'],
+                'label' => str_repeat('— ', max(0, $depth - 1)) . $node['name'],
+                'depth' => $depth,
+                'disabled' => in_array($node['id'], $disabledIds, true) || $depth >= 4,
+            ];
+            if (!empty($node['children'])) {
+                $options = $this->buildCategoryOptions($node['children'], $depth + 1, $options, $disabledIds);
+            }
+        }
+        return $options;
+    }
+
+    private function flattenCategoryTree(array $tree, int $depth = 1, array $rows = []): array
+    {
+        foreach ($tree as $node) {
+            $rows[] = [
+                'id' => $node['id'],
+                'name' => $node['name'],
+                'depth' => $depth,
+            ];
+            if (!empty($node['children'])) {
+                $rows = $this->flattenCategoryTree($node['children'], $depth + 1, $rows);
+            }
+        }
+        return $rows;
     }
 
     public function delete(Request $request): RedirectResponse
