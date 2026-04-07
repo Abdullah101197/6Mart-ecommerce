@@ -444,6 +444,20 @@
                                         </a>
                                     </li>
 
+                                    <li class="nav-item {{ request()->input('level') == 3 && Request::is('admin/category/add') ? 'active' : '' }}">
+                                        <a class="nav-link " href="{{ route('admin.category.add', ['level' => 3]) }}" title="Sub-sub category">
+                                            <span class="tio-circle nav-indicator-icon"></span>
+                                            <span class="text-truncate">Sub-sub category</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item {{ request()->input('level') == 4 && Request::is('admin/category/add') ? 'active' : '' }}">
+                                        <a class="nav-link " href="{{ route('admin.category.add', ['level' => 4]) }}" title="Leaf (Level 4)">
+                                            <span class="tio-circle nav-indicator-icon"></span>
+                                            <span class="text-truncate">Leaf (Level 4)</span>
+                                        </a>
+                                    </li>
+
                                     <li class="nav-item {{ Request::is('admin/category/bulk-import') ? 'active' : '' }}">
                                         <a class="nav-link " href="{{ route('admin.category.bulk-import') }}"
                                            title="{{ translate('messages.bulk_import') }}">

@@ -63,7 +63,8 @@ class CategoryController extends BaseController
             ->get();
 
         $categoryTree = $this->buildCategoryTree($allCategories);
-        $categoryOptions = $this->buildCategoryOptions($categoryTree);
+        $targetLevel = (int) ($request->query('level') ?? 0);
+        $categoryOptions = $this->buildCategoryOptions($categoryTree, targetLevel: $targetLevel);
         $treeRows = $this->flattenCategoryTree($categoryTree);
 
         $language = getWebConfig('language');
@@ -78,7 +79,8 @@ class CategoryController extends BaseController
             'allCategories',
             'categoryTree',
             'categoryOptions',
-            'treeRows'
+            'treeRows',
+            'targetLevel'
         ));
     }
 
@@ -301,17 +303,27 @@ class CategoryController extends BaseController
         return $tree;
     }
 
-    private function buildCategoryOptions(array $tree, int $depth = 1, array $options = [], array $disabledIds = []): array
+    private function buildCategoryOptions(
+        array $tree,
+        int $depth = 1,
+        array $options = [],
+        array $disabledIds = [],
+        int $targetLevel = 0
+    ): array
     {
         foreach ($tree as $node) {
-            $options[] = [
-                'id' => $node['id'],
-                'label' => str_repeat('— ', max(0, $depth - 1)) . $node['name'],
-                'depth' => $depth,
-                'disabled' => in_array($node['id'], $disabledIds, true) || $depth >= 4,
-            ];
+            // If targetLevel is provided (2/3/4), only allow selecting parents from (targetLevel - 1).
+            // Example: to add level 3, parent must be level 2.
+            if ($targetLevel <= 0 || $depth === max(1, $targetLevel - 1)) {
+                $options[] = [
+                    'id' => $node['id'],
+                    'label' => str_repeat('— ', max(0, $depth - 1)) . $node['name'],
+                    'depth' => $depth,
+                    'disabled' => in_array($node['id'], $disabledIds, true) || $depth >= 4,
+                ];
+            }
             if (!empty($node['children'])) {
-                $options = $this->buildCategoryOptions($node['children'], $depth + 1, $options, $disabledIds);
+                $options = $this->buildCategoryOptions($node['children'], $depth + 1, $options, $disabledIds, $targetLevel);
             }
         }
         return $options;

@@ -13,7 +13,15 @@
                 <span class="page-header-icon">
                     <img src="{{ asset('assets/admin/img/category.png') }}" class="w--20" alt="">
                 </span>
-                <span>{{ translate('messages.categories') }}</span>
+                <span>
+                    @if(($targetLevel ?? 0) == 3)
+                        {{ translate('messages.add_new') }} {{ translate('messages.sub_category') }} (Level 3)
+                    @elseif(($targetLevel ?? 0) == 4)
+                        {{ translate('messages.add_new') }} Leaf (Level 4)
+                    @else
+                        {{ translate('messages.categories') }}
+                    @endif
+                </span>
             </h1>
         </div>
         <!-- End Page Header -->
@@ -87,7 +95,15 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <small class="text-muted d-block mt-1">Max 4 levels.</small>
+                                <small class="text-muted d-block mt-1">
+                                    @if(($targetLevel ?? 0) == 3)
+                                        Select a Level 2 parent to create Level 3.
+                                    @elseif(($targetLevel ?? 0) == 4)
+                                        Select a Level 3 parent to create Level 4 (leaf).
+                                    @else
+                                        Max 4 levels.
+                                    @endif
+                                </small>
                             </div>
 
                             <div class="form-group">
