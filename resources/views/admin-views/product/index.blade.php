@@ -2959,11 +2959,11 @@
 
     function npSetActionButtons() {
       const activeTabId = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
-      const idx = Math.max(npTabIds.indexOf(activeTabId), 0);
+      const idx = Math.max(npVisibleTabIds().indexOf(activeTabId), 0);
       const prevBtn = document.querySelector('.np-btn-row button[onclick="npPrevTab()"]');
       const nextBtn = document.querySelector('.np-btn-row button[onclick="npNextTab()"]');
       if (prevBtn) prevBtn.disabled = idx === 0;
-      if (nextBtn) nextBtn.style.display = idx === npTabIds.length - 1 ? 'none' : '';
+      if (nextBtn) nextBtn.style.display = idx === npVisibleTabIds().length - 1 ? 'none' : '';
     }
 
     // ═══ TABS ═══
@@ -3000,8 +3000,9 @@
 
     function npPrevTab() {
       const activeTabId = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
-      const idx = Math.max(npTabIds.indexOf(activeTabId), 0);
-      const prevId = npTabIds[idx - 1] || '';
+      const ids = npVisibleTabIds();
+      const idx = Math.max(ids.indexOf(activeTabId), 0);
+      const prevId = ids[idx - 1] || '';
       if (!prevId) return;
 
       // Force-activate previous tab by id (robust even if tabs are "hidden" in UI overrides)
@@ -3825,8 +3826,9 @@
         if (typeof npAddCustomIncoterm === 'function') { /* noop - only to ensure function exists */ }
       } catch (e) { }
       const activeTabIdAtStart = document.querySelector('.np-tab-panel.active')?.id || 'np-tab-general';
-      const startTabIndex = Math.max(npTabIds.indexOf(activeTabIdAtStart), 0);
-      const nextTabIdAtStart = moveNext ? (npTabIds[startTabIndex + 1] || '') : '';
+      const visibleIds = npVisibleTabIds();
+      const startTabIndex = Math.max(visibleIds.indexOf(activeTabIdAtStart), 0);
+      const nextTabIdAtStart = moveNext ? (visibleIds[startTabIndex + 1] || '') : '';
       window.__npWizardSaving = true;
       try { document.querySelector('.np-btn-row button[onclick="npNextTab()"]')?.setAttribute('disabled', 'disabled'); } catch (e) { }
 
@@ -4283,7 +4285,7 @@
             return;
           }
           if (!parentId) {
-            toastr.warning("{{ translate('messages.select_sub_category') }}", { CloseButton: true, ProgressBar: true });
+            toastr.warning("Select Sub-Sub Category (Level 3) first.", { CloseButton: true, ProgressBar: true });
             return;
           }
         }
@@ -4325,6 +4327,26 @@
           contentType: false,
           success: function (res) {
             if (res && res.id) {
+              // Refresh cascade options from DB so the list is always correct.
+              function npFetchChildren(parentId) {
+                return $.get("{{ route('admin.item.get-categories') }}", {
+                  parent_id: parentId,
+                  module_id: "{{ \Illuminate\Support\Facades\Config::get('module.current_module_id') }}",
+                  q: ''
+                });
+              }
+
+              function npRebuildSelect($sel, rows, placeholder, selectedId) {
+                let opts = `<option value="">${placeholder}</option>`;
+                (rows || []).forEach(function (r) {
+                  opts += `<option value="${String(r.id)}">${String(r.text || '')}</option>`;
+                });
+                npReplaceCategorySelectOptions($sel, opts);
+                if (selectedId) {
+                  $sel.val(String(selectedId)).trigger('change.select2').trigger('change');
+                }
+              }
+
               function npAppendOptionRefresh($sel, text, val) {
                 // Keep Select2 instance; just append + select + notify Select2.
                 $sel.append(new Option(text, val, true, true));
@@ -4336,14 +4358,41 @@
                 }
               }
 
-              if (String(res.position) === '0') {
+              const pos = String(res.position ?? '');
+              if (pos === '0') {
+                // Root: append to main list and trigger cascade
                 npAppendOptionRefresh($('#category_id'), res.name, res.id);
-              } else if (String(res.position) === '1') {
-                npAppendOptionRefresh($('#sub_category_id'), res.name, res.id);
-              } else if (String(res.position) === '2') {
-                npAppendOptionRefresh($('#sub_sub_category_id'), res.name, res.id);
-              } else if (String(res.position) === '3') {
-                npAppendOptionRefresh($('#sub_sub_sub_category_id'), res.name, res.id);
+                $('#category_id').trigger('change');
+              } else if (pos === '1') {
+                const p1 = ($('#category_id').val() || '').toString();
+                if (p1) {
+                  npFetchChildren(p1).done(function (rows) {
+                    npRebuildSelect($('#sub_category_id'), rows, 'Select main first…', res.id);
+                    $('#sub_category_id').trigger('change');
+                  });
+                } else {
+                  npAppendOptionRefresh($('#sub_category_id'), res.name, res.id);
+                }
+              } else if (pos === '2') {
+                const p2 = ($('#sub_category_id').val() || '').toString();
+                if (p2) {
+                  npFetchChildren(p2).done(function (rows) {
+                    npRebuildSelect($('#sub_sub_category_id'), rows, 'Select Level 2 first…', res.id);
+                    $('#sub_sub_category_id').trigger('change');
+                  });
+                } else {
+                  npAppendOptionRefresh($('#sub_sub_category_id'), res.name, res.id);
+                }
+              } else if (pos === '3') {
+                const p3 = ($('#sub_sub_category_id').val() || '').toString();
+                if (p3) {
+                  npFetchChildren(p3).done(function (rows) {
+                    npRebuildSelect($('#sub_sub_sub_category_id'), rows, 'Select Level 3 first…', res.id);
+                    $('#sub_sub_sub_category_id').trigger('change');
+                  });
+                } else {
+                  npAppendOptionRefresh($('#sub_sub_sub_category_id'), res.name, res.id);
+                }
               }
 
               toastr.success(res.message || 'Category added successfully', { CloseButton: true, ProgressBar: true });

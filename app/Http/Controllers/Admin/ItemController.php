@@ -244,12 +244,6 @@ class ItemController extends Controller
                 'position' => 4,
             ]);
         }
-        if ($request->sub_sub_sub_category_id != null) {
-            array_push($category, [
-                'id' => $request->sub_sub_sub_category_id,
-                'position' => 4,
-            ]);
-        }
         $item->category_ids = json_encode($category);
         $item->category_id = $request->sub_sub_sub_category_id
             ?? ($request->sub_sub_category_id ?? ($request->sub_category_id ?? $request->category_id));
@@ -475,7 +469,9 @@ class ItemController extends Controller
                 'custom_tabs_ui' => json_decode($request->custom_tabs_ui_json, true),
             ]);
         }
-        $item->status = $isDraftMode ? (int) ($request->input('status', 0)) : 1;
+        // Wizard saves each step with draft_mode=1; treat those records as Draft consistently.
+        // Publish flow will set status=1 (Active) explicitly.
+        $item->status = $isDraftMode ? 2 : 1;
         $item->save();
         $item->tags()->sync($tag_ids);
         $item->nutritions()->sync($nutrition_ids);
@@ -856,7 +852,8 @@ class ItemController extends Controller
         $item->organic = $request->organic ?? 0;
         $item->veg = $request->veg ?? 0;
         $item->images = $images;
-        $item->status = $isDraftMode ? (int) ($request->input('status', $item->status ?? 0)) : 1;
+        // Keep draft saves as Draft; publish will set Active.
+        $item->status = $isDraftMode ? 2 : 1;
         if (Helpers::get_mail_status('product_approval') && $request?->temp_product) {
 
 
