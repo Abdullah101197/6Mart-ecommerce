@@ -3535,6 +3535,27 @@ class Helpers
             $store_subscription->chat = $package->chat;
             $store_subscription->review = $package->review;
             $store_subscription->self_delivery = $package->self_delivery;
+            // Subscription permission snapshot (used by `subscription:<key>` middleware)
+            $store_subscription->category = $package->category;
+            $store_subscription->role = $package->role;
+            $store_subscription->deliveryman_list = $package->deliveryman_list;
+            $store_subscription->employee = $package->employee;
+            $store_subscription->item = $package->item;
+            $store_subscription->banner = $package->banner;
+            $store_subscription->campaign = $package->campaign;
+            $store_subscription->wallet = $package->wallet;
+            $store_subscription->wallet_method = $package->wallet_method;
+            $store_subscription->coupon = $package->coupon;
+            $store_subscription->advertisement = $package->advertisement;
+            $store_subscription->advertisement_list = $package->advertisement_list;
+            $store_subscription->addon = $package->addon;
+            $store_subscription->store_setup = $package->store_setup;
+            $store_subscription->notification_setup = $package->notification_setup;
+            $store_subscription->profile = $package->profile;
+            $store_subscription->my_shop = $package->my_shop;
+            $store_subscription->expense_report = $package->expense_report;
+            $store_subscription->disbursement_report = $package->disbursement_report;
+            $store_subscription->vat_report = $package->vat_report;
             $store_subscription->is_canceled = 0;
             $store_subscription->canceled_by = 'none';
 
@@ -3606,6 +3627,26 @@ class Helpers
                 'mobile_app' => $package->mobile_app,
                 'max_order' => $package->max_order,
                 'max_product' => $package->max_product,
+                'category' => $package->category,
+                'role' => $package->role,
+                'deliveryman_list' => $package->deliveryman_list,
+                'employee' => $package->employee,
+                'item' => $package->item,
+                'banner' => $package->banner,
+                'campaign' => $package->campaign,
+                'wallet' => $package->wallet,
+                'wallet_method' => $package->wallet_method,
+                'coupon' => $package->coupon,
+                'advertisement' => $package->advertisement,
+                'advertisement_list' => $package->advertisement_list,
+                'addon' => $package->addon,
+                'store_setup' => $package->store_setup,
+                'notification_setup' => $package->notification_setup,
+                'profile' => $package->profile,
+                'my_shop' => $package->my_shop,
+                'expense_report' => $package->expense_report,
+                'disbursement_report' => $package->disbursement_report,
+                'vat_report' => $package->vat_report,
             ];
             DB::beginTransaction();
             $store->save();

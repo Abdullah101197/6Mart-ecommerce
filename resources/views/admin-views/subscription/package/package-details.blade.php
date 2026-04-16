@@ -196,6 +196,226 @@ active
                         </div>
                     </div>
 
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->item == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.item') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->category == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.category') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->coupon == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.coupon') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->campaign == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.campaign') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->addon == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.addon') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->wallet == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.wallet') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->wallet_method == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.withdraw_method') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->employee == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.employee') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->role == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.role') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->deliveryman_list == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.deliveryman') }} ({{ translate('messages.list') }})</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->banner == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.banner') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->advertisement == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.advertisement') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->advertisement_list == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.advertisement') }} ({{ translate('messages.list') }})</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->store_setup == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.store') }} {{ translate('messages.setup') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->notification_setup == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.notification') }} {{ translate('messages.setup') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->profile == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.profile') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->my_shop == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.my_shop') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->expense_report == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.expense_report') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->disbursement_report == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.disbursement_report') }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if ( $subscriptionackage->vat_report == 1 )
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                            @else
+                                <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                            @endif
+                            <span class="form-check-label text-dark">{{ translate('messages.vat_report') }}</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

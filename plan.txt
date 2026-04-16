@@ -1,4 +1,167 @@
-﻿Product Gallery Redesign Plan
+﻿TODAY PLAN — Add Subscription-based Vendor Options (Project-wide)
+Date: 2026-04-16
+Repo: 6MartAdminpanel
+
+Goal
+- Add more subscription package “options” (feature permissions) so vendors can be allowed/blocked per package.
+- Support both “use admin-created lists” (read/select) and “manage/create” capabilities where needed.
+- Ensure gating is enforced consistently via `subscription:<key>` middleware on vendor routes.
+
+Current State (what we already confirmed)
+- Admin has subscription package CRUD under:
+  - URI: admin/business-settings/subscription/subscriptionackage/*
+  - Controller: app/Http/Controllers/Admin/Subscription/SubscriptionController.php
+  - Views: resources/views/admin-views/subscription/package/*.blade.php
+- Vendor routes already contain many `subscription:<key>` gates in routes/vendor.php (e.g., category, role, deliveryman_list).
+- BUT middleware `app/Http/Middleware/Subscription.php` currently enforces only 4 keys:
+  - reviews, pos, deliveryman, chat
+  → So most existing `subscription:<key>` gates are not effective yet.
+
+Definition: “Option”
+- An option is a boolean permission stored on:
+  - subscription_packages (package template)
+  - store_subscriptions (store’s active plan snapshot)
+- Vendor access checks use store_subscriptions (store->store_sub) at runtime.
+
+Scope for Today
+- Implement a scalable permission system (not hard-coded to 4 keys).
+- Add initial set of permissions (recommended starter pack) with minimal disruption:
+  A) Admin-created list usage (vendor read/select)
+     - category_view
+     - brand_view
+     - attribute_view (or catalog_view)
+     - addon_view
+  B) Store operations (vendor manage)
+     - item_manage
+     - coupon_manage
+     - campaign_manage
+     - report_view
+     - wallet_view
+     - employee_manage
+     - role_manage
+  C) Keep existing flags already present
+     - pos, mobile_app, chat, review, self_delivery
+
+Deliverables (end of day)
+- New DB columns on both tables
+- Admin package create/edit UI shows checkboxes for new options
+- Package store/update saves those options
+- Subscription purchase/renew/switch copies options into store_subscriptions
+- Middleware enforces all keys used by routes/vendor.php
+- Vendor routes updated to use the new keys consistently (view vs manage)
+- Quick verification steps documented and runnable
+
+Implementation Steps (Today)
+
+1) Decide final permission keys (15–20 minutes)
+- Freeze the key names used in:
+  - DB columns (snake_case)
+  - middleware parameter (subscription:<key>)
+  - admin UI labels (translation keys)
+- Rule: keep keys stable; changing later requires migration + route edits.
+
+2) Database migrations (30–45 minutes)
+- Create a new migration that adds columns to:
+  - subscription_packages
+  - store_subscriptions
+- Add boolean columns for each new key.
+- Choose safe defaults:
+  - Recommended for safe rollout: default TRUE for permissions that should not break existing vendors.
+  - Alternative (more strict): default FALSE then update existing packages explicitly.
+- Run migrations locally to verify schema updates.
+
+3) Update model casts (10–15 minutes)
+- Update:
+  - app/Models/SubscriptionPackage.php
+  - app/Models/StoreSubscription.php
+- Add new fields to `$casts` as integer/boolean consistently.
+
+4) Admin UI: package create/edit (60–90 minutes)
+- Files:
+  - resources/views/admin-views/subscription/package/create.blade.php
+  - resources/views/admin-views/subscription/package/edit.blade.php
+- Add grouped checkbox sections:
+  - “Admin catalog usage” (view/select)
+  - “Store operations” (manage)
+  - “Team & access”
+  - “Reports & wallet”
+- Ensure old values are preserved:
+  - create: `old('<field>')`
+  - edit: `$subscriptionackage-><field>`
+
+5) Admin controller save/update (30–45 minutes)
+- File:
+  - app/Http/Controllers/Admin/Subscription/SubscriptionController.php
+- In `store()` and `update()`:
+  - Read each checkbox as 0/1 and save to SubscriptionPackage
+  - Keep existing validation; add minimal boolean validation for new fields if needed
+
+6) Copy permissions into store subscription snapshot (60–120 minutes)
+- Identify where subscriptions are applied to a store (typically Helpers::subscription_plan_chosen).
+- Update that logic to copy all permission fields from SubscriptionPackage → StoreSubscription when:
+  - new purchase
+  - renew
+  - plan switch/shift
+- Ensure store_subscriptions remains a “snapshot” (doesn’t change until plan changes).
+
+7) Middleware: enforce all permissions (60–90 minutes)
+- File:
+  - app/Http/Middleware/Subscription.php
+- Replace hard-coded 4-key logic with a single permissions map:
+  - $permissionMap = [
+      'pos' => 'pos',
+      'chat' => 'chat',
+      'reviews' => 'review',
+      'deliveryman' => 'self_delivery',
+      'category_view' => 'category_view',
+      ...
+    ];
+- Behavior:
+  - If vendor is on commission: allow.
+  - If unsubscribed/expired/none: block (existing behavior).
+  - If subscription & missing permission: Toastr error + back.
+- Important: maintain compatibility with existing middleware usage like `subscription:reviews`.
+
+8) Vendor route alignment (45–90 minutes)
+- File:
+  - routes/vendor.php
+- Update route groups to use the new keys consistently:
+  - Category screens: `subscription:category_view` (and `subscription:category_manage` if you split later)
+  - Coupon screens: `subscription:coupon_manage`
+  - Reports: `subscription:report_view`
+  - Wallet: `subscription:wallet_view`
+  - Employees: `subscription:employee_manage`
+  - Custom roles: `subscription:role_manage`
+- Keep existing `module:<name>` middleware as-is; subscription gate is additive.
+
+9) Translations (20–40 minutes)
+- Add `messages.*` translation keys for new checkbox labels and error messages if needed.
+- Ensure English exists at minimum:
+  - resources/lang/en/messages.php
+
+10) Quick verification (30–45 minutes)
+- Admin:
+  - Create a package with only some permissions enabled.
+  - Edit package and confirm values persist.
+- Vendor:
+  - Subscribe a test vendor to that package (or switch plan).
+  - Confirm store_subscriptions has the copied flags.
+  - Attempt to visit gated sections; confirm allowed/blocked matches permissions.
+
+Acceptance Criteria
+- A vendor on a subscription plan cannot access any route guarded by `subscription:<key>` unless their store_sub has that permission set to 1.
+- Existing keys (pos/chat/reviews/deliveryman) still work exactly as before.
+- Package changes do not silently affect existing subscribers until they renew/switch (snapshot model preserved).
+
+Notes / Risks
+- Some vendor routes currently use `subscription:<key>` values that don’t exist in DB today (legacy/placeholder gates).
+  - Today’s middleware upgrade must either:
+    - implement those keys, OR
+    - map them to existing flags, OR
+    - treat unknown keys as “deny” (safer) or “allow” (non-breaking).
+  - Recommended: treat unknown keys as deny in production; during rollout, add mappings for all keys used by routes/vendor.php.
+
+Product Gallery Redesign Plan
 Project: 6MartAdminpanel
 Target Area: Admin Panel > Product Setup > Product Gallery
 Source Design: update galary.html
@@ -115,6 +278,83 @@ Execution Order Recommendation
 5. Phase 4 (optional, approval-gated)
 6. Phase 7 + 8
 7. Phase 9
+
+===============================
+SUBSCRIPTION OPTIONS — Phase 0
+===============================
+
+Phase 0 objective (Subscription)
+- Make all existing `subscription:<key>` gates in `routes/vendor.php` enforceable by mapping them to real
+  `store_subscriptions` columns, with matching columns in `subscription_packages` and a consistent copy step
+  during purchase/renew/switch.
+
+Permission key inventory (from `routes/vendor.php`)
+- Enforced today in middleware:
+  - reviews, pos, deliveryman, chat
+- Present in routes but NOT enforced today:
+  - category, role, deliveryman_list, employee, item, banner, campaign, wallet, wallet_method, coupon,
+    advertisement, advertisement_list, addon, store_setup, notification_setup, profile, my_shop,
+    expense_report, disbursement_report, vat_report
+
+LOCKED mapping: `subscription:<key>` -> `store_subscriptions.<column>`
+A) Already exists (no new DB columns needed)
+- subscription:reviews        -> store_subscriptions.review
+- subscription:pos            -> store_subscriptions.pos
+- subscription:deliveryman    -> store_subscriptions.self_delivery
+- subscription:chat           -> store_subscriptions.chat
+
+B) Requires NEW boolean columns (recommended 1:1 naming)
+- subscription:category            -> store_subscriptions.category
+- subscription:role                -> store_subscriptions.role
+- subscription:deliveryman_list    -> store_subscriptions.deliveryman_list
+- subscription:employee            -> store_subscriptions.employee
+- subscription:item                -> store_subscriptions.item
+- subscription:banner              -> store_subscriptions.banner
+- subscription:campaign            -> store_subscriptions.campaign
+- subscription:wallet              -> store_subscriptions.wallet
+- subscription:wallet_method       -> store_subscriptions.wallet_method
+- subscription:coupon              -> store_subscriptions.coupon
+- subscription:advertisement       -> store_subscriptions.advertisement
+- subscription:advertisement_list  -> store_subscriptions.advertisement_list
+- subscription:addon               -> store_subscriptions.addon
+- subscription:store_setup         -> store_subscriptions.store_setup
+- subscription:notification_setup  -> store_subscriptions.notification_setup
+- subscription:profile             -> store_subscriptions.profile
+- subscription:my_shop             -> store_subscriptions.my_shop
+- subscription:expense_report      -> store_subscriptions.expense_report
+- subscription:disbursement_report -> store_subscriptions.disbursement_report
+- subscription:vat_report          -> store_subscriptions.vat_report
+
+`subscription_packages` must mirror the same fields
+- Add the SAME boolean columns to `subscription_packages` so Admin can configure per package:
+  - category, role, deliveryman_list, employee, item, banner, campaign, wallet, wallet_method, coupon,
+    advertisement, advertisement_list, addon, store_setup, notification_setup, profile, my_shop,
+    expense_report, disbursement_report, vat_report
+
+Rollout defaults (choose one)
+- Safe rollout (no vendor break): new columns default TRUE
+- Strict rollout (admin must enable): new columns default FALSE
+
+Middleware unknown-key behavior (choose one)
+- Safer: unknown subscription:<key> => DENY with message
+- Non-breaking rollout: unknown subscription:<key> => ALLOW (not recommended long-term)
+
+Status (Implemented)
+- DB columns added to `subscription_packages` and `store_subscriptions` with default ON (safe rollout).
+- Admin package create/edit supports all permissions.
+- Subscription purchase/renew/switch copies permission snapshot into `store_subscriptions`.
+- Vendor access is enforced for all `subscription:<key>` via `app/Http/Middleware/Subscription.php`.
+- Vendor sidebar hides menus based on subscription permissions (UI matches enforcement).
+- Admin and Vendor “Package Overview/Details” screens display the new permissions.
+
+Maintenance / Next Steps
+- When you add or rename any `subscription:<key>` in routes, update:
+  1) `app/Http/Middleware/Subscription.php` permission map
+  2) DB columns in both tables (`subscription_packages`, `store_subscriptions`)
+  3) Snapshot copy in `Helpers::subscription_plan_chosen()`
+  4) Sidebar hide rules (optional but recommended)
+- Run the audit command to confirm everything is wired:
+  - `php artisan subscription:audit`
 
 Definition of Done
 1. Product Gallery matches new design direction while keeping existing theme language

@@ -139,6 +139,186 @@
                                                             {{ translate('messages.chatting_options') }} </span>
                                                     </li>
                                                 @endif
+                                                @if ($package->item)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.item') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->category)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.category') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->coupon)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.coupon') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->campaign)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.campaign') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->addon)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.addon') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->wallet)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.wallet') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->wallet_method)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.withdraw_method') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->employee)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.employee') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->role)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.role') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->deliveryman_list)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.deliveryman') }} ({{ translate('messages.list') }}) </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->banner)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.banner') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->advertisement)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.advertisement') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->advertisement_list)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.advertisement') }} ({{ translate('messages.list') }}) </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->store_setup)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.store') }} {{ translate('messages.setup') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->notification_setup)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.notification') }} {{ translate('messages.setup') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->profile)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.profile') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->my_shop)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.my_shop') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->expense_report)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.expense_report') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->disbursement_report)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.disbursement_report') }} </span>
+                                                    </li>
+                                                @endif
+                                                @if ($package->vat_report)
+                                                    <li>
+                                                        <img src="{{ asset('/assets/landing/img/check-1.svg') }}"
+                                                            class="check" alt="">
+                                                        <img src="{{ asset('/assets/landing/img/check-2.svg') }}"
+                                                            class="check-white" alt=""> <span>
+                                                            {{ translate('messages.vat_report') }} </span>
+                                                    </li>
+                                                @endif
                                                 @if ($package->review)
                                                     <li>
                                                         <img src="{{ asset('/assets/landing/img/check-1.svg') }}"

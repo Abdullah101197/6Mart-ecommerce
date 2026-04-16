@@ -181,6 +181,127 @@ active
                             </label>
                         </div>
 
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('item', 1) == 1 ? 'checked' : '' }} name="item" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.item') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('category', 1) == 1 ? 'checked' : '' }} name="category" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.category') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('coupon', 1) == 1 ? 'checked' : '' }} name="coupon" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.coupon') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('campaign', 1) == 1 ? 'checked' : '' }} name="campaign" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.campaign') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('addon', 1) == 1 ? 'checked' : '' }} name="addon" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.addon') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('wallet', 1) == 1 ? 'checked' : '' }} name="wallet" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.wallet') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('wallet_method', 1) == 1 ? 'checked' : '' }} name="wallet_method" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.withdraw_method') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('employee', 1) == 1 ? 'checked' : '' }} name="employee" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.employee') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('role', 1) == 1 ? 'checked' : '' }} name="role" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.role') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('deliveryman_list', 1) == 1 ? 'checked' : '' }} name="deliveryman_list" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.deliveryman') }} ({{ translate('messages.list') }})</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('banner', 1) == 1 ? 'checked' : '' }} name="banner" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.banner') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('advertisement', 1) == 1 ? 'checked' : '' }} name="advertisement" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.advertisement') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('advertisement_list', 1) == 1 ? 'checked' : '' }} name="advertisement_list" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.advertisement') }} ({{ translate('messages.list') }})</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('store_setup', 1) == 1 ? 'checked' : '' }} name="store_setup" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.store') }} {{ translate('messages.setup') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('notification_setup', 1) == 1 ? 'checked' : '' }} name="notification_setup" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.notification') }} {{ translate('messages.setup') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('profile', 1) == 1 ? 'checked' : '' }} name="profile" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.profile') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('my_shop', 1) == 1 ? 'checked' : '' }} name="my_shop" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.my_shop') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('expense_report', 1) == 1 ? 'checked' : '' }} name="expense_report" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.expense_report') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('disbursement_report', 1) == 1 ? 'checked' : '' }} name="disbursement_report" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.disbursement_report') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('vat_report', 1) == 1 ? 'checked' : '' }} name="vat_report" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.vat_report') }}</span>
+                            </label>
+                        </div>
+
                     </div>
                 </div>
             </div>

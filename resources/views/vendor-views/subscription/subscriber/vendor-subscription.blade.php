@@ -266,6 +266,226 @@ active
                             </div>
                         </div>
 
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->item == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.item') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->category == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.category') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->coupon == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.coupon') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->campaign == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.campaign') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->addon == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.addon') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->wallet == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.wallet') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->wallet_method == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.withdraw_method') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->employee == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.employee') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->role == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.role') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->deliveryman_list == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.deliveryman') }} ({{ translate('messages.list') }})</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->banner == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.banner') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->advertisement == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.advertisement') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->advertisement_list == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.advertisement') }} ({{ translate('messages.list') }})</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->store_setup == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.store') }} {{ translate('messages.setup') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->notification_setup == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.notification') }} {{ translate('messages.setup') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->profile == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.profile') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->my_shop == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.my_shop') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->expense_report == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.expense_report') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->disbursement_report == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.disbursement_report') }}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if ( $store?->store_sub_update_application?->vat_report == 1 )
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                @else
+                                    <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                @endif
+                                <span class="form-check-label text-dark">{{ translate('messages.vat_report') }}</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 {{-- {{ dd($store?->store_sub_update_application) }} --}}
@@ -368,6 +588,106 @@ active
                                         @if ($package->chat)
                                         <li>
                                             <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.chatting_options') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->item)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.item') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->category)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.category') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->coupon)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.coupon') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->campaign)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.campaign') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->addon)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.addon') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->wallet)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.wallet') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->wallet_method)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.withdraw_method') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->employee)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.employee') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->role)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.role') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->deliveryman_list)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.deliveryman') }} ({{ translate('messages.list') }}) </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->banner)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.banner') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->advertisement)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.advertisement') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->advertisement_list)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.advertisement') }} ({{ translate('messages.list') }}) </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->store_setup)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.store') }} {{ translate('messages.setup') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->notification_setup)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.notification') }} {{ translate('messages.setup') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->profile)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.profile') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->my_shop)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.my_shop') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->expense_report)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.expense_report') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->disbursement_report)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.disbursement_report') }} </span>
+                                        </li>
+                                        @endif
+                                        @if ($package->vat_report)
+                                        <li>
+                                            <i class="tio-checkmark-circle"></i> <span>  {{ translate('messages.vat_report') }} </span>
                                         </li>
                                         @endif
                                         @if ($package->review)

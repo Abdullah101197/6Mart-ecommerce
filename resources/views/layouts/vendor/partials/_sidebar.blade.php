@@ -6,6 +6,31 @@
                 <!-- Logo -->
 
                 @php($store_data = \App\CentralLogics\Helpers::get_store_data())
+                @php($store_sub_data = $store_data?->store_sub ?? $store_data?->store_sub_update_application)
+                @php($subscription_allow_all = ($store_data?->store_business_model ?? null) === 'commission')
+                @php($subscription_can_pos = $subscription_allow_all || ((int) data_get($store_sub_data, 'pos', 0) === 1))
+                @php($subscription_can_item = $subscription_allow_all || ((int) data_get($store_sub_data, 'item', 0) === 1))
+                @php($subscription_can_category = $subscription_allow_all || ((int) data_get($store_sub_data, 'category', 0) === 1))
+                @php($subscription_can_addon = $subscription_allow_all || ((int) data_get($store_sub_data, 'addon', 0) === 1))
+                @php($subscription_can_campaign = $subscription_allow_all || ((int) data_get($store_sub_data, 'campaign', 0) === 1))
+                @php($subscription_can_coupon = $subscription_allow_all || ((int) data_get($store_sub_data, 'coupon', 0) === 1))
+                @php($subscription_can_banner = $subscription_allow_all || ((int) data_get($store_sub_data, 'banner', 0) === 1))
+                @php($subscription_can_advertisement = $subscription_allow_all || ((int) data_get($store_sub_data, 'advertisement', 0) === 1))
+                @php($subscription_can_advertisement_list = $subscription_allow_all || ((int) data_get($store_sub_data, 'advertisement_list', 0) === 1))
+                @php($subscription_can_deliveryman = $subscription_allow_all || ((int) data_get($store_sub_data, 'self_delivery', 0) === 1))
+                @php($subscription_can_deliveryman_list = $subscription_allow_all || ((int) data_get($store_sub_data, 'deliveryman_list', 0) === 1))
+                @php($subscription_can_wallet = $subscription_allow_all || ((int) data_get($store_sub_data, 'wallet', 0) === 1))
+                @php($subscription_can_wallet_method = $subscription_allow_all || ((int) data_get($store_sub_data, 'wallet_method', 0) === 1))
+                @php($subscription_can_employee = $subscription_allow_all || ((int) data_get($store_sub_data, 'employee', 0) === 1))
+                @php($subscription_can_role = $subscription_allow_all || ((int) data_get($store_sub_data, 'role', 0) === 1))
+                @php($subscription_can_expense_report = $subscription_allow_all || ((int) data_get($store_sub_data, 'expense_report', 0) === 1))
+                @php($subscription_can_disbursement_report = $subscription_allow_all || ((int) data_get($store_sub_data, 'disbursement_report', 0) === 1))
+                @php($subscription_can_vat_report = $subscription_allow_all || ((int) data_get($store_sub_data, 'vat_report', 0) === 1))
+                @php($subscription_can_store_setup = $subscription_allow_all || ((int) data_get($store_sub_data, 'store_setup', 0) === 1))
+                @php($subscription_can_notification_setup = $subscription_allow_all || ((int) data_get($store_sub_data, 'notification_setup', 0) === 1))
+                @php($subscription_can_my_shop = $subscription_allow_all || ((int) data_get($store_sub_data, 'my_shop', 0) === 1))
+                @php($subscription_can_reviews = $subscription_allow_all || ((int) data_get($store_sub_data, 'review', 0) === 1))
+                @php($subscription_can_chat = $subscription_allow_all || ((int) data_get($store_sub_data, 'chat', 0) === 1))
                 <a class="navbar-brand" href="{{ route('vendor.dashboard') }}" aria-label="Front">
                     <img class="navbar-brand-logo initial--36  onerror-image"
                         data-onerror-image="{{ asset('assets/admin/img/160x160/img2.jpg') }}"
@@ -57,7 +82,7 @@
                         </a>
                     </li>
                     <!-- End Dashboards -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('pos'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('pos') && $subscription_can_pos)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/pos') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link  "
@@ -256,9 +281,9 @@
                     @endif
 
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('addon') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('item') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('category'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('addon') && $subscription_can_addon) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('item') && $subscription_can_item) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('category') && $subscription_can_category))
                         <li class="nav-item">
                             <small class="nav-subtitle">{{ translate('messages.item_management') }}</small>
                             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
@@ -266,7 +291,7 @@
                     @endif
 
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('item'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('item') && $subscription_can_item)
                         <!-- Food -->
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/item*') ? 'active' : '' }}">
@@ -352,7 +377,7 @@
                         <!-- End Food -->
                     @endif
                     <!-- AddOn -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('addon'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('addon') && $subscription_can_addon)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/addon*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -366,7 +391,7 @@
                         </li>
                     @endif
                     <!-- End AddOn -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('category'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('category') && $subscription_can_category)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/category*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:"
@@ -399,16 +424,16 @@
 
 
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('campaign') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('coupon') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('banner'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('campaign') && $subscription_can_campaign) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('coupon') && $subscription_can_coupon) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('banner') && $subscription_can_banner))
                         <li class="nav-item">
                             <small class="nav-subtitle">{{ translate('messages.marketing_section') }}</small>
                             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
                         </li>
                     @endif
                     <!-- Campaign -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('campaign'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('campaign') && $subscription_can_campaign)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/campaign*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:"
@@ -441,7 +466,7 @@
                     <!-- End Campaign -->
 
                     <!-- Coupon -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('coupon'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('coupon') && $subscription_can_coupon)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/coupon*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -455,7 +480,7 @@
                     @endif
                     <!-- End Coupon -->
                     <!-- banner -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('banner'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('banner') && $subscription_can_banner)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/banner*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -471,15 +496,15 @@
 
 
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('advertisement') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('advertisement_list'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement') && $subscription_can_advertisement) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement_list') && $subscription_can_advertisement_list))
                         <li class="nav-item">
                             <small class="nav-subtitle">{{ translate('Advertisement Management') }}</small>
                             <small class="tio-more-horizontal nav-subtitle-replacer"></small>
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement') && $subscription_can_advertisement)
                         <li class="navbar-vertical-aside-has-menu @yield('advertisement_create')">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                 href="{{ route('vendor.advertisement.create') }}"
@@ -491,7 +516,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement_list'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement_list') && $subscription_can_advertisement_list)
                         <li class="navbar-vertical-aside-has-menu @yield('advertisement')">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:"
                                 title="{{ translate('messages.Advertisement_List') }}">
@@ -523,7 +548,8 @@
 
                     <!-- DeliveryMan -->
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('deliveryman') || App\CentralLogics\Helpers::employee_module_permission_check('deliveryman_list'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('deliveryman') && $subscription_can_deliveryman) ||
+                            (App\CentralLogics\Helpers::employee_module_permission_check('deliveryman_list') && $subscription_can_deliveryman_list))
                         <li class="nav-item">
                             <small class="nav-subtitle"
                                 title="{{ translate('messages.deliveryman_section') }}">{{ translate('messages.deliveryman_section') }}</small>
@@ -531,7 +557,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('deliveryman'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('deliveryman') && $subscription_can_deliveryman)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/delivery-man/add') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -545,7 +571,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('deliveryman_list'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('deliveryman_list') && $subscription_can_deliveryman_list)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/delivery-man/list') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -563,8 +589,8 @@
 
 
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('wallet') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('wallet_method'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('wallet') && $subscription_can_wallet) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('wallet_method') && $subscription_can_wallet_method))
                         <!-- Business Section-->
                         <li class="nav-item">
                             <small class="nav-subtitle"
@@ -574,7 +600,7 @@
                     @endif
 
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('wallet'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('wallet') && $subscription_can_wallet)
                         <!-- StoreWallet -->
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/wallet') ? 'active' : '' }}">
@@ -587,7 +613,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('wallet_method'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('wallet_method') && $subscription_can_wallet_method)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/withdraw-method*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -606,8 +632,8 @@
 
                     <!-- Employee-->
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('role') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('employee'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('role') && $subscription_can_role) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('employee') && $subscription_can_employee))
                         <li class="nav-item">
                             <small class="nav-subtitle"
                                 title="{{ translate('messages.employee_section') }}">{{ translate('messages.employee_section') }}</small>
@@ -615,7 +641,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('role'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('role') && $subscription_can_role)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/custom-role*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -628,7 +654,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('employee'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('employee') && $subscription_can_employee)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/employee*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:"
@@ -662,9 +688,9 @@
 
 
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('expense_report') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('vat_report') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('disbursement_report'))
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('expense_report') && $subscription_can_expense_report) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('vat_report') && $subscription_can_vat_report) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('disbursement_report') && $subscription_can_disbursement_report))
                         <li class="nav-item">
                             <small class="nav-subtitle"
                                 title="{{ translate('messages.Report_section') }}">{{ translate('messages.Report_section') }}</small>
@@ -672,7 +698,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('expense_report'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('expense_report') && $subscription_can_expense_report)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor/report/expense-report') ? 'active' : '' }}">
                             <a class="nav-link " href="{{ route('vendor.report.expense-report') }}"
@@ -683,7 +709,7 @@
                         </li>
                     @endif
                     <!-- End Business Settings -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('disbursement_report'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('disbursement_report') && $subscription_can_disbursement_report)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/report/disbursement-report') ? 'active' : '' }}">
                             <a class="nav-link " href="{{ route('vendor.report.disbursement-report') }}"
@@ -694,7 +720,7 @@
                         </li>
                     @endif
                     <!-- End Business Settings -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('vat_report'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('vat_report') && $subscription_can_vat_report)
                         <li class="navbar-vertical-aside-has-menu @yield('vendor_tax_report')">
                             <a class="nav-link " href="{{ route('vendor.report.vendorTax') }}"
                                 title="{{ translate('Vat_Report') }}">
@@ -706,12 +732,12 @@
 
 
                     @if (
-                        \App\CentralLogics\Helpers::employee_module_permission_check('store_setup') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('notification_setup') ||
+                        (\App\CentralLogics\Helpers::employee_module_permission_check('store_setup') && $subscription_can_store_setup) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('notification_setup') && $subscription_can_notification_setup) ||
                             \App\CentralLogics\Helpers::employee_module_permission_check('business_plan') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('reviews') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('chat') ||
-                            \App\CentralLogics\Helpers::employee_module_permission_check('my_shop'))
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('reviews') && $subscription_can_reviews) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('chat') && $subscription_can_chat) ||
+                            (\App\CentralLogics\Helpers::employee_module_permission_check('my_shop') && $subscription_can_my_shop))
                         <!-- Business Section-->
                         <li class="nav-item">
                             <small class="nav-subtitle"
@@ -721,7 +747,7 @@
                     @endif
 
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('store_setup'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('store_setup') && $subscription_can_store_setup)
                         <li
                             class="nav-item {{ Request::is('vendor-panel/business-settings/store-setup') ? 'active' : '' }}">
                             <a class="nav-link " href="{{ route('vendor.business-settings.store-setup') }}"
@@ -732,7 +758,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('notification_setup'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('notification_setup') && $subscription_can_notification_setup)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/business-settings/notification-setup') ? 'active' : '' }}">
                             <a class="nav-link " href="{{ route('vendor.business-settings.notification-setup') }}"
@@ -743,7 +769,7 @@
                         </li>
                     @endif
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('my_shop'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('my_shop') && $subscription_can_my_shop)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/store/*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -770,7 +796,7 @@
                     @endif
 
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('reviews'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('reviews') && $subscription_can_reviews)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/reviews') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -783,7 +809,7 @@
                         </li>
                     @endif
                     <!-- End Business Settings -->
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('chat'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('chat') && $subscription_can_chat)
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/message*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -799,7 +825,7 @@
 
 
 
-                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement'))
+                    @if (\App\CentralLogics\Helpers::employee_module_permission_check('advertisement') && $subscription_can_advertisement)
                         <li class="nav-item px-20 pb-5">
                             <div class="promo-card">
                                 <div class="position-relative">

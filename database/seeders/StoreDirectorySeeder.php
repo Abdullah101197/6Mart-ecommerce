@@ -12,7 +12,10 @@ class StoreDirectorySeeder extends Seeder
     {
         $sqlPath = base_path('Shopswallet_Complete_30_Departments_MySQL.sql');
         if (!File::exists($sqlPath)) {
-            throw new \RuntimeException("SQL seed file not found: {$sqlPath}");
+            // Some repos/environments don't ship the large SQL dump.
+            // Skipping this seeder allows `php artisan db:seed` to run for local development.
+            $this->command?->warn("StoreDirectorySeeder skipped (missing SQL file): {$sqlPath}");
+            return;
         }
 
         $sql = File::get($sqlPath);

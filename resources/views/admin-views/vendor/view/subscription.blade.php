@@ -308,6 +308,226 @@
                                     </div>
                                 </div>
 
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->item == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.item') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->category == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.category') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->coupon == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.coupon') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->campaign == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.campaign') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->addon == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.addon') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->wallet == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.wallet') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->wallet_method == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.withdraw_method') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->employee == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.employee') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->role == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.role') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->deliveryman_list == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.deliveryman') }} ({{ translate('messages.list') }})</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->banner == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.banner') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->advertisement == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.advertisement') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->advertisement_list == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.advertisement') }} ({{ translate('messages.list') }})</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->store_setup == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.store') }} {{ translate('messages.setup') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->notification_setup == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.notification') }} {{ translate('messages.setup') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->profile == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.profile') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->my_shop == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.my_shop') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->expense_report == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.expense_report') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->disbursement_report == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.disbursement_report') }}</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if ( $store?->store_sub_update_application?->vat_report == 1 )
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check.png')}}" alt="">
+                                        @else
+                                            <img src="{{asset('/assets/admin/img/subscription-plan/check-1.png')}}" alt="">
+                                        @endif
+                                        <span class="form-check-label text-dark">{{ translate('messages.vat_report') }}</span>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <!-- <div class="btn--container justify-content-end mt-20">
