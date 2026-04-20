@@ -650,7 +650,7 @@
                                 <button type="reset" id='reset-btn'
                                         class="cmn--btn btn--secondary shadow-none rounded-md border-0 outline-0">{{ translate('Reset') }}</button>
                                 <button
-                                    type="{{ \App\CentralLogics\Helpers::subscription_check() == 1 ? 'button' : 'submit' }}"
+                                    type="submit"
                                     id="show-business-plan-div"
                                     class="cmn--btn rounded-md border-0 outline-0 btn-disable">{{ \App\CentralLogics\Helpers::subscription_check() == 1 ? translate('Next') : translate('messages.submit') }}</button>
                             </div>
@@ -820,6 +820,111 @@
 $("#form-id").on('submit', function(e) {
     e.preventDefault();
 
+    const HAS_SUBSCRIPTION_FLOW = {{ \App\CentralLogics\Helpers::subscription_check() ? 'true' : 'false' }};
+
+    // Step-1 submit should first open Business Plan step (when enabled)
+    if (HAS_SUBSCRIPTION_FLOW && $('#reg-form-div').is(':visible') && $('#business-plan-div').hasClass('d-none')) {
+        const logo = $('input[name="logo"]')[0];
+        const cover = $('input[name="cover_photo"]')[0];
+        const tin_certificate_image = $('input[name="tin_certificate_image"]')[0];
+
+        const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+
+        if (!$('#default_name').val()) {
+            toastr.error("{{ translate('Vendor_name_is_required') }}");
+            return;
+        } else if (!$('#address').val()) {
+            toastr.error("{{ translate('Vendor_address_is_required') }}");
+            return;
+        } else if (!logo?.files?.length) {
+            toastr.error("{{ translate('Vendor_logo_required') }}");
+            return;
+        } else if (!cover?.files?.length) {
+            toastr.error("{{ translate('Vendor_cover_photo_required') }}");
+            return;
+        } else if (logo.files[0].size > maxFileSize) {
+            toastr.error("{{ translate('Vendor_logo_must_be_less_than_2MB') }}");
+            return;
+        } else if (tin_certificate_image?.files?.length && tin_certificate_image.files[0].size > maxFileSize) {
+            toastr.error("{{ translate('Tin_certificate_must_be_less_than_2MB') }}");
+            return;
+        } else if (cover.files[0].size > maxFileSize) {
+            toastr.error("{{ translate('Vendor_cover_photo_must_be_less_than_2MB') }}");
+            return;
+        } else if (!$('#choice_zones').val()) {
+            toastr.error("{{ translate('You_must_select_a_zone') }}");
+            return;
+        } else if (!$('#module_id').val()) {
+            toastr.error("{{ translate('You_must_select_a_module') }}");
+            return;
+        } else if (!$('#latitude').val() || !$('#longitude').val()) {
+            toastr.error("{{ translate('Must_click_on_the_map_for_lat/long') }}");
+            return;
+        } else if (!$('#minimum_delivery_time').val()) {
+            toastr.error("{{ translate('minimum_time_is_required') }}");
+            return;
+        } else if (!$('#max_delivery_time').val()) {
+            toastr.error("{{ translate('max_time_is_required') }}");
+            return;
+        } else if (!$('#f_name').val()) {
+            toastr.error("{{ translate('first_name_is_required') }}");
+            return;
+        } else if (!$('#l_name').val()) {
+            toastr.error("{{ translate('last_name_is_required') }}");
+            return;
+        } else if ($('#phone').val().length < 5) {
+            toastr.error("{{ translate('valid_phone_number_is_required') }}");
+            return;
+        } else if (!$('#email').val()) {
+            toastr.error("{{ translate('email_is_required') }}");
+            return;
+        } else if (!$('#exampleInputPassword').val()) {
+            toastr.error("{{ translate('password_is_required') }}");
+            return;
+        } else if ($('#exampleRepeatPassword').val() !== $('#exampleInputPassword').val()) {
+            toastr.error("{{ translate('confirm_password_does_not_match') }}");
+            return;
+        } else if (!isPasswordStrong($('#exampleRepeatPassword').val()) && !isPasswordStrong($('#exampleInputPassword').val())) {
+            toastr.error("{{ translate('Password format is invalid') }}");
+            return;
+        }
+
+        $.get({
+            url: '{{ route('admin.zone.check-location') }}',
+            dataType: 'json',
+            data: {
+                zone_id: $('#choice_zones').val(),
+                latitude: $('#latitude').val(),
+                longitude: $('#longitude').val()
+            },
+            beforeSend: function () {
+                $('#loading').show();
+            },
+            success: function (data) {
+                $('#loading').hide();
+                if (data.errors) {
+                    for (let i = 0; i < data.errors.length; i++) {
+                        toastr.error(data.errors[i].message, {
+                            CloseButton: true,
+                            ProgressBar: true
+                        });
+                    }
+                } else {
+                    $('#business-plan-div').removeClass('d-none');
+                    $('#reg-form-div').addClass('d-none');
+                    $('#show-step2').addClass('active');
+                    $('#show-step1').removeClass('active');
+                    $(window).scrollTop(0);
+                }
+            },
+            error: function () {
+                $('#loading').hide();
+                toastr.error("{{ translate('messages.Something_went_wrong') }}", { CloseButton: true, ProgressBar: true });
+            }
+        });
+        return;
+    }
+
     @if (isset($recaptcha) && $recaptcha['status'] == 1)
     grecaptcha.ready(function() {
         grecaptcha.execute('{{ $recaptcha['site_key'] }}', {action: 'submit'}).then(function(token) {
@@ -975,133 +1080,7 @@ function submitForm() {
 
 
 
-        $('#show-business-plan-div').on('click', function (e) {
-            const logo = $('input[name="logo"]')[0];
-            const cover = $('input[name="cover_photo"]')[0];
-            const tin_certificate_image = $('input[name="tin_certificate_image"]')[0];
-
-            const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
-
-            if (!$('#default_name').val()) {
-                toastr.error("{{ translate('Vendor_name_is_required') }}");
-                e.preventDefault();
-            } else if (!$('#address').val()) {
-                toastr.error("{{ translate('Vendor_address_is_required') }}");
-                e.preventDefault();
-            } else if (!logo.files.length) {
-                toastr.error("{{ translate('Vendor_logo_required') }}");
-                e.preventDefault();
-            } else if (!cover.files.length) {
-                toastr.error("{{ translate('Vendor_cover_photo_required') }}");
-                e.preventDefault();
-            } else if (logo.files[0].size > maxFileSize) {
-                toastr.error("{{ translate('Vendor_logo_must_be_less_than_2MB') }}");
-                e.preventDefault();
-            } else if (tin_certificate_image.files.length && tin_certificate_image.files[0].size > maxFileSize) {
-                toastr.error("{{ translate('Tin_certificate_must_be_less_than_2MB') }}");
-                e.preventDefault();
-            } else if (cover.files[0].size > maxFileSize) {
-                toastr.error("{{ translate('Vendor_cover_photo_must_be_less_than_2MB') }}");
-                e.preventDefault();
-            } else if (!$('#choice_zones').val()) {
-                toastr.error("{{ translate('You_must_select_a_zone') }}");
-                e.preventDefault();
-            } else if (!$('#module_id').val()) {
-                toastr.error("{{ translate('You_must_select_a_module') }}");
-                e.preventDefault();
-            } else if (!$('#latitude').val() || !$('#longitude').val()) {
-                toastr.error("{{ translate('Must_click_on_the_map_for_lat/long') }}");
-                e.preventDefault();
-            } else if (!$('#minimum_delivery_time').val()) {
-                toastr.error("{{ translate('minimum_time_is_required') }}");
-                e.preventDefault();
-            } else if (!$('#max_delivery_time').val()) {
-                toastr.error("{{ translate('max_time_is_required') }}");
-                e.preventDefault();
-            } else if (!$('#f_name').val()) {
-                toastr.error("{{ translate('first_name_is_required') }}");
-                e.preventDefault();
-            } else if (!$('#l_name').val()) {
-                toastr.error("{{ translate('last_name_is_required') }}");
-                e.preventDefault();
-            } else if ($('#phone').val().length < 5) {
-                toastr.error("{{ translate('valid_phone_number_is_required') }}");
-                e.preventDefault();
-            } else if (!$('#email').val()) {
-                toastr.error("{{ translate('email_is_required') }}");
-                e.preventDefault();
-            } else if (!$('#exampleInputPassword').val()) {
-                toastr.error("{{ translate('password_is_required') }}");
-                e.preventDefault();
-            } else if ($('#exampleRepeatPassword').val() !== $('#exampleInputPassword').val()) {
-                toastr.error("{{ translate('confirm_password_does_not_match') }}");
-                e.preventDefault();
-            } else if (!isPasswordStrong($('#exampleRepeatPassword').val()) && !isPasswordStrong($('#exampleInputPassword').val())) {
-                toastr.error("{{ translate('Password format is invalid') }}");
-                e.preventDefault();
-            } else {
-                e.preventDefault();
-                $.get({
-                    url: '{{ route('admin.zone.check-location') }}',
-                    dataType: 'json',
-                    data: {
-                        zone_id: $('#choice_zones').val(),
-                        latitude: $('#latitude').val(),
-                        longitude: $('#longitude').val()
-                    },
-                    beforeSend: function () {
-                        $('#loading').show();
-                    },
-                    success: function (data) {
-                        $('#loading').hide();
-                        if (data.errors) {
-                            for (let i = 0; i < data.errors.length; i++) {
-                                toastr.error(data.errors[i].message, {
-                                    CloseButton: true,
-                                    ProgressBar: true
-                                });
-                            }
-                        } else {
-                            @if (isset($recaptcha) && $recaptcha['status'] == 1)
-                                if (typeof grecaptcha === 'undefined') {
-                                    toastr.error('Invalid recaptcha key provided. Please check the recaptcha configuration.');
-                                    return;
-                                }
-                                grecaptcha.ready(function () {
-                                    grecaptcha.execute('{{$recaptcha['site_key']}}', {action: 'submit'}).then(function (token) {
-                                        $('#g-recaptcha-response').value = token;
-
-                                    });
-                                });
-                                window.onerror = function (message) {
-                                    var errorMessage = 'An unexpected error occurred. Please check the recaptcha configuration';
-                                    if (message.includes('Invalid site key')) {
-                                        errorMessage = 'Invalid site key provided. Please check the recaptcha configuration.';
-                                    } else if (message.includes('not loaded in api.js')) {
-                                        errorMessage = 'reCAPTCHA API could not be loaded. Please check the recaptcha API configuration.';
-                                    }
-                                    toastr.error(errorMessage)
-                                    return true;
-                                };
-                            @endif
-
-
-                            @if (\App\CentralLogics\Helpers::subscription_check())
-                            $('#business-plan-div').removeClass('d-none');
-                            $('#reg-form-div').addClass('d-none');
-                            $('#show-step2').addClass('active');
-                            $('#show-step1').removeClass('active');
-                            $(window).scrollTop(0);
-                            @endif
-                        }
-                    },
-                    error: function () {
-                        $('#loading').hide();
-                        toastr.error("{{ translate('messages.Something_went_wrong') }}", { CloseButton: true, ProgressBar: true });
-                    }
-                });
-            }
-        });
+        // Next button now submits the form; step navigation handled in form submit handler above.
 
         function isPasswordStrong(password) {
             const minLength = password.length >= 8;
