@@ -14,7 +14,7 @@
     @php($openai_config = \App\CentralLogics\Helpers::get_business_settings('openai_config'))
     <div class="content container-fluid">
         <!-- Page Header -->
-        <div class="page-header">
+        <div class="page-header d-flex flex-wrap __gap-15px justify-content-between align-items-center">
             <h1 class="page-header-title">
                 <span class="page-header-icon">
                     <img src="{{ asset('assets/admin/img/edit.png') }}" class="w--22" alt="">
@@ -23,6 +23,23 @@
                     {{ request()->product_gellary == 1 ? translate('Add_item') : translate('item_update') }}
                 </span>
             </h1>
+            <div class="d-flex align-items-end flex-wrap">
+                @if (Config::get('module.current_module_type') == 'food')
+                    <div class="text--primary-2 py-1 d-flex flex-wrap align-items-center foodModalShow" type="button">
+                        <strong class="mr-2">{{ translate('See_how_it_works!') }}</strong>
+                        <div>
+                            <i class="tio-info-outined"></i>
+                        </div>
+                    </div>
+                @else
+                    <div class="text--primary-2 py-1 d-flex flex-wrap align-items-center attributeModalShow" type="button">
+                        <strong class="mr-2">{{ translate('See_how_it_works!') }}</strong>
+                        <div>
+                            <i class="tio-info-outined"></i>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
 
         @if (isset($temp_product) && $temp_product == 1 && $product->note)
@@ -119,60 +136,7 @@
                     </div>
                 </div> --}}
 
-                <div class="col-lg-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-wrap align-items-center">
-                            <div class="w-100 d-flex gap-3 flex-wrap flex-lg-nowrap">
-                                <div class="flex-grow-1 mx-auto overflow-x-auto scrollbar-primary">
-                                    <label class="text-dark d-block">
-                                        {{ translate('messages.item_image') }}
-                                        <small>( {{ translate('messages.ratio') }} 1:1 )</small>
-                                    </label>
-                                    <div class="d-flex __gap-12px __new-coba overflow-x-auto pb-2" id="coba">
-
-                                        <input type="hidden" id="removedImageKeysInput" name="removedImageKeys"
-                                            value="">
-                                        @foreach ($product->images as $key => $photo)
-                                            @php($photo = is_array($photo) ? $photo : ['img' => $photo, 'storage' => 'public'])
-                                            <div id="product_images_{{ $key }}"
-                                                class="spartan_item_wrapper min-w-176px max-w-176px">
-                                                <img class="img--square onerror-image"
-                                                    src="{{ \App\CentralLogics\Helpers::get_full_url('product', $photo['img'] ?? '', $photo['storage']) }}"
-                                                    data-onerror-image="{{ asset('assets/admin/img/upload-img.png') }}"
-                                                    alt="Product image">
-                                                <a href="#" data-key={{ $key }}
-                                                    data-photo="{{ $photo['img'] }}"
-                                                    class="spartan_remove_row function_remove_img"><i
-                                                        class="tio-add-to-trash"></i></a>
-
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 mx-auto pb-2 flex-shrink-0">
-                                    <label class="text-dark d-block">
-                                        {{ translate('messages.item_thumbnail') }}
-                                        <small class="text-danger">* ( {{ translate('messages.ratio') }} 1:1 )</small>
-                                    </label>
-                                    <label class="d-inline-block m-0 position-relative error-wrapper">
-                                        <img class="img--176 border onerror-image" id="viewer"
-                                            src="{{ $product['image_full_url'] ?? asset('assets/admin/img/upload-img.png') }}"
-                                            data-onerror-image="{{ asset('assets/admin/img/upload-img.png') }}"
-                                            alt="thumbnail" />
-                                        <div class="icon-file-group">
-                                            <div class="icon-file">
-                                                <input type="file" name="image" id="customFileEg1"
-                                                    class="custom-file-input read-url"
-                                                    accept=".webp, .jpg, .png, .jpeg, .webp, .gif, .bmp, .tif, .tiff|image/*">
-                                                <i class="tio-edit"></i>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @include('partials.item._legacy_edit_image_block')
 
                 @includeif('admin-views.product.partials._category_and_general')
                 @includeif('admin-views.product.partials._price_and_stock')
@@ -338,7 +302,44 @@
             </div>
         </form>
     </div>
+    <div class="modal" id="food-modal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close foodModalClose" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/IkoF9gPH6zs"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="attribute-modal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close attributeModalClose" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/xG8fO7TXPbk"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <span id="message-enter-choice-values" data-text="{{ translate('enter_choice_values') }}"></span>
+
+    @includeif('admin-views.product.partials._ai_sidebar')
 
 @endsection
 
@@ -538,182 +539,17 @@
 
 
 
-        function combination_update() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $.ajax({
-                type: "POST",
-                url: '{{ route('vendor.item.variant-combination') }}',
-                data: $('#product_form').serialize() + '&stock={{ $module_data['stock'] }}',
-                beforeSend: function() {
-                    $('#loading').show();
-                },
-                success: function(data) {
-                    $('#loading').hide();
-                    $('#variant_combination').html(data.view);
-                    if (data.length > 1) {
-                        $('#quantity').hide();
-                    } else {
-                        $('#quantity').show();
-                    }
-                }
-            });
-        }
-
-
-        $('#brand_id').select2({
-            ajax: {
-                 url: '{{ route('vendor.item.getBrandList') }}',
-                data: function(params) {
-                    return {
-                        q: params.term, // search term
-                        page: params.page,
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                __port: function(params, success, failure) {
-                    let $request = $.ajax(params);
-
-                    $request.then(success);
-                    $request.fail(failure);
-
-                    return $request;
-                }
-            }
-        });
-
-
-
-        $('#product_form').on('submit', function() {
-
-            let $form = $(this);
-            if (!$form.valid()) {
-                return false;
-            }
-
-            let formData = new FormData(this);
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            $.post({
-                url: $('.route_url').val(),
-                data: $('#product_form').serialize(),
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                beforeSend: function() {
-                    $('#loading').show();
-                },
-                success: function(data) {
-                    $('#loading').hide();
-                    if (data.errors) {
-                        for (let i = 0; i < data.errors.length; i++) {
-                            toastr.error(data.errors[i].message, {
-                                CloseButton: true,
-                                ProgressBar: true
-                            });
-                        }
-                    }
-                    if (data.product_approval) {
-                        toastr.success(data.product_approval, {
-                            CloseButton: true,
-                            ProgressBar: true
-                        });
-                        setTimeout(function() {
-                            location.href = '{{ route('vendor.item.pending_item_list') }}';
-                        }, 2000);
-                    }
-                    if (data.success) {
-                        toastr.success(data.success, {
-                            CloseButton: true,
-                            ProgressBar: true
-                        });
-                        setTimeout(function() {
-                            location.href = '{{ route('vendor.item.list') }}';
-                        }, 2000);
-                    }
-                }
-            });
-        });
-
-        function initImagePicker() {
-            $("#coba").spartanMultiImagePicker({
-                fieldName: 'item_images[]',
-                maxCount: 5,
-                rowHeight: '176px !important',
-                groupClassName: 'spartan_item_wrapper min-w-176px max-w-176px',
-                maxFileSize: 1024 * 1024 * 2,
-                placeholderImage: {
-                    image: "{{ asset('assets/admin/img/upload-img.png') }}",
-                    width: '176px'
-                },
-                dropFileLabel: "Drop Here",
-                onAddRow: function(index, file) {
-                    setTimeout(function() {
-                        let $newInput = $("#coba .spartan_item_wrapper").last();
-                        if ($newInput.length) {
-                            $newInput[0].scrollIntoView({
-                                behavior: "smooth",
-                                inline: "end",
-                                block: "nearest"
-                            });
-                        }
-                    }, 50);
-                },
-                onExtensionErr: function(index, file) {
-                    toastr.error("{{ translate('messages.please_only_input_png_or_jpg_type_file') }}", {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
-                },
-                onSizeErr: function(index, file) {
-                    toastr.error("{{ translate('messages.file_size_too_big') }}", {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
-                }
-            });
-        }
-
-        $(function() {
-            initImagePicker();
-            update_qty();
-        });
-
-        function update_qty() {
-            let total_qty = 0;
-            let qty_elements = $('input[name^="stock_"]');
-            for (let i = 0; i < qty_elements.length; i++) {
-                total_qty += parseInt(qty_elements.eq(i).val() || 0);
-            }
-            if (qty_elements.length > 0) {
-
-                $('input[name="current_stock"]').attr("readonly", true);
-                $('input[name="current_stock"]').val(total_qty);
-            } else {
-                $('input[name="current_stock"]').attr("readonly", false);
-            }
-        }
-
-        $(document).on('keyup', 'input[name^="stock_"]', function() {
-            let total_qty = 0;
-            let qty_elements = $('input[name^="stock_"]');
-            for (let i = 0; i < qty_elements.length; i++) {
-                total_qty += parseInt(qty_elements.eq(i).val() || 0);
-            }
-            $('input[name="current_stock"]').val(total_qty);
-        });
+        @include('partials.item._legacy_edit_common_js', [
+            'context' => 'vendor',
+            'variantCombinationUrl' => route('vendor.item.variant-combination'),
+            'brandListUrl' => route('vendor.item.getBrandList'),
+            'variantStockValue' => $module_data['stock'],
+            'variantStockIsJs' => false,
+            'listUrl' => route('vendor.item.list'),
+            'pendingListUrl' => route('vendor.item.pending_item_list'),
+            'hideQuantityOnMulti' => true,
+            'imageMaxBytes' => 2 * 1024 * 1024,
+        ])
 
         // $('#product_form').on('keydown', function(e) {
         //     if (e.key === 'Enter') {

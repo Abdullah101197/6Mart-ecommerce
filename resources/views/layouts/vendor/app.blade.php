@@ -231,6 +231,7 @@
 @stack('script')
 
 <!-- JS Front -->
+<script src="{{ asset('assets/admin/vendor/jquery/jquery.js') }}"></script>
 <script src="{{asset('assets/admin')}}/js/vendor.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/theme.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/sweet_alert.js"></script>

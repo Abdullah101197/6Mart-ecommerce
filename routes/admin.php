@@ -45,8 +45,24 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         Route::get('/get-store-data', 'SystemController@store_data')->name('get-store-data');
         Route::post('remove_image', 'BusinessSettingsController@remove_image')->name('remove_image');
         Route::get('system-currency', 'SystemController@system_currency')->name('system_currency');
-        //dashboard
-        Route::get('/', 'DashboardController@dashboard')->name('dashboard');
+        //dashboard (legacy by default; can be switched to Manufuture by config)
+        Route::get('/', function (\Illuminate\Http\Request $request) {
+            if (config('manufuture.admin_default')) {
+                return redirect()->route('admin.mf.dashboard', $request->query());
+            }
+            return app(\App\Http\Controllers\Admin\DashboardController::class)->dashboard($request);
+        })->name('dashboard');
+        // Manufuture portal (parallel routes; safe rollout)
+        Route::prefix('mf')->as('mf.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ManufutureController::class, 'dashboard'])->name('dashboard');
+            Route::get('orders', [\App\Http\Controllers\Admin\ManufutureOrderController::class, 'index'])->name('orders.index');
+            Route::get('products', [\App\Http\Controllers\Admin\ManufutureProductController::class, 'index'])->name('products.index');
+            Route::get('aipulse', [\App\Http\Controllers\Admin\ManufutureAIPulseController::class, 'index'])->name('aipulse');
+            Route::get('omnichannel', [\App\Http\Controllers\Admin\ManufutureOmnichannelController::class, 'index'])->name('omnichannel');
+            Route::get('pos', [\App\Http\Controllers\Admin\ManufuturePosController::class, 'index'])->name('pos');
+            Route::get('returns', [\App\Http\Controllers\Admin\ManufutureReturnsController::class, 'index'])->name('returns');
+            Route::get('helpcenter', [\App\Http\Controllers\Admin\ManufutureHelpCenterController::class, 'index'])->name('helpcenter');
+        });
 
         Route::get('maintenance-mode', 'SystemController@maintenance_mode')->name('maintenance-mode');
         Route::get('landing-page', 'SystemController@landing_page')->name('landing-page');

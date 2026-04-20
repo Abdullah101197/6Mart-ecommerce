@@ -54,6 +54,7 @@ class ItemController extends Controller
         $productWiseTax = $taxData['productWiseTax'];
         $taxVats = $taxData['taxVats'];
 
+        // Use the updated admin add-new UI.
         return view('admin-views.product.index', compact('categories', 'language', 'languages', 'defaultLang', 'productWiseTax', 'taxVats'));
     }
 

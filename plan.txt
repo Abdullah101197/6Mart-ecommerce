@@ -1,211 +1,152 @@
-﻿TODAY PLAN — Add Subscription-based Vendor Options (Project-wide)
+﻿VENDOR ITEMS vs SUPER ADMIN ITEMS — PLAN (Updated Wizard Parity)
 Date: 2026-04-16
-Repo: 6MartAdminpanel
 
 Goal
-- Add more subscription package “options” (feature permissions) so vendors can be allowed/blocked per package.
-- Support both “use admin-created lists” (read/select) and “manage/create” capabilities where needed.
-- Ensure gating is enforced consistently via `subscription:<key>` middleware on vendor routes.
+- Keep Admin on the updated “new-product wizard” UI:
+  - `resources/views/admin-views/product/index.blade.php`
+- Upgrade Vendor “Items > Add New” and “Items > Edit” to use the SAME wizard UI,
+  so Vendor screens match Super Admin.
+- Keep vendor restrictions:
+  - vendor cannot pick store_id (forced to current store)
+  - vendor scopes to module/subscription/approval rules
+  - vendor redirects to list or pending list
 
-Current State (what we already confirmed)
-- Admin has subscription package CRUD under:
-  - URI: admin/business-settings/subscription/subscriptionackage/*
-  - Controller: app/Http/Controllers/Admin/Subscription/SubscriptionController.php
-  - Views: resources/views/admin-views/subscription/package/*.blade.php
-- Vendor routes already contain many `subscription:<key>` gates in routes/vendor.php (e.g., category, role, deliveryman_list).
-- BUT middleware `app/Http/Middleware/Subscription.php` currently enforces only 4 keys:
-  - reviews, pos, deliveryman, chat
-  → So most existing `subscription:<key>` gates are not effective yet.
+Current status (already done in code)
+- List table rows are shared between admin + vendor:
+  - `resources/views/partials/item/_table_rows.blade.php`
+- Legacy-parity partials exist (old UI), but Admin is now restored to updated wizard UI.
+  (We will NOT continue legacy parity if the goal is “same as updated admin”.)
 
-Definition: “Option”
-- An option is a boolean permission stored on:
-  - subscription_packages (package template)
-  - store_subscriptions (store’s active plan snapshot)
-- Vendor access checks use store_subscriptions (store->store_sub) at runtime.
+Decision
+- Target parity is the UPDATED wizard UI, not legacy.
 
-Scope for Today
-- Implement a scalable permission system (not hard-coded to 4 keys).
-- Add initial set of permissions (recommended starter pack) with minimal disruption:
-  A) Admin-created list usage (vendor read/select)
-     - category_view
-     - brand_view
-     - attribute_view (or catalog_view)
-     - addon_view
-  B) Store operations (vendor manage)
-     - item_manage
-     - coupon_manage
-     - campaign_manage
-     - report_view
-     - wallet_view
-     - employee_manage
-     - role_manage
-  C) Keep existing flags already present
-     - pos, mobile_app, chat, review, self_delivery
+Implementation plan
 
-Deliverables (end of day)
-- New DB columns on both tables
-- Admin package create/edit UI shows checkboxes for new options
-- Package store/update saves those options
-- Subscription purchase/renew/switch copies options into store_subscriptions
-- Middleware enforces all keys used by routes/vendor.php
-- Vendor routes updated to use the new keys consistently (view vs manage)
-- Quick verification steps documented and runnable
+Phase 1 — Inventory the wizard dependencies (30–60 min)
+- Admin wizard view:
+  - `resources/views/admin-views/product/index.blade.php`
+- Vendor current:
+  - Add New: `resources/views/vendor-views/product/index.blade.php`
+  - Edit: `resources/views/vendor-views/product/edit.blade.php`
+- Confirm vendor routes exist for every wizard call:
+  - store: `vendor.item.store`
+  - update: `vendor.item.update`
+  - edit: `vendor.item.edit`
+  - list: `vendor.item.list`
+  - pending: `vendor.item.pending_item_list`
+  - categories: `vendor.item.get-categories`
+  - variant-combination: `vendor.item.variant-combination`
+  - brand list: `vendor.item.getBrandList` (ecommerce)
+  - gallery: `vendor.item.product_gallery`
 
-Implementation Steps (Today)
+Phase 2 — Add a context adapter to the wizard (core step)
+- In `admin-views/product/index.blade.php`, add a single JS config object (one source of truth):
+  - context: admin|vendor
+  - storeMode: selectable|forced
+  - urls:
+    - storeUrl
+    - updateUrlBase (or updateUrl)
+    - editUrlBase
+    - listUrl
+    - pendingListUrl
+    - categoryUrl
+    - variantUrl
+    - brandUrl
+    - galleryUrl
+- Replace any hard-coded admin URLs inside the wizard JS with this config.
 
-1) Decide final permission keys (15–20 minutes)
-- Freeze the key names used in:
-  - DB columns (snake_case)
-  - middleware parameter (subscription:<key>)
-  - admin UI labels (translation keys)
-- Rule: keep keys stable; changing later requires migration + route edits.
+Status
+- DONE (implemented `window.NP_WIZARD` adapter + switched hardcoded admin URLs to config-driven URLs)
 
-2) Database migrations (30–45 minutes)
-- Create a new migration that adds columns to:
-  - subscription_packages
-  - store_subscriptions
-- Add boolean columns for each new key.
-- Choose safe defaults:
-  - Recommended for safe rollout: default TRUE for permissions that should not break existing vendors.
-  - Alternative (more strict): default FALSE then update existing packages explicitly.
-- Run migrations locally to verify schema updates.
+Phase 3 — Vendor Add New uses the wizard
+- Option A (recommended): create a vendor wrapper view:
+  - `resources/views/vendor-views/product/index_wizard.blade.php`
+  - it extends vendor layout but includes wizard content partial(s).
+- Ensure vendor forced store_id:
+  - hide store selector UI OR disable it
+  - submit always includes store_id = Helpers::get_store_id()
 
-3) Update model casts (10–15 minutes)
-- Update:
-  - app/Models/SubscriptionPackage.php
-  - app/Models/StoreSubscription.php
-- Add new fields to `$casts` as integer/boolean consistently.
+Status
+- DONE (vendor add-new now loads wizard, store_id forced, redirects to pending list on approval)
 
-4) Admin UI: package create/edit (60–90 minutes)
-- Files:
-  - resources/views/admin-views/subscription/package/create.blade.php
-  - resources/views/admin-views/subscription/package/edit.blade.php
-- Add grouped checkbox sections:
-  - “Admin catalog usage” (view/select)
-  - “Store operations” (manage)
-  - “Team & access”
-  - “Reports & wallet”
-- Ensure old values are preserved:
-  - create: `old('<field>')`
-  - edit: `$subscriptionackage-><field>`
+Phase 4 — Vendor Edit uses the wizard
+- Return the wizard view in edit mode (prefill from $product).
+- Ensure images + removedImageKeys + existing gallery data still work.
+- Ensure update URL points to vendor update endpoint.
 
-5) Admin controller save/update (30–45 minutes)
-- File:
-  - app/Http/Controllers/Admin/Subscription/SubscriptionController.php
-- In `store()` and `update()`:
-  - Read each checkbox as 0/1 and save to SubscriptionPackage
-  - Keep existing validation; add minimal boolean validation for new fields if needed
+Status
+- DONE (vendor edit now loads wizard in edit mode; update URL uses vendor endpoints via NP_WIZARD)
 
-6) Copy permissions into store subscription snapshot (60–120 minutes)
-- Identify where subscriptions are applied to a store (typically Helpers::subscription_plan_chosen).
-- Update that logic to copy all permission fields from SubscriptionPackage → StoreSubscription when:
-  - new purchase
-  - renew
-  - plan switch/shift
-- Ensure store_subscriptions remains a “snapshot” (doesn’t change until plan changes).
-
-7) Middleware: enforce all permissions (60–90 minutes)
-- File:
-  - app/Http/Middleware/Subscription.php
-- Replace hard-coded 4-key logic with a single permissions map:
-  - $permissionMap = [
-      'pos' => 'pos',
-      'chat' => 'chat',
-      'reviews' => 'review',
-      'deliveryman' => 'self_delivery',
-      'category_view' => 'category_view',
-      ...
-    ];
-- Behavior:
-  - If vendor is on commission: allow.
-  - If unsubscribed/expired/none: block (existing behavior).
-  - If subscription & missing permission: Toastr error + back.
-- Important: maintain compatibility with existing middleware usage like `subscription:reviews`.
-
-8) Vendor route alignment (45–90 minutes)
-- File:
-  - routes/vendor.php
-- Update route groups to use the new keys consistently:
-  - Category screens: `subscription:category_view` (and `subscription:category_manage` if you split later)
-  - Coupon screens: `subscription:coupon_manage`
-  - Reports: `subscription:report_view`
-  - Wallet: `subscription:wallet_view`
-  - Employees: `subscription:employee_manage`
-  - Custom roles: `subscription:role_manage`
-- Keep existing `module:<name>` middleware as-is; subscription gate is additive.
-
-9) Translations (20–40 minutes)
-- Add `messages.*` translation keys for new checkbox labels and error messages if needed.
-- Ensure English exists at minimum:
-  - resources/lang/en/messages.php
-
-10) Quick verification (30–45 minutes)
-- Admin:
-  - Create a package with only some permissions enabled.
-  - Edit package and confirm values persist.
+Phase 5 — Verify behavior
 - Vendor:
-  - Subscribe a test vendor to that package (or switch plan).
-  - Confirm store_subscriptions has the copied flags.
-  - Attempt to visit gated sections; confirm allowed/blocked matches permissions.
+  - category cascade works
+  - variant-combination works
+  - image upload works
+  - submit redirects:
+    - success → vendor.item.list
+    - approval → vendor.item.pending_item_list
+- Admin:
+  - no regressions (store selectable, redirects to admin list)
 
-Acceptance Criteria
-- A vendor on a subscription plan cannot access any route guarded by `subscription:<key>` unless their store_sub has that permission set to 1.
-- Existing keys (pos/chat/reviews/deliveryman) still work exactly as before.
-- Package changes do not silently affect existing subscribers until they renew/switch (snapshot model preserved).
+Status
+- PARTIAL
+- Verified by code/route inspection:
+  - vendor category cascade route is wired
+  - vendor gallery route is wired
+  - vendor approval redirect goes to pending list
+  - admin list redirect remains intact
+- Addressed in code:
+  - new wizard variant matrix now auto-syncs from selected swatches, flavor tags, size tags, and attribute option inputs
+- vendor store/update now persist media `alt_text[]` in `meta_data` like admin
 
-Notes / Risks
-- Some vendor routes currently use `subscription:<key>` values that don’t exist in DB today (legacy/placeholder gates).
-  - Today’s middleware upgrade must either:
-    - implement those keys, OR
-    - map them to existing flags, OR
-    - treat unknown keys as “deny” (safer) or “allow” (non-breaking).
-  - Recommended: treat unknown keys as deny in production; during rollout, add mappings for all keys used by routes/vendor.php.
+Status update
+- DONE from code integration standpoint
+- Optional manual browser QA still recommended for final confidence:
+  - thumbnail replace
+  - multi-image upload
+  - existing gallery image removal
+  - alt text save/load on edit
 
-Product Gallery Redesign Plan
-Project: 6MartAdminpanel
-Target Area: Admin Panel > Product Setup > Product Gallery
-Source Design: update galary.html
+Phase 6 — Cleanup (shared wizard include)
+- DONE (structural):
+  - Added: `resources/views/partials/product/_wizard.blade.php`
+  - Added: `resources/views/admin-views/product/_wizard_impl.blade.php`
+  - Updated:
+    - `resources/views/admin-views/product/index.blade.php`
+    - `resources/views/vendor-views/product/index_wizard.blade.php`
+    - `resources/views/vendor-views/product/edit_wizard.blade.php`
+    - `resources/views/partials/product/_wizard.blade.php`
+  - Admin + vendor wrapper pages now include the shared partial
+  - Shared partial now targets a dedicated implementation include path
+- OPTIONAL (future refactor):
+  - Move wizard implementation out of `resources/views/admin-views/product/index.blade.php`
+    into `resources/views/admin-views/product/_wizard_impl.blade.php`
+    or `resources/views/partials/product/_wizard.blade.php`,
+    and remove the no-layout implementation branch from `admin-views/product/index.blade.php`.
 
-Phase 0: Discovery and Baseline Freeze
-1. Confirm current Product Gallery flow and dependencies:
-   - Route: admin.item.product_gallery
-   - Controller methods: product_gallery(), search()
-   - Views: product_gallery.blade.php, partials/_gallery.blade.php
-2. Snapshot current behavior before changes:
-   - Existing filters, pagination mode, and "Use this product info" action
-3. Identify reusable logic from Product List page:
-   - Status toggle, stock update patterns, filtering conventions
-4. Record data availability from current schema:
-   - Available: name, category, brand, price, stock, status, tax/vat
-   - Missing (for full template parity): sku, ean/barcode, cost_price, expiry_days
+Risks / Notes
+- The wizard file is large; do refactor in small commits:
+  1) add config object
+  2) switch URLs to config (store/update/list/category/variant)
+  3) vendor wrapper view
+  4) vendor controller wiring
 
-Phase 1: UI Integration (Theme-Preserving)
-1. Rebuild Product Gallery UI using update galary.html structure while preserving existing admin theme:
-   - Keep color scheme, spacing language, and existing asset system
-2. Replace static mock sections with Blade + dynamic placeholders:
-   - Stats cards
-   - Advanced filters row
-   - Table layout with sortable headers
-   - Bulk action toolbar
-   - Pagination/footer controls
-3. Keep current working features intact:
-   - Existing navigation and permissions
-   - Existing "Use this product info" edit flow
+*** End of File
 
-Phase 2: Dynamic Data Wiring (Backend + AJAX)
-1. Extend backend query in ItemController@product_gallery and @search:
-   - Search by product name and mapped identifiers (where available)
-   - Filter by brand, category, status, VAT range, price range
-   - Sorting and page-size support
-2. Replace mock front-end array logic with server-side query output
-3. Render table body via dedicated partial (AJAX refresh)
-4. Keep backward compatibility for existing parameters to avoid regressions
-
-Phase 3: Bulk Operations (Safe First)
-1. Add bulk-selection workflow in Product Gallery UI
-2. Implement backend endpoints for bulk actions:
-   - Activate selected
-   - Deactivate selected
+Next implementation work (Goal B)
+- Unify “Add New Item” by extracting the admin wizard UI into shared partials and making it context-aware:
+  - store handling
+    - admin: selectable `store_id`
+    - vendor: hidden `store_id` = current vendor store
+  - routes/URLs (must switch by context)
+    - store endpoint: `admin.item.store` vs `vendor.item.store`
+    - update endpoint: `admin/item/update/{id}` vs vendor equivalent (or route)
+    - list redirect: `admin.item.list` vs `vendor.item.list` (or pending list when approval needed)
+    - category cascade: `admin.item.get-categories` vs `vendor.item.get-categories`
+  - section visibility
+    - remove/replace admin-only buttons (e.g. gallery import) for vendor
+    - decide whether vendor gets: draft mode, SEO, media tab, logistics tab
+*** End of File
    - Optional: bulk delete (permission-gated)
    - Optional: bulk discount apply
 3. Add validation and authorization checks for each bulk action

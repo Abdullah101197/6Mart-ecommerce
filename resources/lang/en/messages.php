@@ -9213,4 +9213,6 @@ Smartly or Earn. ',
   'Memberships' => 'Memberships',
   'Returning customers this period' => 'Returning customers this period',
   'General Setup is the foundational step, where you configure essential business details (time zone, available currency) to set up the business.' => 'General Setup is the foundational step, where you configure essential business details (time zone, available currency) to set up the business.',
+  'Repeat buyers' => 'Repeat buyers',
+  'Highest lifetime value' => 'Highest lifetime value',
 );

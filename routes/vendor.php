@@ -14,7 +14,19 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
         Route::post('store-clicked-route', 'SearchRoutingController@storeClickedRoute')->name('store.clicked.route');
 
         Route::get('lang/{locale}', 'LanguageController@lang')->name('lang');
-        Route::get('/', 'DashboardController@dashboard')->name('dashboard');
+        Route::get('/', function (\Illuminate\Http\Request $request) {
+            if (config('manufuture.vendor_default')) {
+                return redirect()->route('vendor.mf.dashboard', $request->query());
+            }
+            return app(\App\Http\Controllers\Vendor\DashboardController::class)->dashboard($request);
+        })->name('dashboard');
+        // Manufuture portal (parallel routes; safe rollout)
+        Route::prefix('mf')->as('mf.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Vendor\ManufutureController::class, 'dashboard'])->name('dashboard');
+            Route::get('orders', [\App\Http\Controllers\Vendor\ManufutureOrderController::class, 'index'])->name('orders');
+            Route::get('products', [\App\Http\Controllers\Vendor\ManufutureProductController::class, 'index'])->name('products');
+            Route::get('pos', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])->defaults('feature', 'pos')->name('pos');
+        });
         Route::get('/get-store-data', 'DashboardController@store_data')->name('get-store-data');
         Route::post('/store-token', 'DashboardController@updateDeviceToken')->name('store.token');
 

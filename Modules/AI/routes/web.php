@@ -2,7 +2,6 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 
 /*
@@ -18,7 +17,4 @@ use Illuminate\Http\Request;
 
 
 
-Route::get('/test-ai', function (Request $request) {
-dd("Hello tester");
-
-});
+// (intentionally empty) Module routes live in routes/admin/routes.php and routes/api/v1/api.php

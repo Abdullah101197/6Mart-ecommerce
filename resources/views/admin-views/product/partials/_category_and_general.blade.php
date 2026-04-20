@@ -78,7 +78,27 @@
                                 </div>
                             </div>
                         @else
-                            <div class="col-sm-6 col-lg-4">
+                            @php($currentStoreId = \App\CentralLogics\Helpers::get_store_id())
+                            @php($currentStoreName = \App\Models\Store::where('id', $currentStoreId)->value('name'))
+
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="form-group mb-0 error-wrapper">
+                                    <label class="input-label" for="store_id">{{ translate('messages.store') }} <span
+                                            class="form-label-secondary text-danger" data-toggle="tooltip"
+                                            data-placement="right"
+                                            data-original-title="{{ translate('messages.Required.') }}"></span></label>
+                                    <select name="store_id" id="store_id"
+                                        data-placeholder="{{ translate('messages.select_store') }}"
+                                        class="form-control"
+                                        disabled>
+                                        <option value="{{ $currentStoreId }}" selected="selected">
+                                            {{ $currentStoreName ?? '-' }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-lg-3">
                                 <div class="form-group mb-0 error-wrapper">
                                     <label class="input-label"
                                         for="exampleFormControlSelect1">{{ translate('messages.category') }}<span
@@ -89,9 +109,9 @@
                                         data-id="sub-categories">
                                         <option value="">---{{ translate('messages.select') }}---</option>
                                         @foreach($categories as $category)
-                                                <option
-                                                    value="{{$category['id']}}" {{ isset($product) && $category->id==$product_category[0]->id ? 'selected' : ''}} >{{$category['name']}}</option>
-                                            @endforeach
+                                            <option
+                                                value="{{$category['id']}}" {{ isset($product) && $category->id==$product_category[0]->id ? 'selected' : ''}} >{{$category['name']}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

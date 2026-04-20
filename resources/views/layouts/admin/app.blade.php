@@ -37,12 +37,9 @@ $countryCode= strtolower($country?$country:'auto');
 
     <script src="{{asset('assets/admin/vendor/hs-navbar-vertical-aside/hs-navbar-vertical-aside-mini-cache.js')}}"></script>
     <link rel="stylesheet" href="{{asset('assets/admin/css/toastr.css')}}">
+    {{-- Ensure jQuery exists BEFORE any HSCore/theme scripts --}}
+    <script src="{{ asset('assets/admin/vendor/jquery/jquery.js') }}"></script>
     <script src="{{asset('assets/admin/js/vendor.min.js')}}"></script>
-    <script>
-        if (typeof jQuery === 'undefined') {
-            document.write('<script src="https://code.jquery.com/jquery-3.5.1.min.js"><\/script>');
-        }
-    </script>
 </head>
 
 <body class="footer-offset">

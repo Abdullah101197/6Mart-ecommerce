@@ -53,7 +53,7 @@ class ItemController extends Controller
         $productWiseTax = $taxData['productWiseTax'];
         $taxVats = $taxData['taxVats'];
 
-        return view('vendor-views.product.index', compact('categories', 'module_data', 'conditions', 'brands', 'productWiseTax', 'taxVats'));
+        return view('vendor-views.product.index_wizard', compact('categories', 'module_data', 'conditions', 'brands', 'productWiseTax', 'taxVats'));
     }
 
 
@@ -402,7 +402,21 @@ class ItemController extends Controller
             $food->organic = $request->organic ?? 0;
         }
         $food->is_halal = $request->is_halal ?? 0;
-        $food->meta_data = $request->has('meta_data') ? $request->meta_data : null;
+        $metaData = is_array($food->meta_data) ? $food->meta_data : [];
+        $requestMeta = $request->input('meta_data', []);
+        if (is_array($requestMeta) && count($requestMeta) > 0) {
+            $metaData = array_merge($metaData, $requestMeta);
+        }
+        $altText = $request->input('alt_text', []);
+        if (is_array($altText)) {
+            $altText = array_values(array_map(fn($v) => is_string($v) ? trim($v) : $v, $altText));
+            if (count($altText) > 0) {
+                $metaData['alt_text'] = $altText;
+            } else {
+                unset($metaData['alt_text']);
+            }
+        }
+        $food->meta_data = !empty($metaData) ? $metaData : null;
         $food->save();
         $food->tags()->sync($tag_ids);
         $food->nutritions()->sync($nutrition_ids);
@@ -505,7 +519,7 @@ class ItemController extends Controller
         $taxVats = $taxData['taxVats'];
         $taxVatIds = $productWiseTax ? $product->taxVats()->pluck('tax_id')->toArray() : [];
 
-        return view('vendor-views.product.edit', compact('product', 'product_category', 'categories', 'module_data', 'temp_product', 'conditions', 'brands', 'productWiseTax', 'taxVats', 'taxVatIds'));
+        return view('vendor-views.product.edit_wizard', compact('product', 'product_category', 'categories', 'module_data', 'temp_product', 'conditions', 'brands', 'productWiseTax', 'taxVats', 'taxVatIds'));
     }
 
     public function status(Request $request)
@@ -769,6 +783,21 @@ class ItemController extends Controller
         $p->stock = $request->current_stock ?? 0;
         $p->organic = $request->organic ?? 0;
         $p->is_halal = $request->is_halal ?? 0;
+        $metaData = is_array($p->meta_data) ? $p->meta_data : [];
+        $requestMeta = $request->input('meta_data', []);
+        if (is_array($requestMeta) && count($requestMeta) > 0) {
+            $metaData = array_merge($metaData, $requestMeta);
+        }
+        $altText = $request->input('alt_text', []);
+        if (is_array($altText)) {
+            $altText = array_values(array_map(fn($v) => is_string($v) ? trim($v) : $v, $altText));
+            if (count($altText) > 0) {
+                $metaData['alt_text'] = $altText;
+            } else {
+                unset($metaData['alt_text']);
+            }
+        }
+        $p->meta_data = !empty($metaData) ? $metaData : null;
 
 
 
