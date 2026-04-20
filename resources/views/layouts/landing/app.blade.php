@@ -142,6 +142,14 @@
                                     {{ translate('messages.vendor_registration') }}
                                 </a>
                             </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="" href="{{ route('manufuture.apply') }}">
+                                    {{ translate('Manufuture registration') }}
+                                </a>
+                            </li>
                             @if ($toggle_dm_registration)
                                 <li>
                                     <hr class="dropdown-divider">
