@@ -138,6 +138,7 @@ class Store extends Model
         'meta_image',
         'announcement',
         'announcement_message',
+        'portal',
         'comment',
         'tin',
         'tin_expire_date',

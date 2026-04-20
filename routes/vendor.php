@@ -20,8 +20,8 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             }
             return app(\App\Http\Controllers\Vendor\DashboardController::class)->dashboard($request);
         })->name('dashboard');
-        // Manufuture portal (parallel routes; safe rollout)
-        Route::prefix('mf')->as('mf.')->group(function () {
+        // Manufuture portal (portal-gated)
+        Route::prefix('mf')->as('mf.')->middleware(['manufuture.portal'])->group(function () {
             Route::get('/', [\App\Http\Controllers\Vendor\ManufutureController::class, 'dashboard'])->name('dashboard');
             Route::get('orders', [\App\Http\Controllers\Vendor\ManufutureOrderController::class, 'index'])->name('orders');
             Route::get('products', [\App\Http\Controllers\Vendor\ManufutureProductController::class, 'index'])->name('products');

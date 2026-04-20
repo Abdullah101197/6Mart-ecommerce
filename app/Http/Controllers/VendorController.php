@@ -163,6 +163,9 @@ class VendorController extends Controller
         $store->delivery_time = $request->minimum_delivery_time .'-'. $request->maximum_delivery_time.' '.$request->delivery_time_type;
         $store->status = 0;
         $store->store_business_model = 'none';
+        $store->portal = in_array($request->input('portal'), ['vendor', 'manufuture'], true)
+            ? $request->input('portal')
+            : 'vendor';
         $store->save();
 
         Helpers::add_or_update_translations(request: $request, key_data: 'name', name_field: 'name', model_name: 'Store', data_id: $store->id, data_value: $store->name);

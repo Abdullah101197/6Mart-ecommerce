@@ -265,15 +265,9 @@ class LoginController extends Controller
             if(Helpers::get_store_data()?->module_type == 'rental' && addon_published_status('Rental')){
                 return redirect()->route('vendor.providerDashboard')->withCookies($forgetCookies);
             }
-            if ($request->filled('redirect_to')) {
-                $redirectTo = $request->input('redirect_to');
-                if (is_string($redirectTo) && preg_match('/^[a-zA-Z0-9_.-]+$/', $redirectTo) && str_starts_with($redirectTo, 'vendor.mf.')) {
-                    try {
-                        return redirect()->route($redirectTo)->withCookies($forgetCookies);
-                    } catch (\Throwable $e) {
-                        // fallback to default vendor dashboard
-                    }
-                }
+            $store = Helpers::get_store_data();
+            if (($store?->portal ?? null) === 'manufuture') {
+                return redirect()->route('vendor.mf.dashboard')->withCookies($forgetCookies);
             }
             return redirect()->route('vendor.dashboard')->withCookies($forgetCookies);
         }
