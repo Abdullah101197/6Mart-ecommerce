@@ -219,8 +219,11 @@ Route::group(['prefix' => 'vendor', 'as' => 'restaurant.'], function () {
 
 // Manufuture portal auth (v1: reuse vendor auth + redirect into MF dashboard)
 Route::group(['prefix' => 'manufuture', 'as' => 'manufuture.'], function () {
-    Route::get('apply', 'VendorController@create')->name('apply');
-    Route::post('apply', 'VendorController@store')->name('store');
+    Route::get('apply', [\App\Http\Controllers\ManufutureAuthController::class, 'create'])->name('apply');
+    Route::post('apply', [\App\Http\Controllers\ManufutureAuthController::class, 'store'])->name('store');
+    Route::get('get-all-modules', 'VendorController@get_all_modules')->name('get-all-modules');
+    Route::get('get-module-type', 'VendorController@get_modules_type')->name('get-module-type');
+    Route::get('check-module-type', 'VendorController@check_module_type')->name('check-module-type');
 
     Route::get('login', function () {
         $vendorLoginUrl = \App\Models\DataSetting::where('key', 'store_login_url')->value('value');
