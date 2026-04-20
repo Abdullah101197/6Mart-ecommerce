@@ -217,6 +217,20 @@ Route::group(['prefix' => 'vendor', 'as' => 'restaurant.'], function () {
     Route::get('final-step', 'VendorController@final_step')->name('final_step');
 });
 
+// Manufuture portal auth (v1: reuse vendor auth + redirect into MF dashboard)
+Route::group(['prefix' => 'manufuture', 'as' => 'manufuture.'], function () {
+    Route::get('apply', 'VendorController@create')->name('apply');
+    Route::post('apply', 'VendorController@store')->name('store');
+
+    Route::get('login', function () {
+        $vendorLoginUrl = \App\Models\DataSetting::where('key', 'store_login_url')->value('value');
+        abort_unless($vendorLoginUrl, 404);
+
+        return redirect()
+            ->route('login', ['tab' => $vendorLoginUrl, 'redirect_to' => 'vendor.mf.dashboard']);
+    })->name('login');
+});
+
 //Deliveryman Registration
 Route::group(['prefix' => 'deliveryman', 'as' => 'deliveryman.'], function () {
     Route::get('apply', 'DeliveryManController@create')->name('create');
