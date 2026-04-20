@@ -234,7 +234,7 @@
                                                                                    data-original-title="{{ translate('messages.Select zones from where customer can choose their pickup locations for trip booking') }}"><img
                                                     src="{{ asset('/assets/admin/img/info-circle.svg') }}"
                                                     alt="{{ translate('messages.Select zones from where customer can choose their pickup locations for trip booking') }}"></span></label>
-                                        <select name="pickup_zone_id[]" required class="form-control multiple-select2"
+                                        <select name="pickup_zone_id[]" class="form-control multiple-select2"
                                                 data-placeholder="{{ translate('messages.select_zone') }}"
                                                 multiple="multiple">
                                             <option value="" disabled>
