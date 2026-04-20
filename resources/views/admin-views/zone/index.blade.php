@@ -320,8 +320,16 @@
 @endsection
 
 @push('script_2')
-<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key={{\App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value}}&callback=initialize&libraries=drawing,places,marker&v=3.61"></script>
+@php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+@if(empty($mapApiKey))
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+@else
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{$mapApiKey}}&callback=initialize&libraries=drawing,places,marker&v=3.61"></script>
+@endif
 <script>
     "use strict";
     $(".popover-wrapper").click(function () {
@@ -359,6 +367,97 @@
         element.style.height = "5px";
         element.style.height = (element.scrollHeight) + "px";
     }
+
+    @if(empty($mapApiKey))
+        window.initialize = function () {
+            if (!window.L) return;
+            const mapEl = document.getElementById("map-canvas");
+            if (!mapEl) return;
+
+            @php($default_location = \App\Models\BusinessSetting::where('key', 'default_location')->first())
+            @php($default_location = $default_location?->value ? json_decode($default_location->value, true) : 0)
+            const startLat = {{ $default_location ? $default_location['lat'] : '23.757989' }};
+            const startLng = {{ $default_location ? $default_location['lng'] : '90.360587' }};
+
+            const map = L.map("map-canvas").setView([startLat, startLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+
+            function setTextareaFromLatLngs(latlngs) {
+                const str = latlngs.map(p => `(${p.lat}, ${p.lng})`).join(',');
+                $('#coordinates').val(str);
+                auto_grow();
+            }
+
+            const drawControl = new L.Control.Draw({
+                position: 'topright',
+                draw: {
+                    polygon: true,
+                    polyline: false,
+                    rectangle: false,
+                    circle: false,
+                    circlemarker: false,
+                    marker: false
+                },
+                edit: {
+                    featureGroup: drawnItems,
+                    remove: true
+                }
+            });
+            map.addControl(drawControl);
+
+            map.on(L.Draw.Event.CREATED, function (e) {
+                drawnItems.clearLayers();
+                drawnItems.addLayer(e.layer);
+                setTextareaFromLatLngs(e.layer.getLatLngs()[0]);
+            });
+
+            map.on(L.Draw.Event.EDITED, function (e) {
+                e.layers.eachLayer(function (layer) {
+                    if (layer.getLatLngs) {
+                        setTextareaFromLatLngs(layer.getLatLngs()[0]);
+                    }
+                });
+            });
+
+            map.on(L.Draw.Event.DELETED, function () {
+                $('#coordinates').val('');
+                auto_grow();
+            });
+
+            // Search (Enter)
+            const input = document.getElementById("pac-input");
+            if (input) {
+                input.addEventListener('keydown', async function (ev) {
+                    if (ev.key !== 'Enter') return;
+                    ev.preventDefault();
+                    const q = (input.value || '').trim();
+                    if (!q) return;
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`;
+                        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                        if (!res.ok) return;
+                        const results = await res.json();
+                        const first = results && results[0];
+                        if (first && first.lat && first.lon) {
+                            map.setView([parseFloat(first.lat), parseFloat(first.lon)], 13);
+                        }
+                    } catch (e) {}
+                });
+            }
+        };
+
+        $(document).on('ready', function () {
+            if (typeof window.initialize === 'function') {
+                window.initialize();
+            }
+        });
+    @endif
 
 
     $(document).on('ready', function () {

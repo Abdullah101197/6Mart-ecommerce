@@ -630,9 +630,15 @@
 @push('script_2')
     <!-- Page level plugins -->
     <script src="{{ asset('assets/admin/js/file-preview/details-multiple-document-upload.js') }}"></script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}&callback=initMap&libraries=marker&v=3.61">
-    </script>
+    @php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+    @if(empty($mapApiKey))
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    @else
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{ $mapApiKey }}&callback=initMap&libraries=marker&v=3.61">
+        </script>
+    @endif
     <script>
         "use strict";
 
@@ -658,6 +664,18 @@
         initMap();
 
         function initMap() {
+            @if(empty($mapApiKey))
+                const el = document.getElementById("map");
+                if (!el || !window.L) return;
+                const leafletMap = L.map("map").setView([myLatLng.lat, myLatLng.lng], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(leafletMap);
+                L.marker([myLatLng.lat, myLatLng.lng]).addTo(leafletMap);
+                return;
+            @endif
+
         const mapId = "{{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}"
 
             map = new google.maps.Map(document.getElementById("map"), {

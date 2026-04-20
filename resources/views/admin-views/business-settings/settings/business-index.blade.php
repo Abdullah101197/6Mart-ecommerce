@@ -1015,10 +1015,12 @@
         }
     });
 
-</script>
-
-    src="https://maps.googleapis.com/maps/api/js?key={{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value }}&libraries=places,marker&v=3.61">
     </script>
+
+    @php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+    @if(!empty($mapApiKey))
+        <script src="https://maps.googleapis.com/maps/api/js?key={{ $mapApiKey }}&libraries=places,marker&v=3.61"></script>
+    @endif
 <script>
     "use strict";
 

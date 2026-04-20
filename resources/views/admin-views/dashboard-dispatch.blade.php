@@ -155,8 +155,11 @@
 @endsection
 
 @push('script_2')
-<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key={{\App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value}}&callback=initialize&libraries=drawing,places,marker&v=3.61"></script>
+@php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+@if(!empty($mapApiKey))
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{$mapApiKey}}&callback=initialize&libraries=drawing,places,marker&v=3.61"></script>
+@endif
 
 <script>
     "use strict";

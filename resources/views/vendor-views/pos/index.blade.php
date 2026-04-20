@@ -237,9 +237,16 @@
 @endsection
 
 @push('script_2')
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}&libraries=places,marker&callback=initMap&v=3.61">
-    </script>
+    @php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+    @if(empty($mapApiKey))
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="{{ asset('assets/admin/js/view-pages/leaflet-picker.js') }}"></script>
+    @else
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{ $mapApiKey }}&libraries=places,marker&callback=initMap&v=3.61">
+        </script>
+    @endif
 
     <script src="{{asset('assets/admin/js/view-pages/pos.js')}}"></script>
     <script>
@@ -259,6 +266,19 @@
 
 
         function initMap() {
+            @if(empty($mapApiKey))
+                window.npInitLeafletPicker({
+                    mapId: "map",
+                    searchInputId: "pac-input",
+                    latInputId: "latitude",
+                    lngInputId: "longitude",
+                    startLat: {{ $store_data ? $store_data['latitude'] : '23.757989' }},
+                    startLng: {{ $store_data ? $store_data['longitude'] : '90.360587' }},
+                    zoom: 13
+                });
+                return;
+            @endif
+
         const mapId = "{{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}"
 
             let map = new google.maps.Map(document.getElementById("map"), {

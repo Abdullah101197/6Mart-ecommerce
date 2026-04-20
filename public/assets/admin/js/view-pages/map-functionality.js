@@ -8,7 +8,205 @@ let geocoder = null;
 let myMarker = null;
 let searchMarkers = [];
 
-document.getElementById('outOfZone').style.setProperty("display", "none", "important");
+const MAP_ENABLED = !!(window.mapConfig && window.mapConfig.mapApiKey);
+
+const outOfZoneEl = document.getElementById('outOfZone');
+if (outOfZoneEl) {
+    outOfZoneEl.style.setProperty("display", "none", "important");
+}
+
+function setLatLngInputs(lat, lng) {
+    const latEl = document.getElementById('latitude');
+    const lngEl = document.getElementById('longitude');
+    if (latEl) latEl.value = lat;
+    if (lngEl) lngEl.value = lng;
+}
+
+function setAddressText(value) {
+    const visibleAddress = document.querySelector('.lang_form:not(.d-none) textarea[name="address[]"]');
+    if (visibleAddress) {
+        visibleAddress.value = value;
+        return;
+    }
+    const addressEl = document.getElementById('address');
+    if (addressEl) addressEl.value = value;
+}
+
+function checkZonePlain(lat, lng) {
+    if (!window.mapConfig || !window.mapConfig.urls || !window.mapConfig.urls.zoneGetZone) return;
+    checkModuleType();
+    $.get({
+        url: window.mapConfig.urls.zoneGetZone,
+        data: { lat: lat, lng: lng },
+        dataType: 'json',
+        success: function (data) {
+            if (data.id) {
+                $('#choice_zones').data('from-map', true).val(data.id).trigger('change');
+                const latlngEl = document.getElementById('latlng');
+                if (latlngEl) latlngEl.style.setProperty('display', 'flex', 'important');
+                if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'none', 'important');
+            } else {
+                $('#choice_zones').val('').trigger('change');
+                setLatLngInputs('', '');
+                const latlngEl = document.getElementById('latlng');
+                if (latlngEl) latlngEl.style.setProperty('display', 'none', 'important');
+                if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'block', 'important');
+            }
+        },
+    });
+}
+
+function initLeafletMap() {
+    if (MAP_ENABLED || !window.L) return;
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
+
+    const { defaultLocation, oldLat, oldLng, oldAddress } = window.mapConfig || {};
+    const hasOldCoords = !isNaN(oldLat) && !isNaN(oldLng);
+    const startLat = Number(hasOldCoords ? oldLat : (defaultLocation ? defaultLocation.lat : 23.757989));
+    const startLng = Number(hasOldCoords ? oldLng : (defaultLocation ? defaultLocation.lng : 90.360587));
+
+    // Leaflet needs an explicit height; container already has h-280
+    const leafletMap = L.map('map').setView([startLat, startLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(leafletMap);
+
+    let marker = L.marker([startLat, startLng]).addTo(leafletMap);
+    let zoneLayer = null;
+    let zonePolygonLngLat = null; // turf polygon coordinates [[lng,lat],...closed]
+
+    async function loadZonePolygon(zoneId) {
+        if (!window.mapConfig || !window.mapConfig.urls || !window.mapConfig.urls.zoneCoordinates) return;
+        if (!zoneId) {
+            if (zoneLayer) {
+                leafletMap.removeLayer(zoneLayer);
+                zoneLayer = null;
+            }
+            zonePolygonLngLat = null;
+            return;
+        }
+        try {
+            const url = window.mapConfig.urls.zoneCoordinates.replace(':coordinatesZoneId', zoneId);
+            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data || !data.coordinates || !Array.isArray(data.coordinates)) return;
+
+            const latlngs = data.coordinates.map(c => [Number(c.lat), Number(c.lng)]).filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+            if (latlngs.length < 3) return;
+
+            if (zoneLayer) {
+                leafletMap.removeLayer(zoneLayer);
+            }
+            zoneLayer = L.polygon(latlngs, { color: '#FF0000', weight: 2, fill: false }).addTo(leafletMap);
+            leafletMap.fitBounds(zoneLayer.getBounds(), { padding: [12, 12] });
+
+            // Build turf-friendly polygon ring: [[lng,lat],...closed]
+            const ring = data.coordinates
+                .map(c => [Number(c.lng), Number(c.lat)])
+                .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+            if (ring.length >= 3) {
+                const first = ring[0];
+                const last = ring[ring.length - 1];
+                if (!last || last[0] !== first[0] || last[1] !== first[1]) {
+                    ring.push(first);
+                }
+                zonePolygonLngLat = ring;
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
+
+    function isInsideZone(lat, lng) {
+        if (!zonePolygonLngLat) return true; // if no zone drawn yet, allow
+        if (!window.turf || !turf.booleanPointInPolygon) return true; // soft fallback
+        try {
+            const pt = turf.point([Number(lng), Number(lat)]);
+            const poly = turf.polygon([zonePolygonLngLat]);
+            return turf.booleanPointInPolygon(pt, poly);
+        } catch (e) {
+            return true;
+        }
+    }
+    setLatLngInputs(startLat, startLng);
+    if (oldAddress) {
+        const pac = document.getElementById('pac-input');
+        if (pac) pac.value = oldAddress;
+    }
+
+    async function reverseGeocode(lat, lng) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
+            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!res.ok) return;
+            const json = await res.json();
+            if (json && json.display_name) {
+                setAddressText(json.display_name);
+                const pac = document.getElementById('pac-input');
+                if (pac) pac.value = json.display_name;
+            }
+        } catch (e) {
+            // ignore network errors
+        }
+    }
+
+    function setFromLatLng(lat, lng, alsoReverse = true) {
+        const zoneOk = isInsideZone(lat, lng);
+        if (!zoneOk) {
+            setLatLngInputs('', '');
+            if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'block', 'important');
+            return;
+        }
+        setLatLngInputs(lat, lng);
+        marker.setLatLng([lat, lng]);
+        leafletMap.setView([lat, lng], Math.max(leafletMap.getZoom(), 13));
+        if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'none', 'important');
+        checkZonePlain(lat, lng);
+        if (alsoReverse) reverseGeocode(lat, lng);
+    }
+
+    leafletMap.on('click', function (e) {
+        setFromLatLng(e.latlng.lat, e.latlng.lng, true);
+    });
+
+    // Simple search using Nominatim (no key)
+    const pacInput = document.getElementById('pac-input');
+    if (pacInput) {
+        pacInput.addEventListener('keydown', async function (ev) {
+            if (ev.key !== 'Enter') return;
+            ev.preventDefault();
+            const q = (pacInput.value || '').trim();
+            if (!q) return;
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return;
+                const results = await res.json();
+                const first = results && results[0];
+                if (first && first.lat && first.lon) {
+                    setFromLatLng(parseFloat(first.lat), parseFloat(first.lon), false);
+                    setAddressText(first.display_name || q);
+                }
+            } catch (e) {
+                // ignore
+            }
+        });
+    }
+
+    // When zone changes, draw boundary like Google
+    const zoneSelect = document.getElementById('choice_zones');
+    if (zoneSelect) {
+        zoneSelect.addEventListener('change', function () {
+            loadZonePolygon(zoneSelect.value);
+        });
+        if (zoneSelect.value) {
+            loadZonePolygon(zoneSelect.value);
+        }
+    }
+}
 
 function setAddressFromLatLng(latlng) {
     if (!geocoder) return;
@@ -29,6 +227,9 @@ function setAddressFromLatLng(latlng) {
 }
 
 function initMap() {
+    if (!MAP_ENABLED || !(window.google && google.maps)) {
+        return;
+    }
     const { mapApiKey, defaultLocation, oldLat, oldLng, oldAddress, translations } = window.mapConfig;
     const hasOldCoords = !isNaN(oldLat) && !isNaN(oldLng);
 
@@ -66,7 +267,7 @@ function initMap() {
         const obj = JSON.parse(coordinates);
         document.getElementById('latitude').value = obj['lat'];
         document.getElementById('longitude').value = obj['lng'];
-        document.getElementById('outOfZone').style.setProperty("display", "none", "important");
+        if (outOfZoneEl) outOfZoneEl.style.setProperty("display", "none", "important");
         setAddressFromLatLng(mapsMouseEvent.latLng);
         checkZone(obj['lat'], obj['lng']);
     });
@@ -189,8 +390,14 @@ $(document).ready(function () {
 
 $('#choice_zones').on('change', function () {
     checkModuleType();
-    document.getElementById('latlng').style.setProperty('display', 'flex', 'important');
-    document.getElementById('outOfZone').style.setProperty('display', 'block', 'important');
+    const latlngEl = document.getElementById('latlng');
+    if (latlngEl) latlngEl.style.setProperty('display', 'flex', 'important');
+    if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'block', 'important');
+
+    if (!MAP_ENABLED || !(window.google && google.maps)) {
+        // Map is disabled: skip all polygon/map rendering logic.
+        return;
+    }
     const isFromMap = $(this).data('from-map');
     $(this).data('from-map', false);
 
@@ -272,12 +479,12 @@ $('#choice_zones').on('change', function () {
                         map.setCenter(latLngToCheck);
                     }
 
-                    document.getElementById('outOfZone').style.setProperty("display", "none", "important");
+                    if (outOfZoneEl) outOfZoneEl.style.setProperty("display", "none", "important");
                 }
             }
 
             google.maps.event.addListener(zonePolygon, 'click', function (mapsMouseEvent) {
-                document.getElementById('outOfZone').style.setProperty("display", "none", "important");
+                if (outOfZoneEl) outOfZoneEl.style.setProperty("display", "none", "important");
                 infoWindow.close();
                 if (myMarker) {
                     myMarker.setMap(null);
@@ -309,6 +516,9 @@ document.addEventListener('keypress', function (e) {
 
 function checkZone(lat, lng) {
     checkModuleType();
+    if (!MAP_ENABLED || !(window.google && google.maps)) {
+        return;
+    }
     $.get({
         url: window.mapConfig.urls.zoneGetZone,
         data: { lat: lat, lng: lng },
@@ -316,14 +526,16 @@ function checkZone(lat, lng) {
         success: function (data) {
             if (data.id) {
                 $('#choice_zones').data('from-map', true).val(data.id).trigger('change');
-                document.getElementById('latlng').style.setProperty('display', 'flex', 'important');
-                document.getElementById('outOfZone').style.setProperty('display', 'none', 'important');
+                const latlngEl = document.getElementById('latlng');
+                if (latlngEl) latlngEl.style.setProperty('display', 'flex', 'important');
+                if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'none', 'important');
             } else {
                 $('#choice_zones').val('').trigger('change');
                 $('#latitude').val('');
                 $('#longitude').val('');
-                document.getElementById('latlng').style.setProperty('display', 'none', 'important');
-                document.getElementById('outOfZone').style.setProperty('display', 'block', 'important');
+                const latlngEl = document.getElementById('latlng');
+                if (latlngEl) latlngEl.style.setProperty('display', 'none', 'important');
+                if (outOfZoneEl) outOfZoneEl.style.setProperty('display', 'block', 'important');
                 if (infoWindow) {
                     infoWindow.close();
                 }
@@ -417,6 +629,7 @@ function checkModuleType() {
 $(document).ready(function () {
 
     initModuleSelect2();
+    initLeafletMap();
 
     $('#module_id').on('change', function () {
         const moduleId = $(this).val();

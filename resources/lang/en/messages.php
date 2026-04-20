@@ -9215,4 +9215,8 @@ Smartly or Earn. ',
   'General Setup is the foundational step, where you configure essential business details (time zone, available currency) to set up the business.' => 'General Setup is the foundational step, where you configure essential business details (time zone, available currency) to set up the business.',
   'Repeat buyers' => 'Repeat buyers',
   'Highest lifetime value' => 'Highest lifetime value',
+  'Top customer' => 'Top customer',
+  'jpeg, jpg, jfif, png, gif, webp Less Than 2MB' => 'Jpeg, jpg, jfif, png, gif, webp Less Than 2MB',
+  'Map_is_disabled_because_google_map_api_key_is_not_configured' => 'Map is disabled because google map api key is not configured',
+  'location' => 'Location',
 );

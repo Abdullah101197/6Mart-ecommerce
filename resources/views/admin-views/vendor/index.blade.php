@@ -2,6 +2,11 @@
 
 @section('title', translate('messages.add_store_name'))
 
+@push('css_or_js')
+    {{-- Leaflet (OpenStreetMap) fallback when Google key is missing --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+@endpush
+
 
 
 @section('content')
@@ -594,10 +599,15 @@
     <script src="{{ asset('assets/admin/js/view-pages/map-functionality.js') }}"></script>
 
     <script src="{{ asset('assets/admin/js/spartan-multi-image-picker.js') }}"></script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ \App\CentralLogics\Helpers::get_business_settings('map_api_key') }}&libraries=drawing,places,marker,geometry&v=3.61&language={{ str_replace('_', '-', app()->getLocale()) }}&callback=initMap"
-        async defer>
-    </script>
+    @if(empty(\App\CentralLogics\Helpers::get_business_settings('map_api_key')))
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+    @else
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{ \App\CentralLogics\Helpers::get_business_settings('map_api_key') }}&libraries=drawing,places,marker,geometry&v=3.61&language={{ str_replace('_', '-', app()->getLocale()) }}&callback=initMap"
+            async defer>
+        </script>
+    @endif
 
     <script>
         "use strict";

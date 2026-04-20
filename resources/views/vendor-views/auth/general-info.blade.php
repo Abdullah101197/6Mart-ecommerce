@@ -5,6 +5,8 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/css/view-pages/vendor-registration.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/landing/css/select2.min.css') }}"/>
 
+    {{-- Leaflet (OpenStreetMap) fallback when Google key is missing --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
     <link rel="stylesheet" href="{{ asset('assets/admin/vendor/icon-set/style.css') }}">
 
@@ -284,6 +286,8 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="rounded mb-3 map_custom-controls position-relative">
+                                        @php($mapApiKey = \App\CentralLogics\Helpers::get_business_settings('map_api_key'))
+
                                         <input id="pac-input" class="controls rounded initial-8" title="{{translate('messages.search_your_location_here')}}" type="text" placeholder="{{translate('messages.search_here')}}"/>
                                         <div class="h-280" id="map"></div>
 
@@ -790,10 +794,17 @@
     <script src="{{ asset('assets/admin/js/file-preview/store-join-us.js') }}"></script>
     <script src="{{ asset('assets/admin/js/view-pages/map-functionality.js') }}"></script>
 
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ \App\CentralLogics\Helpers::get_business_settings('map_api_key') }}&libraries=drawing,places,marker,geometry&v=3.61&language={{ str_replace('_', '-', app()->getLocale()) }}&callback=initMap"
-        async defer>
-    </script>
+    @if(empty(\App\CentralLogics\Helpers::get_business_settings('map_api_key')))
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+    @endif
+
+    @if(!empty(\App\CentralLogics\Helpers::get_business_settings('map_api_key')))
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{ \App\CentralLogics\Helpers::get_business_settings('map_api_key') }}&libraries=drawing,places,marker,geometry&v=3.61&language={{ str_replace('_', '-', app()->getLocale()) }}&callback=initMap"
+            async defer>
+        </script>
+    @endif
 
 
     @if (isset($recaptcha) && $recaptcha['status'] == 1)

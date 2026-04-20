@@ -48,6 +48,9 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 }
 
 function initMap() {
+    if (!window.mapConfig || !window.mapConfig.mapApiKey || !(window.google && google.maps)) {
+        return;
+    }
     // Create the initial InfoWindow.
     infoWindow.open(map);
     //get current location block

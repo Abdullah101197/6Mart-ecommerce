@@ -3,7 +3,11 @@
 @section('title',translate('Update Zone'))
 
 @push('css_or_js')
-
+    @php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+    @if(empty($mapApiKey))
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+    @endif
 @endpush
 
 @section('content')
@@ -141,7 +145,13 @@
 @endsection
 
 @push('script_2')
-<script src="https://maps.googleapis.com/maps/api/js?v=3.45.8&key={{\App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value}}&libraries=drawing,places,marker&v=3.61"></script>
+@php($mapApiKey = \App\Models\BusinessSetting::where('key', 'map_api_key')->first()?->value)
+@if(!empty($mapApiKey))
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.45.8&key={{$mapApiKey}}&libraries=drawing,places,marker&v=3.61"></script>
+@else
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+@endif
 <script>
     "use strict";
     auto_grow();
@@ -151,6 +161,140 @@
         element.style.height = (element.scrollHeight)+"px";
     }
 
+@if(empty($mapApiKey))
+    (function () {
+        if (!window.L) return;
+        const mapEl = document.getElementById("map-canvas");
+        if (!mapEl) return;
+
+        const centerLat = {{ trim(explode(' ',$zone->center)[1], 'POINT()') }};
+        const centerLng = {{ trim(explode(' ',$zone->center)[0], 'POINT()') }};
+        const map = L.map("map-canvas").setView([centerLat, centerLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const initialPolygon = [
+            @foreach($area['coordinates'] as $coords)
+                [{{ $coords[1] }}, {{ $coords[0] }}],
+            @endforeach
+        ];
+
+        let lastPolygon = null;
+
+        function setTextareaFromLatLngs(latlngs) {
+            const str = latlngs
+                .map(p => `(${p.lat}, ${p.lng})`)
+                .join(',');
+            $('#coordinates').val(str);
+            auto_grow();
+        }
+
+        // Current zone polygon (blue)
+        if (initialPolygon.length >= 3) {
+            lastPolygon = L.polygon(initialPolygon, { color: "#050df2", weight: 2, fillOpacity: 0 }).addTo(map);
+            map.fitBounds(lastPolygon.getBounds(), { padding: [12, 12] });
+            setTextareaFromLatLngs(lastPolygon.getLatLngs()[0]);
+        }
+
+        // Draw + edit controls
+        const drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        if (lastPolygon) {
+            drawnItems.addLayer(lastPolygon);
+        }
+
+        const drawControl = new L.Control.Draw({
+            position: 'topright',
+            draw: {
+                polygon: true,
+                polyline: false,
+                rectangle: false,
+                circle: false,
+                circlemarker: false,
+                marker: false
+            },
+            edit: {
+                featureGroup: drawnItems,
+                remove: true
+            }
+        });
+        map.addControl(drawControl);
+
+        map.on(L.Draw.Event.CREATED, function (e) {
+            drawnItems.clearLayers();
+            lastPolygon = e.layer;
+            drawnItems.addLayer(lastPolygon);
+            setTextareaFromLatLngs(lastPolygon.getLatLngs()[0]);
+        });
+
+        map.on(L.Draw.Event.EDITED, function (e) {
+            e.layers.eachLayer(function (layer) {
+                if (layer.getLatLngs) {
+                    setTextareaFromLatLngs(layer.getLatLngs()[0]);
+                }
+            });
+        });
+
+        map.on(L.Draw.Event.DELETED, function () {
+            $('#coordinates').val('');
+            auto_grow();
+        });
+
+        // Reset button behavior (existing page button)
+        $('#reset_btn').on('click', function () {
+            location.reload(true);
+        });
+
+        // Search box (Enter to search)
+        const input = document.getElementById("pac-input");
+        if (input) {
+            input.addEventListener('keydown', async function (ev) {
+                if (ev.key !== 'Enter') return;
+                ev.preventDefault();
+                const q = (input.value || '').trim();
+                if (!q) return;
+                try {
+                    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`;
+                    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    if (!res.ok) return;
+                    const results = await res.json();
+                    const first = results && results[0];
+                    if (first && first.lat && first.lon) {
+                        map.setView([parseFloat(first.lat), parseFloat(first.lon)], 13);
+                    }
+                } catch (e) {}
+            });
+        }
+
+        // Show all zones (red) for reference
+        function set_all_zones_leaflet() {
+            $.get({
+                url: '{{route('admin.zone.zoneCoordinates')}}/{{$zone->id}}',
+                dataType: 'json',
+                success: function (data) {
+                    if (!Array.isArray(data)) return;
+                    data.forEach(coords => {
+                        if (!Array.isArray(coords)) return;
+                        const latlngs = coords.map(c => [Number(c.lat), Number(c.lng)]).filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+                        if (latlngs.length < 3) return;
+                        L.polygon(latlngs, { color: "#FF0000", weight: 2, fillColor: "#FF0000", fillOpacity: 0.1 }).addTo(map);
+                    });
+                }
+            });
+        }
+
+        $(document).on('ready', function () {
+            set_all_zones_leaflet();
+            $("#zone_form").on('keydown', function(e){
+                if (e.keyCode === 13) {
+                    e.preventDefault();
+                }
+            })
+        });
+    })();
+@else
     let map; // Global declaration of the map
     let lat_longs = new Array();
     let drawingManager;
@@ -355,5 +499,6 @@
         location.reload(true);
     })
 
+@endif
 </script>
 @endpush
