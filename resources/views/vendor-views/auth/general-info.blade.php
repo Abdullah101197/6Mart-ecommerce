@@ -847,16 +847,34 @@ function submitForm() {
 
     const radios = document.querySelectorAll('input[name="business_plan"]');
     let selectedValue = null;
-    for (const radio of radios) {
-        if (radio.checked) {
-            selectedValue = radio.value;
-            break;
-        }
-    }
 
-    if (!selectedValue) {
-        toastr.error("{{ translate('messages.please_select_business_plan') }}");
-        return;
+    // If subscription flow is disabled, the business plan UI may not exist.
+    // In that case default to commission-base and allow submit.
+    if (!radios || radios.length === 0) {
+        selectedValue = 'commission-base';
+        if (document.querySelectorAll('input[name="business_plan"]').length === 0) {
+            if ($("#form-id input[name='business_plan']").length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'business_plan',
+                    value: selectedValue
+                }).appendTo('#form-id');
+            } else {
+                $("#form-id input[name='business_plan']").val(selectedValue);
+            }
+        }
+    } else {
+        for (const radio of radios) {
+            if (radio.checked) {
+                selectedValue = radio.value;
+                break;
+            }
+        }
+
+        if (!selectedValue) {
+            toastr.error("{{ translate('messages.please_select_business_plan') }}");
+            return;
+        }
     }
 
     if (selectedValue === 'subscription-base') {
