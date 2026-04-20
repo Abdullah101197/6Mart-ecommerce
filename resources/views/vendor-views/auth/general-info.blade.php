@@ -1,5 +1,9 @@
 @extends('layouts.landing.app')
-@section('title', translate('messages.vendor_registration'))
+@php($applyTitle = $applyTitle ?? translate('messages.vendor_registration'))
+@php($applyRoutePrefix = $applyRoutePrefix ?? 'restaurant')
+@php($applyHeadingLabel = $applyHeadingLabel ?? translate('messages.vendor'))
+@php($isManufutureApply = ($applyRoutePrefix === 'manufuture'))
+@section('title', $applyTitle)
 @push('css_or_js')
     <link rel="stylesheet" href="{{ asset('assets/admin/css/toastr.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/css/view-pages/vendor-registration.css') }}">
@@ -37,7 +41,7 @@
         <div class="container">
             <!-- Page Header -->
             <div class="section-header">
-                <h2 class="title mb-2">{{ translate('messages.vendor') }} <span
+                <h2 class="title mb-2">{{ $applyHeadingLabel }} <span
                         class="text--base">{{ translate('application') }}</span></h2>
             </div>
             @php($language = \App\CentralLogics\Helpers::get_business_settings('language'))
@@ -63,7 +67,7 @@
                     <div class="card __card mb-3">
                         <div class="card-header">
                             <h5 class="card-title">
-                                {{ translate('messages.vendor_info') }}
+                                {{ $isManufutureApply ? 'Manufuture info' : translate('messages.vendor_info') }}
                             </h5>
                         </div>
                         <div class="card-body p-4">
@@ -115,7 +119,7 @@
                                                                 <input type="text" name="name[]"
                                                                        value="{{ old('name.0') }}" id="default_name"
                                                                        class="form-control __form-control"
-                                                                       placeholder="{{ translate('messages.vendor_name') }}"
+                                                                       placeholder="{{ $isManufutureApply ? 'Manufuture name' : translate('messages.vendor_name') }}"
                                                                        maxlength="250" required>
                                                             </div>
                                                         </div>
@@ -153,7 +157,7 @@
                                                                        value="{{ old('name.' . $key + 1) }}"
                                                                        id="{{ $lang }}_name"
                                                                        class="form-control __form-control"
-                                                                       placeholder="{{ translate('messages.vendor_name') }}">
+                                                                       placeholder="{{ $isManufutureApply ? 'Manufuture name' : translate('messages.vendor_name') }}">
                                                             </div>
                                                         </div>
 
@@ -758,9 +762,9 @@
     @php($default_location = $default_location->value ? json_decode($default_location->value, true) : 0)
 
     <script>
-         const getAllModules ="{{ route('restaurant.get-all-modules') }}";
-         const getModuleType ="{{ route('restaurant.get-module-type') }}";
-         const checkModuleTypeUrl ="{{ route('restaurant.check-module-type') }}";
+         const getAllModules ="{{ route($applyRoutePrefix.'.get-all-modules') }}";
+         const getModuleType ="{{ route($applyRoutePrefix.'.get-module-type') }}";
+         const checkModuleTypeUrl ="{{ route($applyRoutePrefix.'.check-module-type') }}";
         const estimatedPickupText =
         "{{ translate('messages.Estimated_pickup_time') }} <span class='text-danger'>*</span>";
         const approxDeliveryText =
@@ -881,7 +885,7 @@ function submitForm() {
     });
 
     $.post({
-        url: '{{ route('restaurant.store') }}',
+        url: '{{ route($applyRoutePrefix.'.store') }}',
         data: formData,
         cache: false,
         contentType: false,
