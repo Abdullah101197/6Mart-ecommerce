@@ -912,6 +912,21 @@ function submitForm() {
                     location.href = data.redirect_url;
                 }, 1000);
             }
+        },
+        error: function (xhr) {
+            $('#loading').hide();
+            $('.btn-disable').attr('disabled', false);
+            let msg = "{{ translate('messages.Something_went_wrong') }}";
+            try {
+                if (xhr && xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    } else if (xhr.responseJSON.errors && xhr.responseJSON.errors.length) {
+                        msg = xhr.responseJSON.errors[0].message || msg;
+                    }
+                }
+            } catch (e) {}
+            toastr.error(msg, { CloseButton: true, ProgressBar: true });
         }
     });
 }
@@ -1064,6 +1079,7 @@ function submitForm() {
                     },
                     error: function () {
                         $('#loading').hide();
+                        toastr.error("{{ translate('messages.Something_went_wrong') }}", { CloseButton: true, ProgressBar: true });
                     }
                 });
             }
