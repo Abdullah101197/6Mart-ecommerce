@@ -9253,4 +9253,5 @@ Smartly or Earn. ',
   'Sales Today' => 'Sales Today',
   'Manage products using your existing vendor items system (embedded).' => 'Manage products using your existing vendor items system (embedded).',
   'Your existing vendor POS page inside Manufuture (fully functional).' => 'Your existing vendor POS page inside Manufuture (fully functional).',
+  'no_payment_gateway_found' => 'No payment gateway found',
 );

@@ -2,6 +2,7 @@
 @php($frameName = $frameName ?? null)
 @php($frameSrc = $frameSrc ?? null)
 @php($frameOffset = $frameOffset ?? 220)
+@php($frameClean = $frameClean ?? 'vendor-panel')
 
 <div class="mf-card" style="margin-top:14px;padding:0;overflow:hidden">
     <iframe
@@ -12,6 +13,7 @@
         loading="lazy"
         data-mf-frame="1"
         data-mf-offset="{{ $frameOffset }}"
+        data-mf-clean="{{ $frameClean }}"
     ></iframe>
 </div>
 
