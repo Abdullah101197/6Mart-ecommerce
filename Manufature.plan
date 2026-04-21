@@ -196,6 +196,39 @@ Vendor Manufuture portal (store-scoped)
   - Use existing vendor POS page, swap layout to MF layout.
 - Returns & RMA (returns): REUSE if return module exists; else COMING SOON.
 
+Exact code mapping (Vendor MF)
+- MF Dashboard
+  - Route: `vendor.mf.dashboard` → `GET /vendor-panel/mf`
+  - Controller: `app/Http/Controllers/Vendor/ManufutureController.php@dashboard`
+  - View: `resources/views/vendor-views/mf/dashboard.blade.php`
+  - Data reuse:
+    - Order counts: `Vendor/DashboardController@dashboard_order_stats_data()`
+    - Sales totals: `OrderTransaction` (store earnings)
+    - Items KPIs: `Item` scoped to `store_id`
+
+- MF Orders (wrapper + embed existing vendor orders)
+  - Wrapper route: `vendor.mf.orders` → `GET /vendor-panel/mf/orders?status=all|processing|delivered|canceled`
+  - Wrapper controller: `app/Http/Controllers/Vendor/ManufutureOrderController.php@index`
+  - Wrapper view: `resources/views/vendor-views/mf/orders/index.blade.php`
+  - Embedded source route (existing system):
+    - `vendor.order.list` → `GET /vendor-panel/order/list/{status}`
+    - Controller: `Vendor/OrderController@list` (middleware: `module:order`)
+  - Notes:
+    - MF page uses `partials/mf/embedded-frame.blade.php` to embed the existing vendor orders UI.
+
+- MF Products/Items (wrapper + embed existing vendor items)
+  - Wrapper route: `vendor.mf.products` → `GET /vendor-panel/mf/products`
+  - Wrapper controller: `app/Http/Controllers/Vendor/ManufutureProductController.php@index`
+  - Wrapper view: `resources/views/vendor-views/mf/products/index.blade.php`
+  - Embedded source routes (existing system):
+    - `vendor.item.list` → `GET /vendor-panel/item/list`
+    - `vendor.item.add-new` → `GET /vendor-panel/item/add-new`
+    - `vendor.item.bulk-import` → `GET /vendor-panel/item/bulk-import`
+    - `vendor.item.bulk-export-index` → `GET /vendor-panel/item/bulk-export`
+    - Controller: `Vendor/ItemController@...` (middleware: `module:item` + `subscription:item`)
+  - Notes:
+    - MF page embeds the existing vendor items UI in an iframe so functionality remains identical.
+
 Admin Manufuture portal (global)
 - Dashboard: WRAP
   - Use existing admin analytics queries but show MF UI.
