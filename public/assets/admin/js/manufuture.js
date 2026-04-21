@@ -18,11 +18,12 @@
     style.id = 'mf-embed-clean-style';
     style.textContent = `
       /* Hide embedded vendor chrome */
-      header, .navbar, .topbar, .header, #header,
-      aside, .sidebar, #sidebar,
+      /* IMPORTANT: avoid generic 'header/aside/footer' selectors (they can be used inside page content) */
+      #headerMain, #header, #headerFluid, #headerDouble,
+      #sidebarMain,
       .navbar-vertical-aside, .js-navbar-vertical-aside,
       .navbar-vertical-container, .navbar-vertical-content,
-      .footer, footer {
+      .footer {
         display: none !important;
       }
       /* Remove vendor layout paddings/margins */
