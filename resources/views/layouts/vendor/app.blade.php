@@ -269,6 +269,99 @@
     <script src="{{asset('assets/admin/js/view-pages/common.js')}}"></script>
     <script src="{{asset('assets/admin/js/keyword-highlighted.js')}}"></script>
 
+@if(request()->boolean('mf_embed'))
+<script>
+    (function () {
+        "use strict";
+
+        const EMBED_PARAM = 'mf_embed';
+        const EMBED_VALUE = '1';
+
+        function isSkippableHref(href) {
+            if (!href) return true;
+            const h = String(href).trim().toLowerCase();
+            return h.startsWith('javascript:') || h.startsWith('mailto:') || h.startsWith('tel:') || h.startsWith('#');
+        }
+
+        function withEmbedParam(urlString) {
+            try {
+                const url = new URL(urlString, window.location.href);
+                // Only rewrite same-origin links/actions
+                if (url.origin !== window.location.origin) return null;
+                url.searchParams.set(EMBED_PARAM, EMBED_VALUE);
+                return url.toString();
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function rewriteAnchors(root) {
+            const anchors = (root || document).querySelectorAll ? (root || document).querySelectorAll('a[href]') : [];
+            anchors.forEach((a) => {
+                const href = a.getAttribute('href');
+                if (isSkippableHref(href)) return;
+                const next = withEmbedParam(href);
+                if (next) a.setAttribute('href', next);
+            });
+        }
+
+        function ensureFormHiddenInput(form) {
+            if (!form || !form.querySelector) return;
+            let input = form.querySelector(`input[name="${EMBED_PARAM}"]`);
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = EMBED_PARAM;
+                input.value = EMBED_VALUE;
+                form.appendChild(input);
+            } else {
+                input.value = EMBED_VALUE;
+            }
+        }
+
+        function rewriteForms(root) {
+            const forms = (root || document).querySelectorAll ? (root || document).querySelectorAll('form') : [];
+            forms.forEach((form) => {
+                ensureFormHiddenInput(form);
+
+                const method = (form.getAttribute('method') || 'get').toLowerCase();
+                const action = form.getAttribute('action');
+                if (method === 'get' && action) {
+                    const next = withEmbedParam(action);
+                    if (next) form.setAttribute('action', next);
+                }
+            });
+        }
+
+        function rewriteAll(root) {
+            rewriteAnchors(root);
+            rewriteForms(root);
+        }
+
+        // Initial rewrite
+        rewriteAll(document);
+
+        // Keep rewriting for dynamic DOM updates (datatables, ajax, etc.)
+        const obs = new MutationObserver((mutations) => {
+            mutations.forEach((m) => {
+                m.addedNodes && m.addedNodes.forEach((node) => {
+                    if (node && node.nodeType === 1) {
+                        rewriteAll(node);
+                    }
+                });
+            });
+        });
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+
+        // Safety net: on submit, always ensure the hidden input exists
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            ensureFormHiddenInput(form);
+        }, true);
+    })();
+</script>
+@endif
+
 <script>
     var audio = document.getElementById("myAudio");
 
