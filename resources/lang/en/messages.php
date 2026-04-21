@@ -9250,4 +9250,7 @@ Smartly or Earn. ',
   'Out of Stock' => 'Out of Stock',
   'Total Items' => 'Total Items',
   'Sales This Month' => 'Sales This Month',
+  'Sales Today' => 'Sales Today',
+  'Manage products using your existing vendor items system (embedded).' => 'Manage products using your existing vendor items system (embedded).',
+  'Your existing vendor POS page inside Manufuture (fully functional).' => 'Your existing vendor POS page inside Manufuture (fully functional).',
 );
