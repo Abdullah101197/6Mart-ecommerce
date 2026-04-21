@@ -64,17 +64,21 @@
 {{--loader--}}
 
 <!-- Builder -->
-@include('layouts.vendor.partials._front-settings')
+@if(!request()->boolean('mf_embed'))
+    @include('layouts.vendor.partials._front-settings')
+@endif
 <!-- End Builder -->
 
 <!-- JS Preview mode only -->
-@include('layouts.vendor.partials._header')
+@if(!request()->boolean('mf_embed'))
+    @include('layouts.vendor.partials._header')
 
     @if( isset($moduleType) && $moduleType == 'rental')
         @include("rental::provider.partials._sidebar_{$moduleType}")
     @else
         @include('layouts.vendor.partials._sidebar')
     @endif
+@endif
 <!-- END ONLY DEV -->
 
 <main id="content" role="main" class="main pointer-event">
@@ -84,7 +88,9 @@
 <!-- End Content -->
 
     <!-- Footer -->
-@include('layouts.vendor.partials._footer')
+@if(!request()->boolean('mf_embed'))
+    @include('layouts.vendor.partials._footer')
+@endif
 <!-- End Footer -->
 
     <div class="d-none" id="text-validate-translate"

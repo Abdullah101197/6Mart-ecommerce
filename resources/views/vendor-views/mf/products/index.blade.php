@@ -17,10 +17,10 @@
         </div>
         <div class="mf-card-body">
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                <a class="btn btn--primary" href="{{ route('vendor.item.list') }}" target="mf-vendor-products-frame">{{ translate('Open list') }}</a>
-                <a class="btn btn--primary" href="{{ route('vendor.item.add-new') }}" target="mf-vendor-products-frame">{{ translate('Add new') }}</a>
-                <a class="btn btn--primary" href="{{ route('vendor.item.bulk-import') }}" target="mf-vendor-products-frame">{{ translate('Bulk import') }}</a>
-                <a class="btn btn--primary" href="{{ route('vendor.item.bulk-export-index') }}" target="mf-vendor-products-frame">{{ translate('Bulk export') }}</a>
+                <a class="btn btn--primary" href="{{ route('vendor.item.list', ['mf_embed' => 1]) }}" target="mf-vendor-products-frame">{{ translate('Open list') }}</a>
+                <a class="btn btn--primary" href="{{ route('vendor.item.add-new', ['mf_embed' => 1]) }}" target="mf-vendor-products-frame">{{ translate('Add new') }}</a>
+                <a class="btn btn--primary" href="{{ route('vendor.item.bulk-import', ['mf_embed' => 1]) }}" target="mf-vendor-products-frame">{{ translate('Bulk import') }}</a>
+                <a class="btn btn--primary" href="{{ route('vendor.item.bulk-export-index', ['mf_embed' => 1]) }}" target="mf-vendor-products-frame">{{ translate('Bulk export') }}</a>
             </div>
         </div>
     </div>

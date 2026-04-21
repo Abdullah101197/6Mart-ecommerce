@@ -12,7 +12,7 @@ class ManufutureOrderController extends Controller
         $status = $request->get('status', 'all');
 
         // Legacy vendor orders list expects {status} param.
-        $src = route('vendor.order.list', [$status]);
+        $src = route('vendor.order.list', ['status' => $status, 'mf_embed' => 1]);
 
         return view('vendor-views.mf.orders.index', compact('status', 'src'));
     }

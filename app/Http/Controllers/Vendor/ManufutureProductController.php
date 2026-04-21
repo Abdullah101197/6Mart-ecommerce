@@ -9,7 +9,7 @@ class ManufutureProductController extends Controller
 {
     public function index(Request $request)
     {
-        $src = route('vendor.item.list');
+        $src = route('vendor.item.list', ['mf_embed' => 1]);
 
         return view('vendor-views.mf.products.index', compact('src'));
     }
