@@ -35,7 +35,7 @@
         }
     </script>
 </head>
-<body class="mf-body footer-offset">
+<body class="mf-body footer-offset @if(request()->boolean('mf_embed')) mf-embed @endif">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -48,6 +48,7 @@
         </div>
     </div>
     <div class="mf-app">
+        @if(!request()->boolean('mf_embed'))
         <aside class="mf-sidebar" id="mf-sidebar">
             <div class="mf-logo">
                 <div class="mf-logo-icon">🏪</div>
@@ -76,8 +77,10 @@
                 </div>
             </div>
         </aside>
+        @endif
 
         <main class="mf-main">
+            @if(!request()->boolean('mf_embed'))
             <header class="mf-topbar">
                 <div class="mf-topbar-left">
                     <button class="mf-icon-btn" type="button" id="mf-sidebar-toggle">☰</button>
@@ -92,6 +95,7 @@
                     </div>
                 </div>
             </header>
+            @endif
 
             <section class="mf-content">
                 @yield('content')
@@ -99,7 +103,9 @@
         </main>
     </div>
 
-    <script src="{{ asset('assets/admin/js/manufuture.js') }}"></script>
+    @if(!request()->boolean('mf_embed'))
+        <script src="{{ asset('assets/admin/js/manufuture.js') }}"></script>
+    @endif
     @stack('script')
     @stack('script_2')
 </body>
