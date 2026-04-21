@@ -652,14 +652,14 @@
                                 <button
                                     type="submit"
                                     id="show-business-plan-div"
-                                    class="cmn--btn rounded-md border-0 outline-0 btn-disable">{{ \App\CentralLogics\Helpers::subscription_check() == 1 ? translate('Next') : translate('messages.submit') }}</button>
+                                    class="cmn--btn rounded-md border-0 outline-0 btn-disable">{{ (\App\CentralLogics\Helpers::subscription_check() == 1 || $isManufutureApply) ? translate('Next') : translate('messages.submit') }}</button>
                             </div>
                         </div>
                     </div>
 
                 </div>
 
-                @if (\App\CentralLogics\Helpers::subscription_check())
+                @if (\App\CentralLogics\Helpers::subscription_check() || $isManufutureApply)
                     <div class="d-none" id="business-plan-div">
                         <div class="card __card mb-3">
                             <div class="card-header border-0">
@@ -696,45 +696,47 @@
                                             </label>
                                         </div>
                                     @endif
-                                    <div class="col-sm-6">
-                                        <label class="plan-check-item">
-                                            <input type="radio" name="business_plan" value="subscription-base"
-                                                   class="d-none">
-                                            <div class="plan-check-item-inner">
-                                                <div
-                                                    class="d-flex gap-3 justify-content-between align-items-center mb-10">
-                                                    <h5 class="mb-0">{{ translate('Subscription_Base') }}</h5>
-                                                    <span class="checkmark">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                             height="16" fill="currentColor" class="bi bi-check2"
-                                                             viewBox="0 0 16 16">
-                                                            <path
-                                                                d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
-                                                        </svg>
-                                                    </span>
+                                    @if (\App\CentralLogics\Helpers::subscription_check())
+                                        <div class="col-sm-6">
+                                            <label class="plan-check-item">
+                                                <input type="radio" name="business_plan" value="subscription-base"
+                                                       class="d-none">
+                                                <div class="plan-check-item-inner">
+                                                    <div
+                                                        class="d-flex gap-3 justify-content-between align-items-center mb-10">
+                                                        <h5 class="mb-0">{{ translate('Subscription_Base') }}</h5>
+                                                        <span class="checkmark">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                                 height="16" fill="currentColor" class="bi bi-check2"
+                                                                 viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
+                                                            </svg>
+                                                        </span>
+                                                    </div>
+                                                    <p>
+                                                        {{ translate('Run vendor by puchasing subsciption packages. You will have access the features of in vendor panel , app and interaction with user according to the subscription packages.') }}
+                                                    </p>
                                                 </div>
-                                                <p>
-                                                    {{ translate('Run vendor by puchasing subsciption packages. You will have access the features of in vendor panel , app and interaction with user according to the subscription packages.') }}
-                                                </p>
-                                            </div>
-                                        </label>
-                                    </div>
+                                            </label>
+                                        </div>
+                                    @endif
                                 </div>
-                                <div id="subscription-plan">
-                                    <br>
-                                    <div class="card-header px-0 m-0 border-0">
-                                        <h5 class="card-title text-center">
-                                            {{ translate('Choose Subscription Package') }}
-                                        </h5>
+                                @if (\App\CentralLogics\Helpers::subscription_check())
+                                    <div id="subscription-plan">
+                                        <br>
+                                        <div class="card-header px-0 m-0 border-0">
+                                            <h5 class="card-title text-center">
+                                                {{ translate('Choose Subscription Package') }}
+                                            </h5>
+                                        </div>
+                                        <div id='show_sub_packages'>
+                                            @include('vendor-views.auth._package_data', [
+                                                'packages' => $packages,
+                                            ])
+                                        </div>
                                     </div>
-                                    <div id='show_sub_packages'>
-                                        @include('vendor-views.auth._package_data', [
-                                            'packages' => $packages,
-                                        ])
-                                    </div>
-
-
-                                </div>
+                                @endif
                             </div>
                             <div class="text-end pt-5 d-flex flex-wrap p-4 justify-content-end gap-3">
                                 <button type="button" id="back-to-form"
@@ -821,10 +823,11 @@ $("#form-id").on('submit', function(e) {
     e.preventDefault();
 
     const HAS_SUBSCRIPTION_FLOW = {{ \App\CentralLogics\Helpers::subscription_check() ? 'true' : 'false' }};
+    const HAS_BUSINESS_PLAN_STEP = {{ (\App\CentralLogics\Helpers::subscription_check() || $isManufutureApply) ? 'true' : 'false' }};
     const APPLY_ENTITY_LABEL = @json($applyHeadingLabel);
 
     // Step-1 submit should first open Business Plan step (when enabled)
-    if (HAS_SUBSCRIPTION_FLOW && $('#reg-form-div').is(':visible') && $('#business-plan-div').hasClass('d-none')) {
+    if (HAS_BUSINESS_PLAN_STEP && $('#reg-form-div').is(':visible') && $('#business-plan-div').length && $('#business-plan-div').hasClass('d-none')) {
         const logo = $('input[name="logo"]')[0];
         const cover = $('input[name="cover_photo"]')[0];
         const tin_certificate_image = $('input[name="tin_certificate_image"]')[0];
