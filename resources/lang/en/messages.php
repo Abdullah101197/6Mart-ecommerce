@@ -9246,4 +9246,8 @@ Smartly or Earn. ',
   'Coming soon in Manufuture vendor portal.' => 'Coming soon in Manufuture vendor portal.',
   'Most Rated Items' => 'Most Rated Items',
   'Your existing vendor orders page inside Manufuture (fully functional).' => 'Your existing vendor orders page inside Manufuture (fully functional).',
+  'Top Selling Items' => 'Top Selling Items',
+  'Out of Stock' => 'Out of Stock',
+  'Total Items' => 'Total Items',
+  'Sales This Month' => 'Sales This Month',
 );
