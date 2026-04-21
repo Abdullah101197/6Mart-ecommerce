@@ -1,0 +1,351 @@
+MANUFUTURE DASHBOARD IMPLEMENTATION PLAN (from manufuture-rms-v12.html)
+Last updated: 2026-04-21
+
+Source prototype
+- File: `manufuture-rms-v12.html`
+- Nature: standalone HTML + CSS + JS with dummy datasets + Chart.js.
+- What to extract: menu structure (modules), page layouts, widgets, tables, modals, and user actions.
+
+Current Laravel integration status (already in repo)
+- Vendor portal routes (protected by `manufuture.portal` middleware):
+  - `/vendor-panel/mf` dashboard
+  - `/vendor-panel/mf/orders`
+  - `/vendor-panel/mf/products`
+  - `/vendor-panel/mf/pos` (coming-soon)
+- Admin portal routes:
+  - `/admin/mf` dashboard
+  - `/admin/mf/orders`, `/admin/mf/products`, `/admin/mf/pos`, `/admin/mf/returns`, `/admin/mf/helpcenter`, `/admin/mf/omnichannel`, `/admin/mf/aipulse`
+- Layouts + views:
+  - `resources/views/layouts/vendor/manufuture.blade.php`
+  - `resources/views/vendor-views/mf/*`
+  - `resources/views/layouts/admin/manufuture.blade.php`
+  - `resources/views/admin-views/mf/*`
+- Portal separation:
+  - `stores.portal` = `vendor` | `manufuture`
+  - Manufuture login redirects to mf dashboard.
+
+============================================================
+ALIGNMENT RULES (KEEP WITH EXISTING 6MART SYSTEM)
+============================================================
+Non-negotiables
+- Reuse existing 6Mart data + flows wherever possible:
+  - Orders: existing orders + order details/updates/filters
+  - Products/Items: existing item/product management (store-scoped)
+  - POS: existing POS screens and endpoints
+  - Returns: existing return/refund/return request flows (if present)
+  - Store/Vendor auth: existing vendor guard + store scoping
+- Avoid new DB tables unless absolutely required for MVP.
+- For each prototype menu item we decide one of:
+  - REUSE: map to an existing 6Mart module/route/controller/view
+  - WRAP: create a thin MF wrapper page that calls existing queries/endpoints but uses MF layout
+  - COMING SOON: show the page but keep it static until a real backend exists
+
+What “MF Dashboard” means in our project
+- It is NOT a separate application.
+- It is a different portal UI for the SAME store/vendor data, chosen by `stores.portal='manufuture'`.
+
+============================================================
+BUSINESS LOGIC (YOUR MODEL) — ADMIN MANAGES BOTH SIDES
+============================================================
+Actors
+- Super Admin / Admin (Platform operator):
+  - Controls onboarding, permissions, packages, and operational rules.
+  - Has visibility across ALL Manufuture suppliers and Vendor shops.
+- Manufuture (Supplier / Producer):
+  - Produces products and sells to Vendor shops (B2B).
+  - Needs supplier dashboard: incoming purchase orders, inventory, dispatch, invoices.
+- Vendor Store / Shop (Retailer):
+  - Sells to end customers (B2C) using existing 6Mart marketplace + delivery flows.
+  - Needs retail dashboard: customer orders, item management, POS, marketing.
+
+How they interact (high-level)
+1) Supplier publishes/maintains a catalog (supplier-side).
+2) Vendor shops can “source” items from suppliers (vendor-side).
+3) Vendor sells items to customers (existing 6Mart order flow).
+4) Admin monitors everything and can resolve disputes, enforce rules, and manage payments/settlements.
+
+Important: current technical implementation reality (today)
+- We currently separate portals using `stores.portal`:
+  - `vendor` = retailer shop portal
+  - `manufuture` = supplier portal UI
+- BUT both currently still operate on the same underlying store model and standard 6Mart tables.
+- True supplier→vendor B2B purchasing requires additional domain models (see “Future (new tables)” below).
+
+Operational responsibility (admin/super admin)
+- Onboarding:
+  - Approve Manufuture supplier stores
+  - Approve/deny Vendor stores
+  - Convert store portal type vendor ↔ manufuture
+- Catalog governance:
+  - Control which supplier products can be listed by vendors
+  - Control pricing rules / commissions / subscriptions
+- Order governance:
+  - Monitor supplier POs + vendor customer orders
+  - Handle returns/disputes/escalations
+- Finance governance:
+  - Track settlements/payouts (existing wallet/payout where possible)
+  - Future: supplier invoices + vendor payables (needs new models)
+
+MVP interpretation (aligned with existing 6Mart)
+- Phase 1 MVP will focus on:
+  - Manufuture portal UI + analytics for the supplier’s own store data (KPIs, products, orders)
+  - Admin control panels to manage portal types and package visibility
+- Supplier→Vendor “B2B purchase orders” will be planned but marked Coming Soon until approved.
+
+Decision (confirmed)
+- We start with MVP using existing 6Mart data for Manufuture dashboards.
+- No new tables for supplier→vendor purchasing in this phase.
+
+============================================================
+1) UI MODULES (SIDEBAR) FROM PROTOTYPE
+============================================================
+Prototype uses `data-page="..."` and `.page` sections.
+
+Overview
+- dashboard (🏠 Dashboard)
+- aipulse (🤖 AI Pulse) [AI]
+
+Commerce
+- orders (📦 Orders)
+- omnichannel (🌐 Omnichannel) [NEW]
+- pos (🖥️ POS Management) [NEW]
+- returns (↩️ Returns & RMA)
+
+Products
+- products (📊 Products Dashboard)
+- allproducts (📦 All Products)
+- inhouse (🏭 In-House Products)
+- sellerproducts (🏪 Seller Products)
+- digitalproducts (💿 Digital Products) [NEW]
+- categories (🗂️ Categories)
+- brands (🏷️ Brands)
+- attributes (🎨 Attributes & Colors)
+- bulkimport (📥 Bulk Import / Export)
+
+Sellers / Vendors
+- vendors (🏬 Vendor Dashboard)
+- allsellers (✅ All Sellers)
+- pendingsellers (⏳ Pending Sellers) [HOT]
+- vendorpromo (📣 Vendor Promotions) [AI]
+- sponsoredads (🎯 Sponsored Ads)
+- vendorpayouts (💸 Vendor Payouts)
+
+Supply Chain
+- supplychain (🏭 Supply Chain Flow) [NEW]
+
+Inventory
+- inventory (🏭 Stock Management) [NEW]
+- replenishment (🔄 Smart Replenishment) [AI]
+- catalog (🗂️ Merchandise & Catalog)
+
+CRM & Loyalty
+- clienteling (🤝 Clienteling) [NEW]
+- loyalty (⭐ Loyalty Program) [NEW]
+- buyers (👥 Buyer Segments)
+- crmresearch (📖 CRM Research) [NEW]
+
+Store Operations
+- tasks (✅ Task Manager) [NEW]
+- compliance (📋 Compliance & Audit) [NEW]
+- workforce (👷 Workforce) [NEW]
+- pickups (🚚 Pickups & Dispatch)
+
+Grocery Module (optional)
+- grocerydash, grocerypos, selfcheckout, produce, expirytracker, whatsapporders,
+  shelflabels, shrinkage, ageverify, grocerysuppliers, dailysales, grocerypromos
+
+Wholesale & B2B (optional)
+- b2bdash, b2borders, pickpackship, backorders, b2baccounts, b2bpricing, b2bsite
+
+Vendor Integration (optional)
+- vendorimport, vendorinvsync, vendororders, vendorconnect
+
+Retail Integration (optional)
+- retailexport, retailorders, retailecomm, dropship
+
+B2B Accounts Receivable (optional)
+- b2binvoices, onlinepayments, recurringpay, b2bledger
+
+Marketing (optional)
+- marketing, analytics, seo
+
+Finance (optional)
+- creditline, payments, invoices
+
+Support
+- tickets, helpcenter
+
+Future of Retail Execution (optional)
+- repsly-* pages, retail-* execution pages, market-research, fieldcheck-*
+
+
+============================================================
+2) PROTOTYPE DATASETS + WHAT THEY MEAN
+============================================================
+============================================================
+1.1) MODULE → EXISTING 6MART MAPPING (REUSE / WRAP / COMING SOON)
+============================================================
+Vendor Manufuture portal (store-scoped)
+- Dashboard (dashboard): WRAP
+  - Render MF UI but compute KPIs from existing orders/items data.
+- Orders (orders): REUSE/WRAP
+  - Use existing vendor order listing + details logic; MF page can be a themed wrapper.
+- Products (products/allproducts/inhouse/sellerproducts): REUSE/WRAP
+  - Use existing vendor products/items listing and filters, but in MF layout.
+- POS (pos): REUSE (theme only)
+  - Use existing vendor POS page, swap layout to MF layout.
+- Returns & RMA (returns): REUSE if return module exists; else COMING SOON.
+
+Admin Manufuture portal (global)
+- Dashboard: WRAP
+  - Use existing admin analytics queries but show MF UI.
+- Orders/Products/Returns/Helpcenter: REUSE/WRAP (admin scope).
+
+Prototype modules that are NOT in core 6Mart (initially)
+- Omnichannel: COMING SOON (unless order source/channel is stored in DB)
+- AI Pulse: COMING SOON → MVP later using heuristics from existing data
+- Supply Chain / B2B / AR / Credit line: COMING SOON (needs new domain models)
+- CRM/Loyalty/Clienteling: COMING SOON (needs segmentation + points rules)
+- Workforce/Tasks/Compliance: COMING SOON (needs task/audit tables)
+- Vendor promotions/sponsored ads: COMING SOON (depends on marketing modules in your build)
+
+Note on prototype “Sellers/Vendors” section
+- In prototype it looks like a marketplace operator portal.
+- In our MF vendor portal, those pages are usually not relevant for a single supplier store.
+- Keep them admin-only or coming soon.
+
+Dummy JS arrays in prototype:
+- orders[]: B2B-style orders (id, buyer, city, channel, qty, amount, payment, status, eta)
+- inventory[]: stock rows (sku, cat, stock, reserved, reorder, status)
+- replenishment[]: demand forecast suggestions (suggested qty, confidence, urgency, cost)
+- campaigns[], segments[]: marketing + buyer segment analytics
+- clients[], loyaltyMembers[]: CRM + loyalty tiers
+- listings[], keywords[]: SEO/listing health
+- tickets[]: support tickets + SLA
+- tasks[], complianceList[], workforce[]: ops workflows
+- pulseInsights{}: AI Pulse insights buckets (inventory, revenue, crm, marketing, ops, risk)
+- helpCategories[]: help center categories + article titles
+
+These datasets define the minimum DB/API endpoints we must implement per module.
+
+Existing 6Mart data we can reuse immediately (no new tables)
+- Orders + order items: derive the prototype orders table + status badges + amount totals.
+- Items/products: derive inventory-style list using existing item stock/availability fields.
+- POS: reuse existing POS flows; only adjust layout/theme for MF.
+- Returns/RMA: reuse if returns/refunds exist; otherwise keep "Coming Soon".
+
+Anything that needs new domain models stays "Coming Soon" for now
+- Credit line, AR aging/ledger, B2B pricing tiers, loyalty tiers/points, tasks/compliance/workforce, help center KB.
+
+
+============================================================
+3) IMPLEMENTATION STRATEGY (REALISTIC, PHASED)
+============================================================
+Principle
+- Keep the UI/UX inspired by prototype, but implement with Laravel + DB.
+- Do NOT port the entire prototype at once.
+- Start with core pages that map directly to existing 6Mart data: Orders, Products/Items, Stock, basic KPIs.
+- Keep the rest as "Coming Soon" until backends exist.
+
+Phase 1 — Vendor MF dashboard (REAL KPIs)
+- Page: `/vendor-panel/mf` (`vendor-views/mf/dashboard.blade.php`)
+- Replace placeholder KPIs with DB-backed metrics scoped to logged-in store:
+  - Orders today/week/month by status
+  - Total sales (paid_amount) today/month
+  - Products/items count (active, out-of-stock)
+  - Returns count (if returns table exists; else 0 + coming soon)
+- Charts:
+  - Start with 1 chart only (revenue trend) using existing orders table.
+  - Add more charts later.
+
+Phase 2 — Orders (REAL list + filters)
+- Page: `/vendor-panel/mf/orders`
+- Implement:
+  - status filter pills
+  - date range filter
+  - search by order id / customer / phone
+  - order details link (reuse existing vendor order details route or create MF-specific wrapper)
+
+Phase 3 — Products/Inventory (REAL list)
+- Page: `/vendor-panel/mf/products`
+- Implement:
+  - items list scoped to store
+  - stock indicator (good/low/out)
+  - quick stock update action (if supported; else read-only)
+
+Phase 4 — AI Pulse (SAFE MVP)
+- Page: `/vendor-panel/mf/aipulse` (or keep coming-soon route until ready)
+- MVP:
+  - show "insights" cards generated from simple heuristics (low stock, top buyers, delayed orders)
+  - no OpenAI dependency initially
+
+Phase 5 — Optional modules (coming-soon → real)
+- Omnichannel: show channel breakdown if you track channel field; else coming soon
+- POS: reuse existing POS pages but themed in MF layout
+- Returns/RMA: wire to existing order return features if present
+- Help center: static FAQ pages first; then DB-backed KB later
+
+Phase 0 (MVP guardrail)
+- If a prototype feature requires NEW tables/modules, it remains "Coming Soon" until approved.
+- The MVP must stay aligned with existing 6Mart modules (orders/items/pos/returns).
+
+============================================================
+FUTURE (WHEN YOU APPROVE NEW TABLES) — TRUE SUPPLIER → VENDOR B2B
+============================================================
+To fully support “Manufuture sells to Vendor shops”, we typically need:
+- Supplier Catalog + Vendor Sourcing
+  - Link supplier products to vendor products (import/copy/price rules)
+  - Supplier-specific wholesale pricing / tiers (optional)
+- B2B Purchase Orders (Vendor → Supplier)
+  - Separate from customer orders
+  - PO statuses: requested → accepted → packed → shipped → received
+- Supplier Dispatch & Invoicing
+  - Invoice generation + delivery terms
+- Settlements / Payables
+  - Vendor owes supplier; supplier payout schedule
+
+Admin must manage:
+- Approval + limits (which vendor can buy from which supplier)
+- Compliance rules (returns windows, quality disputes)
+- Payment rules (credit terms, Net-30, partial payments) if you want them
+
+
+============================================================
+4) ROUTING + PERMISSIONS (RBAC)
+============================================================
+Vendor MF protection (already)
+- middleware: `manufuture.portal` on `/vendor-panel/mf/*`
+
+RBAC (recommended next)
+- Use existing vendor employee roles to gate MF menu items:
+  - mf.dashboard
+  - mf.orders
+  - mf.products
+  - mf.pos
+  - mf.returns
+  - mf.helpcenter
+  - mf.aipulse
+
+
+============================================================
+5) ADMIN CONTROLS (REQUIRED)
+============================================================
+Already implemented
+- Store portal filter + bulk set portal (Vendor/Manufuture)
+- Subscription packages: `is_manufuture` flag + inline toggle on package list
+
+Next admin enhancements (optional)
+- Admin MF dashboard KPIs across all manufuture stores
+- Admin store details page: portal badge + quick switch
+
+
+============================================================
+6) DEFINITION OF DONE (MVP)
+============================================================
+MVP is complete when:
+- Vendor Manufuture users see MF layout + MF dashboard with real KPIs
+- Orders list works with filters and correct store scoping
+- Products list shows real items and stock status
+- Normal vendors cannot access MF routes
+- Admin can control portal + which packages appear in Manufuture apply
+
