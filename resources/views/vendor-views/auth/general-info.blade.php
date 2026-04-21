@@ -50,7 +50,7 @@
             <!-- Stepper -->
             <div class="stepper">
                 <div id="show-step1" class="stepper-item active">
-                    <div class="step-name">{{ translate('General Info') }}</div>
+                    <div class="step-name">{{ $isManufutureApply ? translate('Supplier Info') : translate('General Info') }}</div>
                 </div>
                 <div class="stepper-item" id="show-step2">
                     <div class="step-name">{{ translate('Business Plan') }}</div>
@@ -436,71 +436,72 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-20 mb-3">
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <h4 class="fs-5 mb-2">{{ translate('Business TIN') }}</h4>
-                                        {{-- <p class="fz-12px mb-0">{{translate('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')}}</p> --}}
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-8 col-xxl-8">
-                                            <div class="card __card bg-F8F9FC rounded p-20 h-100">
-                                                <div class="card-body">
-                                                    <div class="form-group mb-3">
-                                                        <label class="input-label mb-2 d-block title-clr fw-normal"
-                                                               for="exampleFormControlInput1">{{ translate('Taxpayer Identification Number(TIN)') }}
-                                                        </label>
-                                                        <input type="text" name="tin"
-                                                               placeholder="{{ translate('Type Your Taxpayer Identification Number(TIN)') }}"
-                                                               class=" form-control __form-control">
-                                                    </div>
-                                                    <div class="form-group mb-0">
-                                                        <label class="input-label mb-2 d-block title-clr fw-normal"
-                                                               for="exampleFormControlInput1">{{ translate('Expire Date') }}
-                                                        </label>
-                                                        <input type="date" name="tin_expire_date"
-                                                               class="form-control __form-control">
+                            @if(!$isManufutureApply)
+                                <div class="p-20 mb-3">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <h4 class="fs-5 mb-2">{{ translate('Business TIN') }}</h4>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-8 col-xxl-8">
+                                                <div class="card __card bg-F8F9FC rounded p-20 h-100">
+                                                    <div class="card-body">
+                                                        <div class="form-group mb-3">
+                                                            <label class="input-label mb-2 d-block title-clr fw-normal"
+                                                                   for="exampleFormControlInput1">{{ translate('Taxpayer Identification Number(TIN)') }}
+                                                            </label>
+                                                            <input type="text" name="tin"
+                                                                   placeholder="{{ translate('Type Your Taxpayer Identification Number(TIN)') }}"
+                                                                   class=" form-control __form-control">
+                                                        </div>
+                                                        <div class="form-group mb-0">
+                                                            <label class="input-label mb-2 d-block title-clr fw-normal"
+                                                                   for="exampleFormControlInput1">{{ translate('Expire Date') }}
+                                                            </label>
+                                                            <input type="date" name="tin_expire_date"
+                                                                   class="form-control __form-control">
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4 col-xxl-4">
-                                            <div class="bg--secondary rounded p-20 h-100 single-document-uploaderwrap">
-                                                <div
-                                                    class="d-flex align-items-center gap-1 justify-content-between mb-20 mb-4">
+                                            <div class="col-md-4 col-xxl-4">
+                                                <div class="bg--secondary rounded p-20 h-100 single-document-uploaderwrap">
+                                                    <div
+                                                        class="d-flex align-items-center gap-1 justify-content-between mb-20 mb-4">
+                                                        <div>
+                                                            <h4 class="mb-2 fs-5">{{ translate('TIN Certificate') }}</h4>
+                                                            <p class="fs-6 mb-0">
+                                                                {{ translate('pdf, doc, jpg. File size : max 2 MB') }}</p>
+                                                        </div>
+                                                        <div class="d-flex gap-3 align-items-center">
+                                                            <button type="button" id="doc_edit_btn"
+                                                                data-default-image="{{ asset('assets/admin/img/doc-uploaded.png') }}"
+                                                                    class="w-30px h-30 min-w-30px rounded d-flex align-items-center justify-content-center action-btn btn cmn--btn px-3 icon-btn">
+                                                                <i class="tio-edit"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                     <div>
-                                                        <h4 class="mb-2 fs-5">{{ translate('TIN Certificate') }}</h4>
-                                                        <p class="fs-6 mb-0">
-                                                            {{ translate('pdf, doc, jpg. File size : max 2 MB') }}</p>
-                                                    </div>
-                                                    <div class="d-flex gap-3 align-items-center">
-                                                        <button type="button" id="doc_edit_btn"
-                                                            data-default-image="{{ asset('assets/admin/img/doc-uploaded.png') }}"
-                                                                class="w-30px h-30 min-w-30px rounded d-flex align-items-center justify-content-center action-btn btn cmn--btn px-3 icon-btn">
-                                                            <i class="tio-edit"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div id="file-assets"
-                                                         data-picture-icon="{{ asset('assets/admin/img/picture.svg') }}"
-                                                         data-document-icon="{{ asset('assets/admin/img/document.svg') }}"
-                                                         data-blank-thumbnail="{{ asset('assets/admin/img/picture.svg') }}">
-                                                    </div>
-                                                    <!-- Upload box -->
-                                                    <div class="d-flex justify-content-center" id="pdf-container">
-                                                        <div class="document-upload-wrapper" id="doc-upload-wrapper">
-                                                            <input type="file" name="tin_certificate_image"
-                                                                   class="document_input"
-                                                                   accept=".doc, .pdf, .jpg, .png, .jpeg">
-                                                            <div class="textbox">
-                                                                <img width="40" height="40" class="svg"
-                                                                     src="{{ asset('assets/admin/img/doc-uploaded.png') }}"
-                                                                     alt="">
-                                                                <p class="fs-12 mb-0">
-                                                                    {{ translate('messages.Select_a_file_or') }} <span
-                                                                        class="font-semibold">{{ translate('messages.Drag & Drop') }}</span>
-                                                                    {{ translate('messages.here') }}</p>
+                                                        <div id="file-assets"
+                                                             data-picture-icon="{{ asset('assets/admin/img/picture.svg') }}"
+                                                             data-document-icon="{{ asset('assets/admin/img/document.svg') }}"
+                                                             data-blank-thumbnail="{{ asset('assets/admin/img/picture.svg') }}">
+                                                        </div>
+                                                        <!-- Upload box -->
+                                                        <div class="d-flex justify-content-center" id="pdf-container">
+                                                            <div class="document-upload-wrapper" id="doc-upload-wrapper">
+                                                                <input type="file" name="tin_certificate_image"
+                                                                       class="document_input"
+                                                                       accept=".doc, .pdf, .jpg, .png, .jpeg">
+                                                                <div class="textbox">
+                                                                    <img width="40" height="40" class="svg"
+                                                                         src="{{ asset('assets/admin/img/doc-uploaded.png') }}"
+                                                                         alt="">
+                                                                    <p class="fs-12 mb-0">
+                                                                        {{ translate('messages.Select_a_file_or') }} <span
+                                                                            class="font-semibold">{{ translate('messages.Drag & Drop') }}</span>
+                                                                        {{ translate('messages.here') }}</p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -509,7 +510,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                             <div class="card __card bg-F8F9FC mb-3">
                                 <div class="card-header">
                                     <div>

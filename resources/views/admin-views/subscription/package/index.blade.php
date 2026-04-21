@@ -167,6 +167,7 @@ active
                                     <th class="border-top border-bottom"><div class="text-title">{{translate('messages.Pricing')}}</div> </th>
                                     <th class="border-top border-bottom">{{translate('messages.duration') }}</th>
                                     <th class="border-top border-bottom text-center">{{translate('Current_Subscriber')}} </th>
+                                    <th class="border-top border-bottom text-center">{{ translate('Manufuture') }}</th>
                                     <th class="border-top border-bottom">{{translate('messages.status')}}</th>
                                     <th class="border-top border-bottom text-center">{{translate('messages.actions')}}</th>
                                 </thead>
@@ -186,6 +187,19 @@ active
                                         </td>
                                         <td>
                                             <div class="text-title text-center">{{$package->current_subscribers_count ?? 0}}</div>
+                                        </td>
+                                        <td class="text-center">
+                                            <label class="toggle-switch toggle-switch-sm" for="mfCheckbox{{$package->id}}">
+                                                <input type="checkbox"
+                                                       data-url="{{ route('admin.business-settings.subscriptionackage.manufuture', [$package->id]) }}"
+                                                       data-message="{{ translate('messages.updated_successfully') }}"
+                                                       class="toggle-switch-input redirect-url"
+                                                       id="mfCheckbox{{$package->id}}"
+                                                       {{ $package->is_manufuture ? 'checked' : '' }}>
+                                                <span class="toggle-switch-label">
+                                                    <span class="toggle-switch-indicator"></span>
+                                                </span>
+                                            </label>
                                         </td>
                                         <td>
                                                 <label class="toggle-switch toggle-switch-sm" for="stocksCheckbox{{$package->id}}">

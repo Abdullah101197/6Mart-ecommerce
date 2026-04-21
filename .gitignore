@@ -30,3 +30,17 @@ search_debug.log
 # Local backup blades
 *.bak_*
 resources/views/**/*.bak_*
+
+# Manufuture prototype HTMLs (source UI files only)
+manufuture-rms-v12.html
+manufuture-dashboard.html
+
+# Local docs / notes
+undering.txt
+
+# Local helper scripts (keep out of repo)
+tools/
+
+# Local dashboard variants / backups
+resources/views/**/_v2.blade.php
+resources/views/**/*_v2.blade.php

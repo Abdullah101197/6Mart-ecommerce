@@ -607,6 +607,26 @@ class VendorController extends Controller
         return back();
     }
 
+    public function portalBulk(Request $request)
+    {
+        $portal = $request->input('portal');
+        $ids = $request->input('store_ids', []);
+        if ((!is_array($ids) || count($ids) === 0) && $request->filled('store_ids_csv')) {
+            $ids = array_values(array_filter(array_map('intval', explode(',', (string) $request->input('store_ids_csv')))));
+        }
+        if (!in_array($portal, ['vendor', 'manufuture'], true)) {
+            Toastr::error(translate('messages.invalid_input'));
+            return back();
+        }
+        if (!is_array($ids) || count($ids) === 0) {
+            Toastr::error(translate('messages.no_data_found'));
+            return back();
+        }
+        Store::whereIn('id', $ids)->update(['portal' => $portal]);
+        Toastr::success(translate('messages.updated_successfully'));
+        return back();
+    }
+
     public function pending_requests(Request $request)
     {
         $stores = $this->getNewStores($request, null);

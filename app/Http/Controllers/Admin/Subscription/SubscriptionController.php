@@ -182,6 +182,14 @@ class SubscriptionController extends Controller
         return back();
     }
 
+    public function toggleManufuture(SubscriptionPackage $subscriptionackage)
+    {
+        $subscriptionackage->is_manufuture = ! (bool) ($subscriptionackage->is_manufuture ?? true);
+        $subscriptionackage->save();
+        Toastr::success(translate('messages.updated_successfully'));
+        return back();
+    }
+
     public function show(SubscriptionPackage $subscriptionackage)
     {
         $packages= SubscriptionPackage::where('status',1)->where('module_type', $subscriptionackage->module_type == 'rental' && addon_published_status('Rental') ? 'rental' : 'all' )->get();
