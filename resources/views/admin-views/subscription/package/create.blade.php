@@ -103,6 +103,16 @@ active
                             </div>
                         </div>
 
+                        <div class="col-lg-4 col-sm-6">
+                            <div class="form-group">
+                                <label class="input-label d-block">{{ translate('Available for Manufuture') }}</label>
+                                <label class="form-group form-check form--check m-0">
+                                    <input type="checkbox" class="form-check-input" name="is_manufuture" value="1" {{ old('is_manufuture', 1) ? 'checked' : '' }}>
+                                    <span class="form-check-label text-dark">{{ translate('Enable this package for Manufuture portal registration') }}</span>
+                                </label>
+                            </div>
+                        </div>
+
 
                         <div class="col-lg-4 col-sm-6 lang_form default-form" >
                             <div class="form-group m-0">

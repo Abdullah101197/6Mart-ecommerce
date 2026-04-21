@@ -15,7 +15,11 @@ class ManufutureAuthController extends Controller
         // Reuse the existing registration mechanics, but render with Manufuture labels + routes.
         $admin_commission = Helpers::get_business_settings('admin_commission');
         $business_name = Helpers::get_business_settings('business_name');
-        $packages = SubscriptionPackage::where('status', 1)->where('module_type', 'all')->latest()->get();
+        $packages = SubscriptionPackage::where('status', 1)
+            ->where('module_type', 'all')
+            ->where('is_manufuture', 1)
+            ->latest()
+            ->get();
 
         $custome_recaptcha = new CaptchaBuilder;
         $custome_recaptcha->build();

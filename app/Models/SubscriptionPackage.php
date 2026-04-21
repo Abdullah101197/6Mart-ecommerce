@@ -48,6 +48,7 @@ class SubscriptionPackage extends Model
         'expense_report' => 'integer',
         'disbursement_report' => 'integer',
         'vat_report' => 'integer',
+        'is_manufuture' => 'boolean',
     ];
 
     /**

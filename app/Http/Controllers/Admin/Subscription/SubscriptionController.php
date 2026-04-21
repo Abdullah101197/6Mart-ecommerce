@@ -165,6 +165,7 @@ class SubscriptionController extends Controller
         $package->vat_report = $request->vat_report ?? 0;
         $package->colour = $request?->colour;
         $package->module_type = $request?->module ?? 'all';
+        $package->is_manufuture = $request->has('is_manufuture') ? 1 : 0;
         $package->save();
 
         $this->translationRepo->addByModel(request: $request, model: $package, modelPath: 'App\Models\SubscriptionPackage', attribute: 'package_name');
@@ -270,6 +271,7 @@ class SubscriptionController extends Controller
         $subscriptionackage->disbursement_report = $request->disbursement_report ?? 0;
         $subscriptionackage->vat_report = $request->vat_report ?? 0;
         $subscriptionackage->colour = $request?->colour;
+        $subscriptionackage->is_manufuture = $request->has('is_manufuture') ? 1 : 0;
         $subscriptionackage->save();
         $this->translationRepo->updateByModel(request: $request, model: $subscriptionackage, modelPath: 'App\Models\SubscriptionPackage', attribute: 'package_name');
         $this->translationRepo->updateByModel(request: $request, model: $subscriptionackage, modelPath: 'App\Models\SubscriptionPackage', attribute: 'text');

@@ -9219,4 +9219,7 @@ Smartly or Earn. ',
   'jpeg, jpg, jfif, png, gif, webp Less Than 2MB' => 'Jpeg, jpg, jfif, png, gif, webp Less Than 2MB',
   'Map_is_disabled_because_google_map_api_key_is_not_configured' => 'Map is disabled because google map api key is not configured',
   'location' => 'Location',
+  'Please_select_a_location_within_the_selected_zone.' => 'Please select a location within the selected zone.',
+  'Something_went_wrong' => 'Something went wrong',
+  'Manufuture registration' => 'Manufuture registration',
 );

@@ -821,6 +821,7 @@ $("#form-id").on('submit', function(e) {
     e.preventDefault();
 
     const HAS_SUBSCRIPTION_FLOW = {{ \App\CentralLogics\Helpers::subscription_check() ? 'true' : 'false' }};
+    const APPLY_ENTITY_LABEL = @json($applyHeadingLabel);
 
     // Step-1 submit should first open Business Plan step (when enabled)
     if (HAS_SUBSCRIPTION_FLOW && $('#reg-form-div').is(':visible') && $('#business-plan-div').hasClass('d-none')) {
@@ -831,25 +832,25 @@ $("#form-id").on('submit', function(e) {
         const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
 
         if (!$('#default_name').val()) {
-            toastr.error("{{ translate('Vendor_name_is_required') }}");
+            toastr.error(APPLY_ENTITY_LABEL + " name is required");
             return;
         } else if (!$('#address').val()) {
-            toastr.error("{{ translate('Vendor_address_is_required') }}");
+            toastr.error(APPLY_ENTITY_LABEL + " address is required");
             return;
         } else if (!logo?.files?.length) {
-            toastr.error("{{ translate('Vendor_logo_required') }}");
+            toastr.error(APPLY_ENTITY_LABEL + " logo is required");
             return;
         } else if (!cover?.files?.length) {
-            toastr.error("{{ translate('Vendor_cover_photo_required') }}");
+            toastr.error(APPLY_ENTITY_LABEL + " cover photo is required");
             return;
         } else if (logo.files[0].size > maxFileSize) {
-            toastr.error("{{ translate('Vendor_logo_must_be_less_than_2MB') }}");
+            toastr.error(APPLY_ENTITY_LABEL + " logo must be less than 2MB");
             return;
         } else if (tin_certificate_image?.files?.length && tin_certificate_image.files[0].size > maxFileSize) {
             toastr.error("{{ translate('Tin_certificate_must_be_less_than_2MB') }}");
             return;
         } else if (cover.files[0].size > maxFileSize) {
-            toastr.error("{{ translate('Vendor_cover_photo_must_be_less_than_2MB') }}");
+            toastr.error(APPLY_ENTITY_LABEL + " cover photo must be less than 2MB");
             return;
         } else if (!$('#choice_zones').val()) {
             toastr.error("{{ translate('You_must_select_a_zone') }}");

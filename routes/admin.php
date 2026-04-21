@@ -256,6 +256,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::get('export/withdraw/{type}/{store_id}', 'VendorController@withdraw_trans_export')->name('withdraw_trans_export');
                 Route::get('status/{store}/{status}', 'VendorController@status')->name('status');
                 Route::get('featured/{store}/{status}', 'VendorController@featured')->name('featured');
+                Route::post('portal/{store}', 'VendorController@portal')->name('portal');
                 Route::get('toggle-settings-status/{store}/{status}/{menu}', 'VendorController@store_status')->name('toggle-settings');
                 Route::post('status-filter', 'VendorController@status_filter')->name('status-filter');
 

@@ -540,11 +540,15 @@ class VendorController extends Controller
         $zone_id = $request->query('zone_id', 'all');
         $type = $request->query('type', 'all');
         $module_id = $request->query('module_id', 'all');
+        $portal = $request->query('portal', 'all');
         $stores = Store::with('vendor', 'module', 'zone')->whereHas('vendor', function ($query) {
             return $query->where('status', 1);
         })
             ->when(is_numeric($zone_id), function ($query) use ($zone_id) {
                 return $query->where('zone_id', $zone_id);
+            })
+            ->when(in_array($portal, ['vendor', 'manufuture'], true), function ($query) use ($portal) {
+                return $query->where('portal', $portal);
             })
             ->when(is_numeric($module_id), function ($query) use ($request) {
                 return $query->module($request->query('module_id'));
@@ -588,6 +592,19 @@ class VendorController extends Controller
             ->sum('amount');
 
         return view('admin-views.vendor.list', compact('stores', 'zone', 'type', 'total_store', 'active_stores', 'inactive_stores', 'recent_stores', 'total_transaction', 'comission_earned', 'store_withdraws'));
+    }
+
+    public function portal(Request $request, Store $store)
+    {
+        $portal = $request->input('portal');
+        if (!in_array($portal, ['vendor', 'manufuture'], true)) {
+            Toastr::error(translate('messages.invalid_input'));
+            return back();
+        }
+        $store->portal = $portal;
+        $store->save();
+        Toastr::success(translate('messages.updated_successfully'));
+        return back();
     }
 
     public function pending_requests(Request $request)
