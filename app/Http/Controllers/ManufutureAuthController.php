@@ -18,6 +18,10 @@ class ManufutureAuthController extends Controller
         $packages = SubscriptionPackage::where('status', 1)
             ->where('module_type', 'all')
             ->where('is_manufuture', 1)
+            ->where(function ($q) {
+                $q->whereNull('vendor_types')
+                    ->orWhereJsonContains('vendor_types', 'manufacturer');
+            })
             ->latest()
             ->get();
 

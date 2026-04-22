@@ -166,6 +166,12 @@ class SubscriptionController extends Controller
         $package->colour = $request?->colour;
         $package->module_type = $request?->module ?? 'all';
         $package->is_manufuture = $request->has('is_manufuture') ? 1 : 0;
+        $vendorTypes = $request->input('vendor_types', []);
+        if (!is_array($vendorTypes)) {
+            $vendorTypes = [];
+        }
+        $vendorTypes = array_values(array_unique(array_intersect($vendorTypes, ['shopkeeper', 'manufacturer', 'wholesale', 'b2b'])));
+        $package->vendor_types = count($vendorTypes) ? $vendorTypes : null;
         $package->save();
 
         $this->translationRepo->addByModel(request: $request, model: $package, modelPath: 'App\Models\SubscriptionPackage', attribute: 'package_name');
@@ -280,6 +286,12 @@ class SubscriptionController extends Controller
         $subscriptionackage->vat_report = $request->vat_report ?? 0;
         $subscriptionackage->colour = $request?->colour;
         $subscriptionackage->is_manufuture = $request->has('is_manufuture') ? 1 : 0;
+        $vendorTypes = $request->input('vendor_types', []);
+        if (!is_array($vendorTypes)) {
+            $vendorTypes = [];
+        }
+        $vendorTypes = array_values(array_unique(array_intersect($vendorTypes, ['shopkeeper', 'manufacturer', 'wholesale', 'b2b'])));
+        $subscriptionackage->vendor_types = count($vendorTypes) ? $vendorTypes : null;
         $subscriptionackage->save();
         $this->translationRepo->updateByModel(request: $request, model: $subscriptionackage, modelPath: 'App\Models\SubscriptionPackage', attribute: 'package_name');
         $this->translationRepo->updateByModel(request: $request, model: $subscriptionackage, modelPath: 'App\Models\SubscriptionPackage', attribute: 'text');

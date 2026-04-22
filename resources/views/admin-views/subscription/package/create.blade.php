@@ -113,6 +113,22 @@ active
                             </div>
                         </div>
 
+                        <div class="col-lg-8 col-sm-12">
+                            <div class="form-group">
+                                <label class="input-label d-block">{{ translate('Available for Vendor Types') }}</label>
+                                @php($selectedVendorTypes = (array) old('vendor_types', ['shopkeeper', 'manufacturer', 'wholesale', 'b2b']))
+                                <div class="d-flex flex-wrap" style="gap:14px">
+                                    @foreach(['shopkeeper' => 'Shopkeeper', 'manufacturer' => 'Manufacturer', 'wholesale' => 'Wholesale Vendor', 'b2b' => 'B2B Vendor'] as $vtKey => $vtLabel)
+                                        <label class="form-group form-check form--check m-0">
+                                            <input type="checkbox" class="form-check-input" name="vendor_types[]" value="{{ $vtKey }}" {{ in_array($vtKey, $selectedVendorTypes, true) ? 'checked' : '' }}>
+                                            <span class="form-check-label text-dark">{{ translate($vtLabel) }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <small class="text-muted">{{ translate('If none selected, this package will be available for all vendor types.') }}</small>
+                            </div>
+                        </div>
+
 
                         <div class="col-lg-4 col-sm-6 lang_form default-form" >
                             <div class="form-group m-0">

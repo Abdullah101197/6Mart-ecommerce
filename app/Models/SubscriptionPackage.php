@@ -49,6 +49,7 @@ class SubscriptionPackage extends Model
         'disbursement_report' => 'integer',
         'vat_report' => 'integer',
         'is_manufuture' => 'boolean',
+        'vendor_types' => 'array',
     ];
 
     /**

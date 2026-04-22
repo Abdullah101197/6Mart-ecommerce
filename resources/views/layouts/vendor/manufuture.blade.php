@@ -59,12 +59,37 @@
             </div>
 
             <nav class="mf-nav">
+                @php($vendorType = (string) ($store?->vendor_type ?? config('vendor_types.default', 'shopkeeper')))
+                @php($vendorTypeAllow = (array) (config('vendor_types.types')[$vendorType] ?? []))
+                @php($mfAllowed = function (string $feature) use ($vendorTypeAllow): bool {
+                    return in_array($feature, $vendorTypeAllow, true);
+                })
                 <div class="mf-nav-label">Overview</div>
-                <a class="mf-nav-item {{ request()->routeIs('vendor.mf.dashboard') ? 'active' : '' }}" href="{{ route('vendor.mf.dashboard') }}">Dashboard</a>
+                @if($mfAllowed('mf_dashboard'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.dashboard') ? 'active' : '' }}" href="{{ route('vendor.mf.dashboard') }}">Dashboard</a>
+                @endif
+                @if($mfAllowed('mf_aipulse'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.aipulse') ? 'active' : '' }}" href="{{ route('vendor.mf.aipulse') }}">AI Pulse</a>
+                @endif
                 <div class="mf-nav-label">Store</div>
-                <a class="mf-nav-item {{ request()->routeIs('vendor.mf.orders') ? 'active' : '' }}" href="{{ route('vendor.mf.orders') }}">Orders</a>
-                <a class="mf-nav-item {{ request()->routeIs('vendor.mf.products') ? 'active' : '' }}" href="{{ route('vendor.mf.products') }}">Products</a>
-                <a class="mf-nav-item {{ request()->routeIs('vendor.mf.pos') ? 'active' : '' }}" href="{{ route('vendor.mf.pos') }}">POS</a>
+                @if($mfAllowed('mf_orders'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.orders') ? 'active' : '' }}" href="{{ route('vendor.mf.orders') }}">Orders</a>
+                @endif
+                @if($mfAllowed('mf_omnichannel'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.omnichannel') ? 'active' : '' }}" href="{{ route('vendor.mf.omnichannel') }}">Omnichannel</a>
+                @endif
+                @if($mfAllowed('mf_products'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.products') ? 'active' : '' }}" href="{{ route('vendor.mf.products') }}">Products</a>
+                @endif
+                @if($mfAllowed('mf_pos'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.pos') ? 'active' : '' }}" href="{{ route('vendor.mf.pos') }}">POS</a>
+                @endif
+                @if($mfAllowed('mf_returns'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.returns') ? 'active' : '' }}" href="{{ route('vendor.mf.returns') }}">Returns</a>
+                @endif
+                @if($mfAllowed('mf_helpcenter'))
+                    <a class="mf-nav-item {{ request()->routeIs('vendor.mf.helpcenter') ? 'active' : '' }}" href="{{ route('vendor.mf.helpcenter') }}">Help Center</a>
+                @endif
             </nav>
 
             <div class="mf-sidebar-footer">

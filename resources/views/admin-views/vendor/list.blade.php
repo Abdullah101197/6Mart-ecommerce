@@ -113,6 +113,16 @@
                     </select>
                 </div>
 
+                <div class="select-item min--220">
+                    <select name="vendor_type" class="form-control js-select2-custom set-filter" data-url="{{ url()->full() }}" data-filter="vendor_type">
+                        <option value="" {{ !request('vendor_type') ? 'selected' : '' }}>{{ translate('All Vendor Types') }}</option>
+                        <option value="shopkeeper" {{ request('vendor_type') === 'shopkeeper' ? 'selected' : '' }}>{{ translate('Shopkeeper') }}</option>
+                        <option value="manufacturer" {{ request('vendor_type') === 'manufacturer' ? 'selected' : '' }}>{{ translate('Manufacturer') }}</option>
+                        <option value="wholesale" {{ request('vendor_type') === 'wholesale' ? 'selected' : '' }}>{{ translate('Wholesale Vendor') }}</option>
+                        <option value="b2b" {{ request('vendor_type') === 'b2b' ? 'selected' : '' }}>{{ translate('B2B Vendor') }}</option>
+                    </select>
+                </div>
+
                     <div class="hs-unfold mr-2">
                         <a class="js-hs-unfold-invoker btn btn-sm btn-white dropdown-toggle min-height-40" href="javascript:;"
                            data-hs-unfold-options='{"target": "#portalBulkDropdown","type": "css-animation"}'>
@@ -193,6 +203,7 @@
                         <th class="border-0">{{translate('messages.owner_information')}}</th>
                         <th class="border-0">{{translate('messages.zone')}}</th>
                         <th class="border-0">{{translate('Portal')}}</th>
+                        <th class="border-0">{{ translate('Vendor Type') }}</th>
                         <th class="text-uppercase border-0">{{translate('messages.featured')}}</th>
                         <th class="text-uppercase border-0">{{translate('messages.status')}}</th>
                         <th class="text-center border-0">{{translate('messages.action')}}</th>
@@ -240,6 +251,38 @@
                             </td>
                             <td>
                                 <span class="badge badge-soft-info text-uppercase">{{ $store->portal ?? 'vendor' }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column align-items-start" style="gap:6px">
+                                    <span class="badge badge-soft-dark text-uppercase">{{ $store->vendor_type ?? 'shopkeeper' }}</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-white dropdown-toggle" type="button" id="vendorTypeMenu{{ $store->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            {{ translate('Vendor Type') }}
+                                        </button>
+                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="vendorTypeMenu{{ $store->id }}">
+                                            <form action="{{ route('admin.store.vendor-type', $store->id) }}" method="post" class="px-3 py-1">
+                                                @csrf
+                                                <input type="hidden" name="vendor_type" value="shopkeeper">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary w-100 mb-1">{{ translate('Set Shopkeeper') }}</button>
+                                            </form>
+                                            <form action="{{ route('admin.store.vendor-type', $store->id) }}" method="post" class="px-3 py-1">
+                                                @csrf
+                                                <input type="hidden" name="vendor_type" value="manufacturer">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary w-100 mb-1">{{ translate('Set Manufacturer') }}</button>
+                                            </form>
+                                            <form action="{{ route('admin.store.vendor-type', $store->id) }}" method="post" class="px-3 py-1">
+                                                @csrf
+                                                <input type="hidden" name="vendor_type" value="wholesale">
+                                                <button type="submit" class="btn btn-sm btn-outline-info w-100 mb-1">{{ translate('Set Wholesale') }}</button>
+                                            </form>
+                                            <form action="{{ route('admin.store.vendor-type', $store->id) }}" method="post" class="px-3 py-1">
+                                                @csrf
+                                                <input type="hidden" name="vendor_type" value="b2b">
+                                                <button type="submit" class="btn btn-sm btn-outline-success w-100">{{ translate('Set B2B') }}</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <label class="toggle-switch toggle-switch-sm" for="featuredCheckbox{{$store->id}}">

@@ -53,6 +53,71 @@
                     </li>
                     <!-- End Dashboards -->
 
+                    {{-- Manufuture (Manufacturer) Modules --}}
+                    @if(auth('admin')->check() && auth('admin')->user()->role_id == 1)
+                        <li class="nav-item">
+                            <small class="nav-subtitle" title="{{ translate('Manufuture') }}">{{ translate('Manufuture') }}</small>
+                            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+                        </li>
+
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/mf*') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:" title="{{ translate('Manufuture') }}">
+                                <i class="tio-layers-outlined nav-icon"></i>
+                                <span class="text-truncate">{{ translate('Manufuture') }}</span>
+                            </a>
+                            <ul class="js-navbar-vertical-aside-submenu nav nav-sub" style="display:{{ Request::is('admin/mf*') ? 'block' : 'none' }}">
+                                <li class="{{ Request::is('admin/mf') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.dashboard') }}" title="{{ translate('messages.dashboard') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('messages.dashboard') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/orders*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.orders.index') }}" title="{{ translate('messages.orders') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('messages.orders') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/products*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.products.index') }}" title="{{ translate('messages.items') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('messages.items') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/pos*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.pos') }}" title="{{ translate('messages.pos') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('messages.pos') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/returns*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.returns') }}" title="{{ translate('Returns') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('Returns') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/omnichannel*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.omnichannel') }}" title="{{ translate('Omnichannel') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('Omnichannel') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/aipulse*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.aipulse') }}" title="{{ translate('AI Pulse') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('AI Pulse') }}</span>
+                                    </a>
+                                </li>
+                                <li class="{{ Request::is('admin/mf/helpcenter*') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.mf.helpcenter') }}" title="{{ translate('Help Center') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ translate('Help Center') }}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
+
                     <!-- Marketing section -->
                     <li class="nav-item">
                         <small class="nav-subtitle" title="{{ translate('messages.employee_handle') }}">{{ translate('pos section') }}</small>

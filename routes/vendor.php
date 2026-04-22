@@ -22,10 +22,36 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
         })->name('dashboard');
         // Manufuture portal (portal-gated)
         Route::prefix('mf')->as('mf.')->middleware(['manufuture.portal'])->group(function () {
-            Route::get('/', [\App\Http\Controllers\Vendor\ManufutureController::class, 'dashboard'])->name('dashboard');
-            Route::get('orders', [\App\Http\Controllers\Vendor\ManufutureOrderController::class, 'index'])->name('orders');
-            Route::get('products', [\App\Http\Controllers\Vendor\ManufutureProductController::class, 'index'])->name('products');
-            Route::get('pos', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])->defaults('feature', 'pos')->name('pos');
+            Route::get('/', [\App\Http\Controllers\Vendor\ManufutureController::class, 'dashboard'])
+                ->middleware('vendor_type:mf_dashboard')
+                ->name('dashboard');
+            Route::get('orders', [\App\Http\Controllers\Vendor\ManufutureOrderController::class, 'index'])
+                ->middleware('vendor_type:mf_orders')
+                ->name('orders');
+            Route::get('products', [\App\Http\Controllers\Vendor\ManufutureProductController::class, 'index'])
+                ->middleware('vendor_type:mf_products')
+                ->name('products');
+            Route::get('pos', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
+                ->middleware('vendor_type:mf_pos')
+                ->defaults('feature', 'pos')
+                ->name('pos');
+
+            Route::get('aipulse', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
+                ->middleware('vendor_type:mf_aipulse')
+                ->defaults('feature', 'aipulse')
+                ->name('aipulse');
+            Route::get('omnichannel', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
+                ->middleware('vendor_type:mf_omnichannel')
+                ->defaults('feature', 'omnichannel')
+                ->name('omnichannel');
+            Route::get('returns', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
+                ->middleware('vendor_type:mf_returns')
+                ->defaults('feature', 'returns')
+                ->name('returns');
+            Route::get('helpcenter', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
+                ->middleware('vendor_type:mf_helpcenter')
+                ->defaults('feature', 'helpcenter')
+                ->name('helpcenter');
         });
         Route::get('/get-store-data', 'DashboardController@store_data')->name('get-store-data');
         Route::post('/store-token', 'DashboardController@updateDeviceToken')->name('store.token');
@@ -40,7 +66,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
 
         Route::group(['prefix' => 'pos', 'as' => 'pos.'], function () {
             Route::post('variant_price', 'POSController@variant_price')->name('variant_price');
-            Route::group(['middleware' => ['module:pos','subscription:pos' ]], function () {
+            Route::group(['middleware' => ['module:pos','subscription:pos','vendor_type:pos' ]], function () {
                 Route::get('/', 'POSController@index')->name('index');
                 Route::get('quick-view', 'POSController@quick_view')->name('quick-view');
                 Route::get('quick-view-cart-item', 'POSController@quick_view_card_item')->name('quick-view-cart-item');
@@ -130,7 +156,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::get('list-export', 'EmployeeController@list_export')->name('export-employee');
         });
 
-        Route::group(['prefix' => 'item', 'as' => 'item.', 'middleware' => ['module:item' ,'subscription:item']], function () {
+        Route::group(['prefix' => 'item', 'as' => 'item.', 'middleware' => ['module:item' ,'subscription:item','vendor_type:item']], function () {
             Route::get('add-new', 'ItemController@index')->name('add-new');
             Route::post('variant-combination', 'ItemController@variant_combination')->name('variant-combination');
             Route::post('store', 'ItemController@store')->name('store');
@@ -170,7 +196,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
 
         });
 
-        Route::group(['prefix' => 'banner', 'as' => 'banner.', 'middleware' => ['module:banner','subscription:banner']], function () {
+        Route::group(['prefix' => 'banner', 'as' => 'banner.', 'middleware' => ['module:banner','subscription:banner','vendor_type:banner']], function () {
             Route::get('list', 'BannerController@list')->name('list');
             Route::post('store', 'BannerController@store')->name('store');
             Route::get('edit/{banner}', 'BannerController@edit')->name('edit');
@@ -180,7 +206,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::get('join_campaign/{id}/{status}', 'BannerController@status')->name('status');
         });
 
-        Route::group(['prefix' => 'campaign', 'as' => 'campaign.', 'middleware' => ['module:campaign','subscription:campaign']], function () {
+        Route::group(['prefix' => 'campaign', 'as' => 'campaign.', 'middleware' => ['module:campaign','subscription:campaign','vendor_type:campaign']], function () {
             Route::get('list', 'CampaignController@list')->name('list');
             Route::get('item/list', 'CampaignController@itemlist')->name('itemlist');
             Route::get('remove-store/{campaign}/{store}', 'CampaignController@remove_store')->name('remove-store');
@@ -188,7 +214,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::post('search-item', 'CampaignController@searchItem')->name('searchItem');
         });
 
-        Route::group(['prefix' => 'wallet', 'as' => 'wallet.', 'middleware' => ['module:wallet' ,'subscription:wallet']], function () {
+        Route::group(['prefix' => 'wallet', 'as' => 'wallet.', 'middleware' => ['module:wallet' ,'subscription:wallet','vendor_type:wallet']], function () {
             Route::get('/', 'WalletController@index')->name('index');
             Route::post('request', 'WalletController@w_request')->name('withdraw-request');
             Route::delete('close/{id}', 'WalletController@close_request')->name('close-request');
@@ -202,14 +228,14 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
 
         });
 
-        Route::group(['prefix' => 'withdraw-method', 'as' => 'wallet-method.', 'middleware' => ['module:wallet_method' ,'subscription:wallet_method' ]], function () {
+        Route::group(['prefix' => 'withdraw-method', 'as' => 'wallet-method.', 'middleware' => ['module:wallet_method' ,'subscription:wallet_method','vendor_type:wallet_method' ]], function () {
             Route::get('/', 'WalletMethodController@index')->name('index');
             Route::post('store/', 'WalletMethodController@store')->name('store');
             Route::get('default/{id}/{default}', 'WalletMethodController@default')->name('default');
             Route::delete('delete/{id}', 'WalletMethodController@delete')->name('delete');
         });
 
-        Route::group(['prefix' => 'coupon', 'as' => 'coupon.', 'middleware' => ['module:coupon','subscription:coupon']], function () {
+        Route::group(['prefix' => 'coupon', 'as' => 'coupon.', 'middleware' => ['module:coupon','subscription:coupon','vendor_type:coupon']], function () {
             Route::get('add-new', 'CouponController@add_new')->name('add-new');
             Route::post('store', 'CouponController@store')->name('store');
             Route::get('update/{id}', 'CouponController@edit')->name('update');
@@ -219,14 +245,14 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
         });
 
         Route::group([ 'prefix' => 'advertisement', 'as' => 'advertisement.'], function () {
-            Route::group(['middleware' => ['module:advertisement' ,'subscription:advertisement']], function () {
+            Route::group(['middleware' => ['module:advertisement' ,'subscription:advertisement','vendor_type:advertisement']], function () {
                 Route::get('create/', 'AdvertisementController@create')->name('create');
                 Route::get('/copy-advertisement/{advertisement}', 'AdvertisementController@copyAdd')->name('copyAdd');
                 Route::post('/copy-add-post/{advertisement}', 'AdvertisementController@copyAddPost')->name('copyAddPost');
                 Route::post('store', 'AdvertisementController@store')->name('store');
             });
 
-            Route::group(['middleware' => ['module:advertisement_list' ,'subscription:advertisement_list']], function () {
+            Route::group(['middleware' => ['module:advertisement_list' ,'subscription:advertisement_list','vendor_type:advertisement_list']], function () {
                 Route::get('/', 'AdvertisementController@index')->name('index');
                 Route::get('details/{advertisement}', 'AdvertisementController@show')->name('show');
                 Route::get('{advertisement}/edit', 'AdvertisementController@edit')->name('edit');
@@ -236,7 +262,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             });
         });
 
-        Route::group(['prefix' => 'addon', 'as' => 'addon.', 'middleware' => ['module:addon','subscription:addon']], function () {
+        Route::group(['prefix' => 'addon', 'as' => 'addon.', 'middleware' => ['module:addon','subscription:addon','vendor_type:addon']], function () {
             Route::get('add-new', 'AddOnController@index')->name('add-new');
             Route::post('store', 'AddOnController@store')->name('store');
             Route::get('edit/{id}', 'AddOnController@edit')->name('edit');
@@ -244,7 +270,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::delete('delete/{id}', 'AddOnController@delete')->name('delete');
         });
 
-        Route::group(['prefix' => 'order', 'as' => 'order.' , 'middleware' => ['module:order']], function () {
+        Route::group(['prefix' => 'order', 'as' => 'order.' , 'middleware' => ['module:order','vendor_type:order']], function () {
             Route::get('list/{status}', 'OrderController@list')->name('list');
             Route::put('status-update/{id}', 'OrderController@status')->name('status-update');
             Route::post('add-to-cart', 'OrderController@add_to_cart')->name('add-to-cart');
@@ -266,7 +292,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
         });
 
         Route::group(['prefix' => 'business-settings', 'as' => 'business-settings.'], function () {
-            Route::group(['middleware' => ['module:store_setup' ,'subscription:store_setup']], function () {
+            Route::group(['middleware' => ['module:store_setup' ,'subscription:store_setup','vendor_type:store_setup']], function () {
                 Route::get('store-setup', 'BusinessSettingsController@store_index')->name('store-setup');
                 Route::post('add-schedule', 'BusinessSettingsController@add_schedule')->name('add-schedule');
                 Route::get('remove-schedule/{store_schedule}', 'BusinessSettingsController@remove_schedule')->name('remove-schedule');
@@ -276,25 +302,25 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
                 Route::get('toggle-settings-status/{store}/{status}/{menu}', 'BusinessSettingsController@store_status')->name('toggle-settings');
             });
 
-            Route::group(['middleware' => ['module:notification_setup' ,'subscription:notification_setup']], function () {
+            Route::group(['middleware' => ['module:notification_setup' ,'subscription:notification_setup','vendor_type:notification_setup']], function () {
                 Route::get('notification-setup', 'BusinessSettingsController@notification_index')->name('notification-setup');
                 Route::get('notification-status-change/{key}/{type}', 'BusinessSettingsController@notification_status_change')->name('notification_status_change');
             });
         });
-        Route::group(['prefix' => 'profile', 'as' => 'profile.', 'middleware' => ['module:profile' ,'subscription:profile']], function () {
+        Route::group(['prefix' => 'profile', 'as' => 'profile.', 'middleware' => ['module:profile' ,'subscription:profile','vendor_type:profile']], function () {
             Route::get('view', 'ProfileController@view')->name('view');
             Route::post('update', 'ProfileController@update')->name('update');
             Route::post('settings-password', 'ProfileController@settings_password_update')->name('settings-password');
         });
 
-        Route::group(['prefix' => 'store', 'as' => 'shop.', 'middleware' => ['module:my_shop' ,'subscription:my_shop']], function () {
+        Route::group(['prefix' => 'store', 'as' => 'shop.', 'middleware' => ['module:my_shop' ,'subscription:my_shop','vendor_type:my_shop']], function () {
             Route::get('view', 'RestaurantController@view')->name('view');
             Route::get('edit', 'RestaurantController@edit')->name('edit');
             Route::post('update', 'RestaurantController@update')->name('update');
             Route::post('update-message', 'RestaurantController@update_message')->name('update-message');
         });
 
-        Route::group(['prefix' => 'message', 'as' => 'message.', 'middleware' => ['module:chat','subscription:chat']], function () {
+        Route::group(['prefix' => 'message', 'as' => 'message.', 'middleware' => ['module:chat','subscription:chat','vendor_type:chat']], function () {
             Route::get('list', 'ConversationController@list')->name('list');
             Route::post('store/{user_id}/{user_type}', 'ConversationController@store')->name('store');
             Route::get('view/{conversation_id}/{user_id}', 'ConversationController@view')->name('view');
@@ -302,15 +328,15 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
 
         Route::group(['prefix' => 'report', 'as' => 'report.'], function () {
             Route::post('set-date', 'ReportController@set_date')->name('set-date');
-                Route::group(['middleware' => ['module:expense_report' ,'subscription:expense_report']], function () {
+                Route::group(['middleware' => ['module:expense_report' ,'subscription:expense_report','vendor_type:expense_report']], function () {
                     Route::get('expense-report', 'ReportController@expense_report')->name('expense-report');
                     Route::get('expense-export', 'ReportController@expense_export')->name('expense-export');
                 });
-                Route::group(['middleware' => ['module:disbursement_report' ,'subscription:disbursement_report']], function () {
+                Route::group(['middleware' => ['module:disbursement_report' ,'subscription:disbursement_report','vendor_type:disbursement_report']], function () {
                     Route::get('disbursement-report', 'ReportController@disbursement_report')->name('disbursement-report');
                     Route::get('disbursement-report-export/{type}', 'ReportController@disbursement_report_export')->name('disbursement-report-export');
                 });
-                Route::group(['middleware' => ['module:vat_report' ,'subscription:vat_report']], function () {
+                Route::group(['middleware' => ['module:vat_report' ,'subscription:vat_report','vendor_type:vat_report']], function () {
                     Route::get('vendor-tax-report', 'VendorTaxReportController@vendorTax')->name('vendorTax');
                     Route::get('vendor-tax-export', 'VendorTaxReportController@vendorTaxExport')->name('vendorTaxExport');
                 });

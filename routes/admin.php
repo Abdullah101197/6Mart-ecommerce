@@ -258,6 +258,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::get('featured/{store}/{status}', 'VendorController@featured')->name('featured');
                 Route::post('portal/{store}', 'VendorController@portal')->name('portal');
                 Route::post('portal-bulk', 'VendorController@portalBulk')->name('portal-bulk');
+                Route::post('vendor-type/{store}', 'VendorController@vendorType')->name('vendor-type');
                 Route::get('toggle-settings-status/{store}/{status}/{menu}', 'VendorController@store_status')->name('toggle-settings');
                 Route::post('status-filter', 'VendorController@status_filter')->name('status-filter');
 

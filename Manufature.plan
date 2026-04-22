@@ -185,62 +185,78 @@ Future of Retail Execution (optional)
 ============================================================
 1.1) MODULE → EXISTING 6MART MAPPING (REUSE / WRAP / COMING SOON)
 ============================================================
-Vendor Manufuture portal (store-scoped)
-- Dashboard (dashboard): WRAP
-  - Render MF UI but compute KPIs from existing orders/items data.
-- Orders (orders): REUSE/WRAP
-  - Use existing vendor order listing + details logic; MF page can be a themed wrapper.
-- Products (products/allproducts/inhouse/sellerproducts): REUSE/WRAP
-  - Use existing vendor products/items listing and filters, but in MF layout.
-- POS (pos): REUSE (theme only)
-  - Use existing vendor POS page, swap layout to MF layout.
-- Returns & RMA (returns): REUSE if return module exists; else COMING SOON.
+Legend
+- REUSE: existing 6Mart pages/controllers (no iframe needed)
+- WRAP: MF wrapper route + MF layout; may embed existing vendor/admin page or rebuild UI using same queries
+- COMING SOON: placeholder page until new domain models are approved
 
-Exact code mapping (Vendor MF)
-- MF Dashboard
-  - Route: `vendor.mf.dashboard` → `GET /vendor-panel/mf`
+Canonical feature keys (we will use these later for `vendor_type` + subscription gating)
+- Existing vendor subscription feature keys already supported by `subscription:` middleware:
+  - `pos`, `item`, `category`, `addon`, `campaign`, `banner`, `coupon`, `wallet`, `wallet_method`,
+    `employee`, `deliveryman`, `deliveryman_list`, `role`, `advertisement`, `advertisement_list`,
+    `store_setup`, `notification_setup`, `profile`, `my_shop`, `expense_report`, `disbursement_report`, `vat_report`, `reviews`, `chat`
+- Existing vendor modules currently gated by `module:` middleware but not yet subscription-mapped in DB:
+  - `order` (currently `module:order` exists; subscription gating can be added later)
+- New RMS-only (not in 6Mart core): we define keys now but keep COMING SOON:
+  - `mf_ai_pulse`, `mf_omnichannel`, `mf_returns_rma`, `mf_inventory`, `mf_replenishment`, `mf_catalog`,
+    `mf_b2b_*`, `mf_crm_*`, `mf_supply_chain`, `mf_tasks`, `mf_compliance`, `mf_workforce`, etc.
+
+Vendor Manufuture portal (store-scoped, `stores.portal=manufuture`)
+- dashboard: WRAP (already implemented)
+  - `vendor.mf.dashboard` → `GET /vendor-panel/mf`
   - Controller: `app/Http/Controllers/Vendor/ManufutureController.php@dashboard`
   - View: `resources/views/vendor-views/mf/dashboard.blade.php`
-  - Data reuse:
-    - Order counts: `Vendor/DashboardController@dashboard_order_stats_data()`
-    - Sales totals: `OrderTransaction` (store earnings)
-    - Items KPIs: `Item` scoped to `store_id`
+  - Data reuse: `OrderTransaction`, `Item` (store-scoped)
 
-- MF Orders (wrapper + embed existing vendor orders)
-  - Wrapper route: `vendor.mf.orders` → `GET /vendor-panel/mf/orders?status=all|processing|delivered|canceled`
+- orders: WRAP (already implemented)
+  - Wrapper route: `vendor.mf.orders` → `GET /vendor-panel/mf/orders?status=...`
   - Wrapper controller: `app/Http/Controllers/Vendor/ManufutureOrderController.php@index`
   - Wrapper view: `resources/views/vendor-views/mf/orders/index.blade.php`
-  - Embedded source route (existing system):
-    - `vendor.order.list` → `GET /vendor-panel/order/list/{status}`
-    - Controller: `Vendor/OrderController@list` (middleware: `module:order`)
-  - Notes:
-    - MF page uses `partials/mf/embedded-frame.blade.php` to embed the existing vendor orders UI.
+  - Embedded source (existing): `vendor.order.list` → `GET /vendor-panel/order/list/{status}` (`module:order`)
 
-- MF Products/Items (wrapper + embed existing vendor items)
+- products/items: WRAP (already implemented)
   - Wrapper route: `vendor.mf.products` → `GET /vendor-panel/mf/products`
   - Wrapper controller: `app/Http/Controllers/Vendor/ManufutureProductController.php@index`
   - Wrapper view: `resources/views/vendor-views/mf/products/index.blade.php`
-  - Embedded source routes (existing system):
-    - `vendor.item.list` → `GET /vendor-panel/item/list`
-    - `vendor.item.add-new` → `GET /vendor-panel/item/add-new`
-    - `vendor.item.bulk-import` → `GET /vendor-panel/item/bulk-import`
-    - `vendor.item.bulk-export-index` → `GET /vendor-panel/item/bulk-export`
-    - Controller: `Vendor/ItemController@...` (middleware: `module:item` + `subscription:item`)
-  - Notes:
-    - MF page embeds the existing vendor items UI in an iframe so functionality remains identical.
+  - Embedded source (existing): `vendor.item.*` (`module:item` + `subscription:item`)
 
-Admin Manufuture portal (global)
-- Dashboard: WRAP
-  - Use existing admin analytics queries but show MF UI.
-- Orders/Products/Returns/Helpcenter: REUSE/WRAP (admin scope).
+- pos: WRAP/REUSE (already implemented via embed)
+  - Wrapper route: `vendor.mf.pos` → `GET /vendor-panel/mf/pos`
+  - Wrapper controller: `app/Http/Controllers/Vendor/ManufutureFeatureController.php@comingSoon` (pos case)
+  - Wrapper view: `resources/views/vendor-views/mf/pos/index.blade.php`
+  - Embedded source (existing): `vendor.pos.index` → `GET /vendor-panel/pos` (`module:pos` + `subscription:pos`)
 
-Prototype modules that are NOT in core 6Mart (initially)
-- Omnichannel: COMING SOON (unless order source/channel is stored in DB)
-- AI Pulse: COMING SOON → MVP later using heuristics from existing data
-- Supply Chain / B2B / AR / Credit line: COMING SOON (needs new domain models)
-- CRM/Loyalty/Clienteling: COMING SOON (needs segmentation + points rules)
-- Workforce/Tasks/Compliance: COMING SOON (needs task/audit tables)
-- Vendor promotions/sponsored ads: COMING SOON (depends on marketing modules in your build)
+- helpcenter: COMING SOON (route + placeholder exists)
+  - Vendor MF view: `resources/views/vendor-views/mf/coming-soon.blade.php` and/or `vendor-views/mf/helpcenter/index.blade.php`
+
+- returns_rma: COMING SOON for MF vendor (unless your build already has vendor return module)
+
+Admin Manufuture portal (global, admin manages/manages supplier stores)
+- Existing MF routes already present (from earlier integration):
+  - `/admin/mf` dashboard and module stubs under `/admin/mf/*` (aipulse/omnichannel/pos/orders/products/returns/helpcenter)
+- Status:
+  - dashboard: WRAP (admin aggregated KPIs)
+  - orders/products/pos: REUSE/WRAP (admin-scope management)
+  - aipulse/omnichannel/returns/helpcenter: COMING SOON until backend is confirmed
+
+RMS v12 sidebar modules: mapping summary (initial MVP status)
+- Overview
+  - dashboard → WRAP (done)
+  - aipulse → COMING SOON (later: heuristics from orders/items)
+- Commerce
+  - orders → WRAP (done)
+  - omnichannel → COMING SOON
+  - pos → WRAP (done)
+  - returns → COMING SOON (or REUSE if return/refund module exists for vendors in your build)
+- Products
+  - products/allproducts/inhouse/sellerproducts → WRAP (covered by vendor items list + filters)
+  - digitalproducts → COMING SOON (unless your build has digital products module)
+  - categories/brands/attributes → REUSE (vendor-side if enabled) or admin-only if not applicable
+  - bulkimport → REUSE (vendor item bulk import/export)
+- Sellers / Vendors (operator-style)
+  - vendor dashboards / payouts / sponsored ads / promotions → admin-only or COMING SOON for vendor MF portal
+- Supply chain / Inventory / CRM / Store ops / Grocery / B2B / Integrations / Finance / Support
+  - COMING SOON for MVP (requires new domain models or dedicated integrations)
 
 Note on prototype “Sellers/Vendors” section
 - In prototype it looks like a marketplace operator portal.

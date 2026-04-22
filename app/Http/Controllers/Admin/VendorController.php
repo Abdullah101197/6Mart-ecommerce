@@ -541,6 +541,7 @@ class VendorController extends Controller
         $type = $request->query('type', 'all');
         $module_id = $request->query('module_id', 'all');
         $portal = $request->query('portal', 'all');
+        $vendor_type = $request->query('vendor_type', 'all');
         $stores = Store::with('vendor', 'module', 'zone')->whereHas('vendor', function ($query) {
             return $query->where('status', 1);
         })
@@ -549,6 +550,9 @@ class VendorController extends Controller
             })
             ->when(in_array($portal, ['vendor', 'manufuture'], true), function ($query) use ($portal) {
                 return $query->where('portal', $portal);
+            })
+            ->when(in_array($vendor_type, ['shopkeeper', 'manufacturer', 'wholesale', 'b2b'], true), function ($query) use ($vendor_type) {
+                return $query->where('vendor_type', $vendor_type);
             })
             ->when(is_numeric($module_id), function ($query) use ($request) {
                 return $query->module($request->query('module_id'));
@@ -592,6 +596,21 @@ class VendorController extends Controller
             ->sum('amount');
 
         return view('admin-views.vendor.list', compact('stores', 'zone', 'type', 'total_store', 'active_stores', 'inactive_stores', 'recent_stores', 'total_transaction', 'comission_earned', 'store_withdraws'));
+    }
+
+    public function vendorType(Request $request, Store $store)
+    {
+        $vendorType = $request->input('vendor_type');
+        if (!in_array($vendorType, ['shopkeeper', 'manufacturer', 'wholesale', 'b2b'], true)) {
+            Toastr::error(translate('messages.invalid_input'));
+            return back();
+        }
+
+        $store->vendor_type = $vendorType;
+        $store->save();
+
+        Toastr::success(translate('messages.updated_successfully'));
+        return back();
     }
 
     public function portal(Request $request, Store $store)

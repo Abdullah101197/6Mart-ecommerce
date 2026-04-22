@@ -39,7 +39,14 @@ class VendorController extends Controller
         }
         $admin_commission= Helpers::get_business_settings ('admin_commission');
         $business_name= Helpers::get_business_settings ('business_name');
-        $packages= SubscriptionPackage::where('status',1)->where('module_type', 'all')->latest()->get();
+        $packages= SubscriptionPackage::where('status',1)
+            ->where('module_type', 'all')
+            ->where(function ($q) {
+                $q->whereNull('vendor_types')
+                    ->orWhereJsonContains('vendor_types', 'shopkeeper');
+            })
+            ->latest()
+            ->get();
         $custome_recaptcha = new CaptchaBuilder;
         $custome_recaptcha->build();
         Session::put('six_captcha', $custome_recaptcha->getPhrase());
