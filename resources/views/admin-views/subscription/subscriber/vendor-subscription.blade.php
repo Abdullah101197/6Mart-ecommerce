@@ -10,6 +10,15 @@ active
 @section('content')
 
     <div class="content container-fluid">
+        @php($vendorType = strtolower((string) ($store?->vendor_type ?? config('vendor_types.default','shopkeeper'))))
+        @php($sub = $store?->store_sub_update_application)
+        @php($subscriptionAllowAll = ($store?->store_business_model ?? null) === 'commission')
+        @php($mfModules = [
+            'ai_pulse' => translate('AI Pulse'),
+            'omnichannel' => translate('Omnichannel'),
+            'returns' => translate('Returns'),
+            'helpcenter' => translate('Help Center'),
+        ])
         <div class="page-header">
             <div class="d-flex flex-wrap justify-content-between align-items-center py-2">
                 <div class="flex-grow-1">
@@ -197,6 +206,33 @@ active
                             <div class="font-medium text--title">{{ $store?->store_sub_update_application?->package?->text }}</div>
                         </div>
                         <h3 class="right">{{ \App\CentralLogics\Helpers::format_currency($store?->store_sub_update_application?->last_transcations?->price) }} /<small class="font-medium text--title">{{ $store?->store_sub_update_application?->last_transcations?->validity }} {{ translate('messages.Days') }}</small></h3>
+                    </div>
+
+                    <div class="mt-3 px-3">
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <span class="badge badge-soft-info text-capitalize">
+                                {{ translate('Vendor Type') }}: {{ str_replace('_',' ', $vendorType) }}
+                            </span>
+                            @if(in_array($vendorType, ['manufacturer','manufuture'], true))
+                                <span class="badge badge-soft-primary">{{ translate('Manufacturer') }}</span>
+                            @endif
+                        </div>
+
+                        @if(in_array($vendorType, ['manufacturer','manufuture','wholesale','b2b'], true))
+                            <div class="mt-2">
+                                <div class="font-weight-bold text--title mb-1" style="font-size:12px">
+                                    {{ translate('Manufacturer Modules (Subscription)') }}
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach($mfModules as $key => $label)
+                                        @php($enabled = $subscriptionAllowAll || ((int) data_get($sub, $key, 0) === 1))
+                                        <span class="badge {{ $enabled ? 'badge-soft-success' : 'badge-soft-secondary' }}">
+                                            {{ $label }}: {{ $enabled ? translate('Enabled') : translate('Disabled') }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
 

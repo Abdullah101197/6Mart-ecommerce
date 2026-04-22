@@ -217,21 +217,11 @@ Route::group(['prefix' => 'vendor', 'as' => 'restaurant.'], function () {
     Route::get('final-step', 'VendorController@final_step')->name('final_step');
 });
 
-// Manufuture portal auth (v1: reuse vendor auth + redirect into MF dashboard)
-Route::group(['prefix' => 'manufuture', 'as' => 'manufuture.'], function () {
-    Route::get('apply', [\App\Http\Controllers\ManufutureAuthController::class, 'create'])->name('apply');
-    Route::post('apply', [\App\Http\Controllers\ManufutureAuthController::class, 'store'])->name('store');
-    Route::get('get-all-modules', 'VendorController@get_all_modules')->name('get-all-modules');
-    Route::get('get-module-type', 'VendorController@get_modules_type')->name('get-module-type');
-    Route::get('check-module-type', 'VendorController@check_module_type')->name('check-module-type');
-
-    Route::get('login', function () {
-        $vendorLoginUrl = \App\Models\DataSetting::where('key', 'store_login_url')->value('value');
-        abort_unless($vendorLoginUrl, 404);
-
-        return redirect()
-            ->route('login', ['tab' => $vendorLoginUrl, 'redirect_to' => 'vendor.mf.dashboard']);
-    })->name('login');
+// Legacy manufuture routes (redirect to unified vendor apply)
+Route::group(['prefix' => 'manufuture'], function () {
+    Route::get('apply', fn () => redirect()->route('restaurant.create', ['vendor_type' => 'manufacturer']));
+    Route::post('apply', fn () => abort(410));
+    Route::get('login', fn () => redirect()->route('login'));
 });
 
 //Deliveryman Registration

@@ -85,12 +85,6 @@
                 <div class="search--button-wrapper">
                     <h5 class="card-title">{{translate('messages.stores_list')}}</h5>
 
-                    <form action="{{ route('admin.store.portal-bulk') }}" method="post" id="portal-bulk-form" class="d-none">
-                        @csrf
-                        <input type="hidden" name="portal" id="portal-bulk-portal" value="">
-                        <input type="hidden" name="store_ids_csv" id="portal-bulk-ids" value="">
-                    </form>
-
                 @if(!isset(auth('admin')->user()->zone_id))
                 <div class="select-item min--280">
                     <select name="zone_id" class="form-control js-select2-custom set-filter" data-url="{{url()->full()}}" data-filter="zone_id">
@@ -106,14 +100,6 @@
                 @endif
 
                 <div class="select-item min--220">
-                    <select name="portal" class="form-control js-select2-custom set-filter" data-url="{{ url()->full() }}" data-filter="portal">
-                        <option value="" {{ !request('portal') ? 'selected' : '' }}>{{ translate('All Portals') }}</option>
-                        <option value="vendor" {{ request('portal') === 'vendor' ? 'selected' : '' }}>{{ translate('Vendor') }}</option>
-                        <option value="manufuture" {{ request('portal') === 'manufuture' ? 'selected' : '' }}>{{ translate('Manufuture') }}</option>
-                    </select>
-                </div>
-
-                <div class="select-item min--220">
                     <select name="vendor_type" class="form-control js-select2-custom set-filter" data-url="{{ url()->full() }}" data-filter="vendor_type">
                         <option value="" {{ !request('vendor_type') ? 'selected' : '' }}>{{ translate('All Vendor Types') }}</option>
                         <option value="shopkeeper" {{ request('vendor_type') === 'shopkeeper' ? 'selected' : '' }}>{{ translate('Shopkeeper') }}</option>
@@ -123,17 +109,6 @@
                     </select>
                 </div>
 
-                    <div class="hs-unfold mr-2">
-                        <a class="js-hs-unfold-invoker btn btn-sm btn-white dropdown-toggle min-height-40" href="javascript:;"
-                           data-hs-unfold-options='{"target": "#portalBulkDropdown","type": "css-animation"}'>
-                            {{ translate('Portal') }}
-                        </a>
-                        <div id="portalBulkDropdown" class="hs-unfold-content dropdown-unfold dropdown-menu dropdown-menu-sm-right">
-                            <span class="dropdown-header">{{ translate('Bulk change portal') }}</span>
-                            <a class="dropdown-item" href="javascript:;" data-bulk-portal="vendor">{{ translate('Set Vendor') }}</a>
-                            <a class="dropdown-item" href="javascript:;" data-bulk-portal="manufuture">{{ translate('Set Manufuture') }}</a>
-                        </div>
-                    </div>
                     <form class="search-form">
                                     <!-- Search -->
                         <div class="input-group input--group">
@@ -195,14 +170,10 @@
                         }'>
                     <thead class="thead-light">
                     <tr>
-                        <th class="border-0">
-                            <input type="checkbox" id="portal-bulk-check-all">
-                        </th>
                         <th class="border-0">{{translate('sl')}}</th>
                         <th class="border-0">{{translate('messages.store_information')}}</th>
                         <th class="border-0">{{translate('messages.owner_information')}}</th>
                         <th class="border-0">{{translate('messages.zone')}}</th>
-                        <th class="border-0">{{translate('Portal')}}</th>
                         <th class="border-0">{{ translate('Vendor Type') }}</th>
                         <th class="text-uppercase border-0">{{translate('messages.featured')}}</th>
                         <th class="text-uppercase border-0">{{translate('messages.status')}}</th>
@@ -213,9 +184,6 @@
                     <tbody id="set-rows">
                     @foreach($stores as $key=>$store)
                         <tr>
-                            <td>
-                                <input type="checkbox" class="portal-bulk-check" value="{{ $store->id }}">
-                            </td>
                             <td>{{$key+$stores->firstItem()}}</td>
                             <td>
                                 <div>
@@ -248,9 +216,6 @@
                             </td>
                             <td>
                                 {{$store->zone?$store->zone->name:translate('messages.zone_deleted')}}
-                            </td>
-                            <td>
-                                <span class="badge badge-soft-info text-uppercase">{{ $store->portal ?? 'vendor' }}</span>
                             </td>
                             <td>
                                 <div class="d-flex flex-column align-items-start" style="gap:6px">
@@ -312,23 +277,6 @@
 
                             <td>
                                 <div class="btn--container justify-content-center">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-white dropdown-toggle" type="button" id="portalMenu{{ $store->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{ translate('Portal') }}
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="portalMenu{{ $store->id }}">
-                                            <form action="{{ route('admin.store.portal', $store->id) }}" method="post" class="px-3 py-1">
-                                                @csrf
-                                                <input type="hidden" name="portal" value="vendor">
-                                                <button type="submit" class="btn btn-sm btn-outline-secondary w-100 mb-1">{{ translate('Set Vendor') }}</button>
-                                            </form>
-                                            <form action="{{ route('admin.store.portal', $store->id) }}" method="post" class="px-3 py-1">
-                                                @csrf
-                                                <input type="hidden" name="portal" value="manufuture">
-                                                <button type="submit" class="btn btn-sm btn-outline-primary w-100">{{ translate('Set Manufuture') }}</button>
-                                            </form>
-                                        </div>
-                                    </div>
                                     <a class="btn action-btn btn--warning btn-outline-warning"
                                             href="{{route('admin.store.view', $store->id)}}"
                                             title="{{ translate('messages.view') }}"><i
@@ -440,34 +388,7 @@
             });
         });
 
-        function getSelectedStoreIds() {
-            const ids = [];
-            document.querySelectorAll('.portal-bulk-check:checked').forEach((el) => ids.push(el.value));
-            return ids;
-        }
-
-        document.getElementById('portal-bulk-check-all')?.addEventListener('change', function () {
-            const checked = this.checked;
-            document.querySelectorAll('.portal-bulk-check').forEach((el) => { el.checked = checked; });
-        });
-
-        document.querySelectorAll('[data-bulk-portal]').forEach((el) => {
-            el.addEventListener('click', function () {
-                const portal = this.getAttribute('data-bulk-portal');
-                const ids = getSelectedStoreIds();
-                if (!ids.length) {
-                    toastr.error("{{ translate('messages.no_data_found') }}");
-                    return;
-                }
-                const form = document.getElementById('portal-bulk-form');
-                const portalEl = document.getElementById('portal-bulk-portal');
-                const idsEl = document.getElementById('portal-bulk-ids');
-                if (!form || !portalEl || !idsEl) return;
-                portalEl.value = portal;
-                idsEl.value = ids.join(',');
-                form.submit();
-            });
-        });
+        // Portal bulk controls removed (vendor_type is the unified control)
     </script>
 
 @endpush

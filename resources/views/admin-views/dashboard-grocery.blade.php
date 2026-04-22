@@ -100,8 +100,14 @@
                         <p>{{ translate($mod->module_name) }} · {{ translate('messages.Dashboard') }} — {{ translate('Retail Management System') }}</p>
                         <div class="mf-actions">
                             <a class="mf-btn primary" href="{{ route('admin.order.list',['processing']) }}">📦 {{ translate('Open Orders') }} ({{ $data['processing'] ?? $data['pending'] ?? 0 }})</a>
-                            <a class="mf-btn ghost" href="{{ route('admin.mf.aipulse', array_filter(['module_id' => config('module.current_module_id')])) }}">🤖 {{ translate('AI Pulse Insights') }}</a>
-                            <a class="mf-btn ghost" href="{{ route('admin.mf.products.index', array_filter(['module_id' => config('module.current_module_id')])) }}">📦 {{ translate('Stock Status') }}</a>
+                            <a class="mf-btn ghost"
+                               href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.aipulse') ? route('admin.mf.aipulse', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               @unless(\Illuminate\Support\Facades\Route::has('admin.mf.aipulse')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                            >🤖 {{ translate('AI Pulse Insights') }}</a>
+                            <a class="mf-btn ghost"
+                               href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.products.index') ? route('admin.mf.products.index', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               @unless(\Illuminate\Support\Facades\Route::has('admin.mf.products.index')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                            >📦 {{ translate('Stock Status') }}</a>
                         </div>
                     </div>
                     <div class="col-lg-4 mt-3 mt-lg-0">
@@ -199,7 +205,9 @@
                     <div class="mf-board h-100">
                         <div class="mf-board-h">
                             <div class="ttl">{{ translate('Inventory alerts') }}</div>
-                            <a href="{{ route('admin.mf.products.index', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('Manage stock') }} →</a>
+                            <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.products.index') ? route('admin.mf.products.index', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               @unless(\Illuminate\Support\Facades\Route::has('admin.mf.products.index')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                            >{{ translate('Manage stock') }} →</a>
                         </div>
                         <div class="mf-board-b">
                             <ul class="mf-list">
@@ -236,7 +244,9 @@
                     <div class="mf-board h-100">
                         <div class="mf-board-h">
                             <div class="ttl">{{ translate("Today's tasks") }}</div>
-                            <a href="{{ route('admin.mf.helpcenter', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('All tasks') }} →</a>
+                            <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.helpcenter') ? route('admin.mf.helpcenter', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               @unless(\Illuminate\Support\Facades\Route::has('admin.mf.helpcenter')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                            >{{ translate('All tasks') }} →</a>
                         </div>
                         <div class="mf-board-b">
                             <ul class="mf-list">
@@ -501,7 +511,9 @@
                     <div class="mf-board h-100">
                         <div class="mf-board-h">
                             <div class="ttl">{{ translate('Store activity') }}</div>
-                            <a href="{{ route('admin.mf.orders.index', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('Details') }} →</a>
+                            <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.orders.index') ? route('admin.mf.orders.index', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               @unless(\Illuminate\Support\Facades\Route::has('admin.mf.orders.index')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                            >{{ translate('Details') }} →</a>
                         </div>
                         <div class="mf-board-b">
                             <ul class="mf-list">
@@ -534,7 +546,9 @@
                     <div class="mf-board h-100">
                         <div class="mf-board-h">
                             <div class="ttl">{{ translate('Omnichannel summary') }}</div>
-                            <a href="{{ route('admin.mf.omnichannel', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('Details') }} →</a>
+                            <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.omnichannel') ? route('admin.mf.omnichannel', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               @unless(\Illuminate\Support\Facades\Route::has('admin.mf.omnichannel')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                            >{{ translate('Details') }} →</a>
                         </div>
                         <div class="mf-board-b">
                             <ul class="mf-list">
@@ -553,21 +567,30 @@
                     <div class="mf-board mf-side h-100">
                         <div class="mf-board-h">
                             <div class="ttl">AI PULSE LIVE</div>
-                            <a href="{{ route('admin.mf.aipulse', array_filter(['module_id' => config('module.current_module_id')])) }}" style="color:#a7f3d0">{{ translate('View') }} →</a>
+                            <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.aipulse') ? route('admin.mf.aipulse', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                               aria-disabled="{{ \Illuminate\Support\Facades\Route::has('admin.mf.aipulse') ? 'false' : 'true' }}"
+                               style="color:#a7f3d0;{{ \Illuminate\Support\Facades\Route::has('admin.mf.aipulse') ? '' : 'opacity:.6;pointer-events:none' }}"
+                            >{{ translate('View') }} →</a>
                         </div>
                         <div class="mf-board-b">
                             <div class="mf-cardx">
                                 <div class="h">{{ translate('Demand prediction') }}</div>
                                 <div class="p">{{ translate('Stockout risk detected. Consider reordering soon.') }}</div>
-                                <a href="{{ route('admin.mf.products.index', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('Reorder now') }} →</a>
+                                <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.products.index') ? route('admin.mf.products.index', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                                   @unless(\Illuminate\Support\Facades\Route::has('admin.mf.products.index')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                                >{{ translate('Reorder now') }} →</a>
                             </div>
                             <div class="mf-cardx">
                                 <div class="h">{{ translate('Low stock running') }}</div>
                                 <div class="p">{{ translate('Forecast suggests increased demand this month.') }}</div>
-                                <a href="{{ route('admin.mf.pos', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('Create PO') }} →</a>
+                                <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.pos') ? route('admin.mf.pos', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                                   @unless(\Illuminate\Support\Facades\Route::has('admin.mf.pos')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                                >{{ translate('Create PO') }} →</a>
                             </div>
                             <div class="mf-cta">
-                                <a href="{{ route('admin.mf.aipulse', array_filter(['module_id' => config('module.current_module_id')])) }}">{{ translate('View AI Insights') }}</a>
+                                <a href="{{ \Illuminate\Support\Facades\Route::has('admin.mf.aipulse') ? route('admin.mf.aipulse', array_filter(['module_id' => config('module.current_module_id')])) : 'javascript:void(0)' }}"
+                                   @unless(\Illuminate\Support\Facades\Route::has('admin.mf.aipulse')) aria-disabled="true" style="opacity:.6;pointer-events:none" @endunless
+                                >{{ translate('View AI Insights') }}</a>
                             </div>
                         </div>
                     </div>

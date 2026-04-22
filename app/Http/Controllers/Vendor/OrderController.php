@@ -12,6 +12,7 @@ use App\CentralLogics\Helpers;
 use App\Models\BusinessSetting;
 use App\CentralLogics\OrderLogic;
 use App\CentralLogics\CouponLogic;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\OrderPayment;
@@ -28,7 +29,12 @@ class OrderController extends Controller
         $key = explode(' ', request()?->search);
         Order::where(['checked' => 0])->where('store_id',Helpers::get_store_id())->update(['checked' => 1]);
 
-        $orders = Order::with(['customer'])
+        $storeData = Helpers::get_store_data();
+        $sub = $storeData?->store_sub ?? $storeData?->store_sub_update_application;
+        $allowAll = ($storeData?->store_business_model ?? null) === 'commission';
+        $ordersRmsUi = $allowAll || ((int) data_get($sub, 'order_rms_ui', 1) === 1);
+
+        $orders = Order::with(['customer','details.item.category'])
         ->when($status == 'searching_for_deliverymen', function($query){
             return $query->SearchingForDeliveryman();
         })
@@ -58,10 +64,10 @@ class OrderController extends Controller
             return $query->where('order_status','handover');
         })
         ->when($status == 'refund_requested', function($query){
-            return $query->RefundRequest();
+            return $query->where('order_status', 'refund_requested');
         })
         ->when($status == 'refunded', function($query){
-            return $query->Refunded();
+            return $query->where('order_status', 'refunded');
         })
         ->when($status == 'scheduled', function($query){
             return $query->Scheduled()->where(function($q){
@@ -98,12 +104,91 @@ class OrderController extends Controller
                 }
             });
         })
-        ->StoreOrder()->NotDigitalOrder()
+        ->when($ordersRmsUi, function ($q) {
+            return $q->whereIn('order_type', ['take_away', 'delivery', 'pos']);
+        }, function ($q) {
+            return $q->StoreOrder();
+        })->NotDigitalOrder()
         ->where('store_id',\App\CentralLogics\Helpers::get_store_id())
         ->orderBy('schedule_at', 'desc')
         ->paginate(config('default_pagination'));
+
+        $storeId = Helpers::get_store_id();
+        $base = Order::query()
+            ->where('store_id', $storeId)
+            ->when($ordersRmsUi, function ($q) {
+                return $q->whereIn('order_type', ['take_away', 'delivery', 'pos']);
+            }, function ($q) {
+                return $q->StoreOrder();
+            })
+            ->NotDigitalOrder();
+
+        $order_stats = [
+            'all' => (clone $base)->where(function($query){
+                return $query->whereNotIn(
+                    'order_status',
+                    (config('order_confirmation_model') == 'store' || Helpers::get_store_data()->sub_self_delivery)
+                        ? ['failed','canceled', 'refund_requested', 'refunded']
+                        : ['pending','failed','canceled', 'refund_requested', 'refunded']
+                )->orWhere(function($q){
+                    return $q->where('order_status','pending')->where('order_type','take_away');
+                });
+            })->count(),
+            'pending' => (clone $base)->where(function($q){
+                if(config('order_confirmation_model') == 'store' || Helpers::get_store_data()->sub_self_delivery) {
+                    $q->where('order_status','pending');
+                } else {
+                    $q->where('order_status','pending')->where('order_type','take_away');
+                }
+            })->count(),
+            'confirmed' => (clone $base)->whereIn('order_status',['confirmed','accepted'])->whereNotNull('confirmed')->count(),
+            'processing' => (clone $base)->where('order_status','processing')->count(),
+            'handover' => (clone $base)->where('order_status','handover')->count(),
+            'picked_up' => (clone $base)->where('order_status','picked_up')->count(),
+            'delivered' => (clone $base)->where('order_status','delivered')->count(),
+            'refund_requested' => (clone $base)->where('order_status','refund_requested')->count(),
+            'refunded' => (clone $base)->where('order_status','refunded')->count(),
+        ];
+
+        $from30 = Carbon::now()->subDays(30)->startOfDay();
+        $channel_counts = Order::query()
+            ->where('store_id', $storeId)
+            ->whereIn('order_type', ['delivery', 'take_away', 'pos'])
+            ->whereBetween('created_at', [$from30, Carbon::now()])
+            ->selectRaw('order_type, COUNT(*) as c')
+            ->groupBy('order_type')
+            ->pluck('c', 'order_type')
+            ->toArray();
+        $order_stats['channels'] = [
+            'online' => (int) ($channel_counts['delivery'] ?? 0),
+            'click_collect' => (int) ($channel_counts['take_away'] ?? 0),
+            'pos' => (int) ($channel_counts['pos'] ?? 0),
+        ];
+
+        // KPIs (this month)
+        $fromMonth = Carbon::now()->startOfMonth();
+        $baseMonth = Order::query()
+            ->where('store_id', $storeId)
+            ->when($ordersRmsUi, function ($q) {
+                return $q->whereIn('order_type', ['take_away', 'delivery', 'pos']);
+            }, function ($q) {
+                return $q->StoreOrder();
+            })
+            ->NotDigitalOrder()
+            ->whereBetween('created_at', [$fromMonth, Carbon::now()]);
+
+        $order_kpis = [
+            'total_orders' => (clone $baseMonth)->count(),
+            // "Pending Pickup" ≈ confirmed + processing
+            'pending_pickup' => (clone $baseMonth)->whereIn('order_status', ['confirmed', 'accepted', 'processing'])->count(),
+            // "In Transit" ≈ picked_up
+            'in_transit' => (clone $baseMonth)->where('order_status', 'picked_up')->count(),
+            // "Returns" ≈ refund requested/refunded
+            'returns' => (clone $baseMonth)->whereIn('order_status', ['refund_requested', 'refunded'])->count(),
+        ];
+
         $status = $status;
-        return view('vendor-views.order.list', compact('orders', 'status'));
+        return view('vendor-views.order.list', compact('orders', 'status', 'order_stats', 'order_kpis'));
     }
 
 
@@ -141,10 +226,10 @@ class OrderController extends Controller
             return $query->where('order_status','handover');
         })
         ->when($status == 'refund_requested', function($query){
-            return $query->RefundRequest();
+            return $query->where('order_status', 'refund_requested');
         })
         ->when($status == 'refunded', function($query){
-            return $query->Refunded();
+            return $query->where('order_status', 'refunded');
         })
         ->when($status == 'scheduled', function($query){
             return $query->Scheduled()->where(function($q){

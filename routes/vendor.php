@@ -15,53 +15,50 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
 
         Route::get('lang/{locale}', 'LanguageController@lang')->name('lang');
         Route::get('/', function (\Illuminate\Http\Request $request) {
-            if (config('manufuture.vendor_default')) {
-                return redirect()->route('vendor.mf.dashboard', $request->query());
-            }
             return app(\App\Http\Controllers\Vendor\DashboardController::class)->dashboard($request);
         })->name('dashboard');
-        // Manufuture portal (portal-gated)
-        Route::prefix('mf')->as('mf.')->middleware(['manufuture.portal'])->group(function () {
-            Route::get('/', [\App\Http\Controllers\Vendor\ManufutureController::class, 'dashboard'])
-                ->middleware('vendor_type:mf_dashboard')
-                ->name('dashboard');
-            Route::get('orders', [\App\Http\Controllers\Vendor\ManufutureOrderController::class, 'index'])
-                ->middleware('vendor_type:mf_orders')
-                ->name('orders');
-            Route::get('products', [\App\Http\Controllers\Vendor\ManufutureProductController::class, 'index'])
-                ->middleware('vendor_type:mf_products')
-                ->name('products');
-            Route::get('pos', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
-                ->middleware('vendor_type:mf_pos')
-                ->defaults('feature', 'pos')
-                ->name('pos');
-
-            Route::get('aipulse', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
-                ->middleware('vendor_type:mf_aipulse')
-                ->defaults('feature', 'aipulse')
-                ->name('aipulse');
-            Route::get('omnichannel', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
-                ->middleware('vendor_type:mf_omnichannel')
-                ->defaults('feature', 'omnichannel')
-                ->name('omnichannel');
-            Route::get('returns', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
-                ->middleware('vendor_type:mf_returns')
-                ->defaults('feature', 'returns')
-                ->name('returns');
-            Route::get('helpcenter', [\App\Http\Controllers\Vendor\ManufutureFeatureController::class, 'comingSoon'])
-                ->middleware('vendor_type:mf_helpcenter')
-                ->defaults('feature', 'helpcenter')
-                ->name('helpcenter');
+        // Backward-compat redirects (remove after rollout)
+        Route::prefix('mf')->group(function () {
+            Route::get('/', fn () => redirect()->route('vendor.dashboard'))->name('mf.redirect.dashboard');
+            Route::get('orders', fn () => redirect()->route('vendor.order.list', ['status' => 'all']))->name('mf.redirect.orders');
+            Route::get('products', fn () => redirect()->route('vendor.item.list'))->name('mf.redirect.products');
+            Route::get('pos', fn () => redirect()->route('vendor.pos.index'))->name('mf.redirect.pos');
+            Route::get('aipulse', fn () => redirect()->route('vendor.ai_pulse'))->name('mf.redirect.aipulse');
+            Route::get('omnichannel', fn () => redirect()->route('vendor.omnichannel'))->name('mf.redirect.omnichannel');
+            Route::get('returns', fn () => redirect()->route('vendor.returns'))->name('mf.redirect.returns');
+            Route::get('helpcenter', fn () => redirect()->route('vendor.helpcenter'))->name('mf.redirect.helpcenter');
         });
         Route::get('/get-store-data', 'DashboardController@store_data')->name('get-store-data');
         Route::post('/store-token', 'DashboardController@updateDeviceToken')->name('store.token');
 
-        Route::group(['middleware' => ['module:reviews' ,'subscription:reviews']], function () {
+        Route::group(['middleware' => ['module:reviews' ,'subscription:reviews','vendor_type:reviews']], function () {
             Route::get('/reviews', 'ReviewController@index')->name('reviews');
             Route::get('/reviews_export', 'ReviewController@reviewsExport')->name('reviewsExport');
             Route::post('/store-reply/{id}', 'ReviewController@update_reply')->name('review-reply');
         });
         Route::get('site_direction', 'BusinessSettingsController@site_direction_vendor')->name('site_direction');
+
+        // Unified coming-soon modules (AI Pulse, Omnichannel, Returns, Help Center, etc.)
+        Route::get('feature/{feature}', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->name('feature.comingSoon');
+
+        // Unified vendor panel advanced modules (Coming Soon; gated by vendor_type + subscription)
+        Route::get('ai-pulse', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor_type:ai_pulse', 'subscription:ai_pulse'])
+            ->defaults('feature', 'ai_pulse')
+            ->name('ai_pulse');
+        Route::get('omnichannel', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor_type:omnichannel', 'subscription:omnichannel'])
+            ->defaults('feature', 'omnichannel')
+            ->name('omnichannel');
+        Route::get('returns', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor_type:returns', 'subscription:returns'])
+            ->defaults('feature', 'returns')
+            ->name('returns');
+        Route::get('help-center', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor_type:helpcenter', 'subscription:helpcenter'])
+            ->defaults('feature', 'helpcenter')
+            ->name('helpcenter');
 
 
         Route::group(['prefix' => 'pos', 'as' => 'pos.'], function () {
@@ -106,7 +103,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::post('order-stats', 'DashboardController@order_stats')->name('order-stats');
         });
 
-        Route::group(['prefix' => 'category', 'as' => 'category.', 'middleware' => ['module:category','subscription:category']], function () {
+        Route::group(['prefix' => 'category', 'as' => 'category.', 'middleware' => ['module:category','subscription:category','vendor_type:category']], function () {
             Route::get('get-all', 'CategoryController@get_all')->name('get-all');
             Route::get('list', 'CategoryController@index')->name('add');
             Route::get('sub-category-list', 'CategoryController@sub_index')->name('add-sub-category');
@@ -114,7 +111,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::get('export-sub-categories', 'CategoryController@export_sub_categories')->name('export-sub-categories');
         });
 
-        Route::group(['prefix' => 'custom-role', 'as' => 'custom-role.', 'middleware' => ['module:role' ,'subscription:role']], function () {
+        Route::group(['prefix' => 'custom-role', 'as' => 'custom-role.', 'middleware' => ['module:role' ,'subscription:role','vendor_type:role']], function () {
             Route::get('create', 'CustomRoleController@create')->name('create');
             Route::post('create', 'CustomRoleController@store')->name('store');
             Route::get('edit/{id}', 'CustomRoleController@edit')->name('edit');
@@ -124,13 +121,13 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
 
         Route::group(['prefix' => 'delivery-man', 'as' => 'delivery-man.'], function () {
 
-            Route::group(['middleware' => ['module:deliveryman' ,'subscription:deliveryman']], function () {
+            Route::group(['middleware' => ['module:deliveryman' ,'subscription:deliveryman','vendor_type:deliveryman']], function () {
 
                 Route::get('add', 'DeliveryManController@index')->name('add');
                 Route::post('store', 'DeliveryManController@store')->name('store');
             });
 
-            Route::group(['middleware' => ['module:deliveryman_list' ,'subscription:deliveryman_list']], function () {
+            Route::group(['middleware' => ['module:deliveryman_list' ,'subscription:deliveryman_list','vendor_type:deliveryman_list']], function () {
                 Route::get('preview/{id}/{tab?}', 'DeliveryManController@preview')->name('preview');
                 Route::get('list', 'DeliveryManController@list')->name('list');
                 Route::group(['prefix' => 'reviews', 'as' => 'reviews.'], function () {

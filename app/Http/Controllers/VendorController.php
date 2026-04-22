@@ -39,14 +39,7 @@ class VendorController extends Controller
         }
         $admin_commission= Helpers::get_business_settings ('admin_commission');
         $business_name= Helpers::get_business_settings ('business_name');
-        $packages= SubscriptionPackage::where('status',1)
-            ->where('module_type', 'all')
-            ->where(function ($q) {
-                $q->whereNull('vendor_types')
-                    ->orWhereJsonContains('vendor_types', 'shopkeeper');
-            })
-            ->latest()
-            ->get();
+        $packages= SubscriptionPackage::where('status',1)->where('module_type', 'all')->latest()->get();
         $custome_recaptcha = new CaptchaBuilder;
         $custome_recaptcha->build();
         Session::put('six_captcha', $custome_recaptcha->getPhrase());
@@ -91,6 +84,7 @@ class VendorController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
+            'vendor_type' => 'required|in:shopkeeper,manufacturer,wholesale,b2b',
             'f_name' => 'required',
             'name' => 'required',
             'address' => 'required',
@@ -170,9 +164,8 @@ class VendorController extends Controller
         $store->delivery_time = $request->minimum_delivery_time .'-'. $request->maximum_delivery_time.' '.$request->delivery_time_type;
         $store->status = 0;
         $store->store_business_model = 'none';
-        $store->portal = in_array($request->input('portal'), ['vendor', 'manufuture'], true)
-            ? $request->input('portal')
-            : 'vendor';
+        $store->portal = 'vendor';
+        $store->vendor_type = $request->input('vendor_type', 'shopkeeper');
         $store->save();
 
         Helpers::add_or_update_translations(request: $request, key_data: 'name', name_field: 'name', model_name: 'Store', data_id: $store->id, data_value: $store->name);
@@ -206,6 +199,18 @@ class VendorController extends Controller
 
         if (Helpers::subscription_check()) {
             if ($request->business_plan == 'subscription-base' && $request->package_id != null ) {
+
+                $selectedPackage = SubscriptionPackage::withoutGlobalScope('translate')->where('status', 1)->find($request->package_id);
+                if (!$selectedPackage) {
+                    $validator->getMessageBag()->add('package_id', translate('messages.no_data_found'));
+                    return response()->json(['errors' => Helpers::error_processor($validator)]);
+                }
+                $vt = (string) $request->input('vendor_type', 'shopkeeper');
+                $allowedVendorTypes = $selectedPackage->vendor_types;
+                if (is_array($allowedVendorTypes) && count($allowedVendorTypes) > 0 && !in_array($vt, $allowedVendorTypes, true)) {
+                    $validator->getMessageBag()->add('package_id', translate('messages.invalid_input'));
+                    return response()->json(['errors' => Helpers::error_processor($validator)]);
+                }
 
                 $store->package_id = $request->package_id;
                 $store->save();

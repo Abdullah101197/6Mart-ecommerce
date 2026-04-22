@@ -328,6 +328,143 @@ active
                             </label>
                         </div>
 
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('ai_pulse') == 1 ? 'checked' : '' }} name="ai_pulse" value="1">
+                                <span class="form-check-label text-dark">{{ translate('AI Pulse') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('omnichannel') == 1 ? 'checked' : '' }} name="omnichannel" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Omnichannel') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('returns') == 1 ? 'checked' : '' }} name="returns" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Returns') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('helpcenter') == 1 ? 'checked' : '' }} name="helpcenter" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Help Center') }}</span>
+                            </label>
+                        </div>
+
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('order_rms_ui', 1) == 1 ? 'checked' : '' }} name="order_rms_ui" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Orders RMS UI') }}</span>
+                            </label>
+                        </div>
+
+                        <div class="w-100 mt-3 mb-1">
+                            <div class="text--title font-weight-bold">{{ translate('Dashboard') }}</div>
+                            <div class="fz-12px text-muted">{{ translate('Control what appears on the vendor dashboard') }}</div>
+                        </div>
+
+                        {{-- KPI cards --}}
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_gmv', 1) == 1 ? 'checked' : '' }} name="dash_kpi_gmv" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Display GMV') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_orders', 1) == 1 ? 'checked' : '' }} name="dash_kpi_orders" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Display Orders KPI') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_stock_health', 1) == 1 ? 'checked' : '' }} name="dash_kpi_stock_health" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Display Stock Health KPI') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_items', 1) == 1 ? 'checked' : '' }} name="dash_kpi_items" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Display Items KPI') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_tasks_due', 1) == 1 ? 'checked' : '' }} name="dash_kpi_tasks_due" value="1">
+                                <span class="form-check-label text-dark">{{ translate("Display Today's Tasks KPI") }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_ai_pulse_status', 1) == 1 ? 'checked' : '' }} name="dash_kpi_ai_pulse_status" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Display AI Pulse KPI') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_kpi_nps', 1) == 1 ? 'checked' : '' }} name="dash_kpi_nps" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Display NPS Score') }}</span>
+                            </label>
+                        </div>
+
+                        {{-- Sections --}}
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_revenue_trend_channels', 1) == 1 ? 'checked' : '' }} name="dash_revenue_trend_channels" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Revenue Trend + Channels') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_channel_mix', 1) == 1 ? 'checked' : '' }} name="dash_channel_mix" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Channel Mix') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_ai_pulse_live', 1) == 1 ? 'checked' : '' }} name="dash_ai_pulse_live" value="1">
+                                <span class="form-check-label text-dark">{{ translate('AI Pulse Live') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_recent_orders', 1) == 1 ? 'checked' : '' }} name="dash_recent_orders" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Recent Orders') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_inventory_alerts', 1) == 1 ? 'checked' : '' }} name="dash_inventory_alerts" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Inventory Alerts') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_today_tasks', 1) == 1 ? 'checked' : '' }} name="dash_today_tasks" value="1">
+                                <span class="form-check-label text-dark">{{ translate("Today's Tasks") }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_store_activity', 1) == 1 ? 'checked' : '' }} name="dash_store_activity" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Store Activity') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_top_loyal_buyers', 1) == 1 ? 'checked' : '' }} name="dash_top_loyal_buyers" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Top Loyal Buyers') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('dash_omnichannel_summary', 1) == 1 ? 'checked' : '' }} name="dash_omnichannel_summary" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Omnichannel Summary') }}</span>
+                            </label>
+                        </div>
+
                     </div>
                 </div>
             </div>

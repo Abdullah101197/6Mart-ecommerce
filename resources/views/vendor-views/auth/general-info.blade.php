@@ -1,8 +1,8 @@
 @extends('layouts.landing.app')
-@php($applyTitle = $applyTitle ?? translate('messages.vendor_registration'))
-@php($applyRoutePrefix = $applyRoutePrefix ?? 'restaurant')
-@php($applyHeadingLabel = $applyHeadingLabel ?? translate('messages.vendor'))
-@php($isManufutureApply = ($applyRoutePrefix === 'manufuture'))
+@php($applyTitle = translate('messages.vendor_registration'))
+@php($applyRoutePrefix = 'restaurant')
+@php($applyHeadingLabel = translate('messages.vendor'))
+@php($isManufutureApply = false)
 @section('title', $applyTitle)
 @push('css_or_js')
     <link rel="stylesheet" href="{{ asset('assets/admin/css/toastr.css') }}">
@@ -50,7 +50,7 @@
             <!-- Stepper -->
             <div class="stepper">
                 <div id="show-step1" class="stepper-item active">
-                    <div class="step-name">{{ $isManufutureApply ? translate('Supplier Info') : translate('General Info') }}</div>
+                    <div class="step-name">{{ translate('General Info') }}</div>
                 </div>
                 <div class="stepper-item" id="show-step2">
                     <div class="step-name">{{ translate('Business Plan') }}</div>
@@ -67,7 +67,7 @@
                     <div class="card __card mb-3">
                         <div class="card-header">
                             <h5 class="card-title">
-                                {{ $isManufutureApply ? 'Manufuture info' : translate('messages.vendor_info') }}
+                                {{ translate('messages.vendor_info') }}
                             </h5>
                         </div>
                         <div class="card-body p-4">
@@ -108,6 +108,19 @@
                                             <div class="lang_form " id="default-form">
                                                 <input type="hidden" name="lang[]" value="default">
                                                 <div class="row g-2">
+                                                    <div class="col-12">
+                                                        <div class="form-group">
+                                                            <label class="input-label" for="vendor_type">
+                                                                {{ translate('Vendor Type') }}<span class="text-danger">*</span>
+                                                            </label>
+                                                            <select name="vendor_type" id="vendor_type" required class="form-control __form-control js-select2-custom">
+                                                                <option value="shopkeeper" {{ old('vendor_type', request('vendor_type', 'shopkeeper')) === 'shopkeeper' ? 'selected' : '' }}>{{ translate('Shopkeeper') }}</option>
+                                                                <option value="manufacturer" {{ old('vendor_type', request('vendor_type')) === 'manufacturer' ? 'selected' : '' }}>{{ translate('Manufacturer') }}</option>
+                                                                <option value="wholesale" {{ old('vendor_type', request('vendor_type')) === 'wholesale' ? 'selected' : '' }}>{{ translate('Wholesale Vendor') }}</option>
+                                                                <option value="b2b" {{ old('vendor_type', request('vendor_type')) === 'b2b' ? 'selected' : '' }}>{{ translate('B2B Vendor') }}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-lg-6">
                                                         <div class="mb-4 mb-lg-0">
                                                             <div class="form-group">
@@ -157,7 +170,7 @@
                                                                        value="{{ old('name.' . $key + 1) }}"
                                                                        id="{{ $lang }}_name"
                                                                        class="form-control __form-control"
-                                                                       placeholder="{{ $isManufutureApply ? 'Manufuture name' : translate('messages.vendor_name') }}">
+                                                                       placeholder="{{ translate('messages.vendor_name') }}">
                                                             </div>
                                                         </div>
 
@@ -796,6 +809,63 @@
         };
     </script>
 
+    <script>
+        (function () {
+            "use strict";
+
+            function getSelectedVendorType() {
+                const el = document.getElementById('vendor_type');
+                return el ? (el.value || 'shopkeeper') : 'shopkeeper';
+            }
+
+            function isPackageAllowedForVendorType(pkgVendorTypes, vendorType) {
+                if (!pkgVendorTypes || !Array.isArray(pkgVendorTypes) || pkgVendorTypes.length === 0) {
+                    return true; // NULL/empty = available for all
+                }
+                return pkgVendorTypes.includes(vendorType);
+            }
+
+            function applyPackageFilter() {
+                const vendorType = getSelectedVendorType();
+                const items = document.querySelectorAll('#show_sub_packages label.__plan-item[data-vendor-types]');
+                let firstVisibleRadio = null;
+
+                items.forEach((label) => {
+                    let allowedTypes = null;
+                    try {
+                        allowedTypes = JSON.parse(label.getAttribute('data-vendor-types'));
+                    } catch (e) {
+                        allowedTypes = null;
+                    }
+
+                    const ok = isPackageAllowedForVendorType(allowedTypes, vendorType);
+                    label.style.display = ok ? '' : 'none';
+
+                    const radio = label.querySelector('input[type="radio"][name="package_id"]');
+                    if (ok && radio && !firstVisibleRadio) {
+                        firstVisibleRadio = radio;
+                    }
+                });
+
+                const checked = document.querySelector('#show_sub_packages input[type="radio"][name="package_id"]:checked');
+                if (checked) {
+                    const parent = checked.closest('label.__plan-item');
+                    if (parent && parent.style.display === 'none') {
+                        checked.checked = false;
+                    }
+                }
+                const anyChecked = document.querySelector('#show_sub_packages input[type="radio"][name="package_id"]:checked');
+                if (!anyChecked && firstVisibleRadio) {
+                    firstVisibleRadio.checked = true;
+                }
+            }
+
+            document.getElementById('vendor_type')?.addEventListener('change', applyPackageFilter);
+            // Apply once on load
+            setTimeout(applyPackageFilter, 50);
+        })();
+    </script>
+
     <script src="{{ asset('assets/admin/js/file-preview/pdf.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/file-preview/pdf-worker.min.js') }}"></script>
     <script src="{{ asset('assets/admin/js/file-preview/store-join-us.js') }}"></script>
@@ -840,6 +910,9 @@ $("#form-id").on('submit', function(e) {
             return;
         } else if (!$('#address').val()) {
             toastr.error(APPLY_ENTITY_LABEL + " address is required");
+            return;
+        } else if (!$('#vendor_type').val()) {
+            toastr.error("{{ translate('Vendor Type') }}" + " is required");
             return;
         } else if (!logo?.files?.length) {
             toastr.error(APPLY_ENTITY_LABEL + " logo is required");

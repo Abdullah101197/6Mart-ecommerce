@@ -46,20 +46,14 @@ return [
         ],
 
         'manufacturer' => [
-            // Manufacturer portal (mf) wrappers
-            'mf_dashboard',
-            'mf_orders',
-            'mf_products',
-            'mf_pos',
-            'mf_aipulse',
-            'mf_omnichannel',
-            'mf_returns',
-            'mf_helpcenter',
-
-            // Still allow underlying vendor modules used by wrappers
+            // Unified vendor panel modules (same routes, gated by vendor_type + subscription)
             'order',
             'item',
             'pos',
+            'ai_pulse',
+            'omnichannel',
+            'returns',
+            'helpcenter',
             'category',
             'addon',
             'banner',
@@ -76,6 +70,10 @@ return [
             'order',
             'item',
             'pos',
+            'ai_pulse',
+            'omnichannel',
+            'returns',
+            'helpcenter',
             'category',
             'addon',
             'campaign',
@@ -105,6 +103,10 @@ return [
             'order',
             'item',
             'pos',
+            'ai_pulse',
+            'omnichannel',
+            'returns',
+            'helpcenter',
             'category',
             'addon',
             'campaign',

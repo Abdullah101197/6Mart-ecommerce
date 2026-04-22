@@ -13,42 +13,111 @@
     $max_processing_time = explode('-', $order['store']['delivery_time'])[0];
     ?>
     <div class="content container-fluid">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="row align-items-center">
-                <div class="col-sm mb-2 mb-sm-0">
-                    <h1 class="page-header-title">
-                        <span class="page-header-icon">
-                            <img src="{{ asset('/assets/admin/img/shopping-basket.png') }}" class="w--20"
-                                alt="">
-                        </span>
-                        <span>
-                            {{ translate('order_details') }} <span
-                                class="badge badge-soft-dark rounded-circle ml-1">{{ $order->details->count() }}</span>
-                        </span>
-                    </h1>
-                </div>
+        @php($storeData = \App\CentralLogics\Helpers::get_store_data())
+        @php($sub = $storeData?->store_sub ?? $storeData?->store_sub_update_application)
+        @php($allowAll = ($storeData?->store_business_model ?? null) === 'commission')
+        @php($ordersRmsUi = $allowAll || ((int) data_get($sub, 'order_rms_ui', 1) === 1))
+        @php($addr = $order->is_guest ? (json_decode((string)($order->delivery_address ?? '{}'), true) ?: []) : (json_decode((string)($order->delivery_address ?? '{}'), true) ?: []))
+        @php($buyer = $order->is_guest ? (string) data_get($addr,'contact_person_name','') : trim((string)($order?->customer?->f_name ?? '').' '.(string)($order?->customer?->l_name ?? '')))
+        @php($city = (string) data_get($addr,'city',''))
+        @php($channel = $order['order_type'] === 'take_away' ? 'Click & Collect' : ($order['order_type'] === 'pos' ? 'In-Store' : 'Online'))
 
-                <div class="col-sm-auto">
-                    <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle mr-1"
-                        href="{{ route('vendor.order.details', [$order['id'] - 1]) }}" data-toggle="tooltip"
-                        data-placement="top" title="Previous order">
-                        <i class="tio-chevron-left"></i>
-                    </a>
-                    <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle"
-                        href="{{ route('vendor.order.details', [$order['id'] + 1]) }}" data-toggle="tooltip"
-                        data-placement="top" title="Next order">
-                        <i class="tio-chevron-right"></i>
-                    </a>
+        @if($ordersRmsUi)
+            @push('css_or_js')
+                <style>
+                    .mf-od{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+                    .mf-od .mf-welcome{
+                        background: linear-gradient(125deg, var(--dark-clr, #005555) 0%, var(--primary, #006161) 45%, var(--primary-clr, #107980) 100%);
+                        border-radius:14px;padding:18px 20px;color:#fff;position:relative;overflow:hidden
+                    }
+                    .mf-od .mf-welcome:before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04)}
+                    .mf-od .mf-welcome:after{content:'';position:absolute;right:60px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.03)}
+                    .mf-od .mf-welcome h1{font-size:16px;font-weight:900;margin:0;color:#fff;position:relative}
+                    .mf-od .mf-welcome p{font-size:12px;opacity:.82;margin:6px 0 0;color:#fff;position:relative}
+                    .mf-od .mf-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;position:relative}
+                    .mf-od .mf-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 12px;font-weight:900;font-size:12px;border:1px solid rgba(255,255,255,.28);text-decoration:none}
+                    .mf-od .mf-chip.primary{background:#fff;color:#0f172a;border-color:#fff}
+                    .mf-od .mf-chip.ghost{background:rgba(255,255,255,.14);color:#fff}
+                    .mf-od .mf-pill{display:inline-flex;align-items:center;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:900;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff}
+                    .mf-od-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+                    .mf-od-card .card-header{border-bottom:1px solid #eef2f7}
+                    .mf-od-card .page-header-title{font-size:16px;font-weight:900;color:#0f172a}
+                    .mf-od-card .order-invoice-right-contents h6{font-size:12px;margin-bottom:8px}
+                    .mf-od-card .order-invoice-left>div>span{font-size:12px;color:#475569}
+                </style>
+            @endpush
+        @endif
+        <!-- Page Header -->
+        @if($ordersRmsUi)
+            <div class="mf-od mb-3">
+                <div class="mf-welcome">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h1>{{ translate('Order') }} PO-{{ $order['id'] }}</h1>
+                            <p>
+                                {{ $buyer !== '' ? $buyer : translate('Customer') }}
+                                @if($city !== '')
+                                    · {{ $city }}
+                                @endif
+                                · <span class="mf-pill">{{ translate($channel) }}</span>
+                                · <span class="mf-pill">{{ translate(ucwords(str_replace('_',' ', (string) $order['order_status']))) }}</span>
+                            </p>
+                            <div class="mf-chips">
+                                <a class="mf-chip primary" href="{{ route('vendor.order.list',['all']) }}">{{ translate('Back to Orders') }}</a>
+                                <a class="mf-chip ghost" target="_blank" href="{{ route('vendor.order.generate-invoice',[$order['id']]) }}">{{ translate('Invoice') }}</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mt-3 mt-lg-0 text-right">
+                            <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle mr-1"
+                               href="{{ route('vendor.order.details', [$order['id'] - 1]) }}" data-toggle="tooltip"
+                               data-placement="top" title="Previous order">
+                                <i class="tio-chevron-left"></i>
+                            </a>
+                            <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle"
+                               href="{{ route('vendor.order.details', [$order['id'] + 1]) }}" data-toggle="tooltip"
+                               data-placement="top" title="Next order">
+                                <i class="tio-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        @else
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col-sm mb-2 mb-sm-0">
+                        <h1 class="page-header-title">
+                            <span class="page-header-icon">
+                                <img src="{{ asset('/assets/admin/img/shopping-basket.png') }}" class="w--20" alt="">
+                            </span>
+                            <span>
+                                {{ translate('order_details') }}
+                                <span class="badge badge-soft-dark rounded-circle ml-1">{{ $order->details->count() }}</span>
+                            </span>
+                        </h1>
+                    </div>
+
+                    <div class="col-sm-auto">
+                        <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle mr-1"
+                           href="{{ route('vendor.order.details', [$order['id'] - 1]) }}" data-toggle="tooltip"
+                           data-placement="top" title="Previous order">
+                            <i class="tio-chevron-left"></i>
+                        </a>
+                        <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle"
+                           href="{{ route('vendor.order.details', [$order['id'] + 1]) }}" data-toggle="tooltip"
+                           data-placement="top" title="Next order">
+                            <i class="tio-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
         <!-- End Page Header -->
 
         <div class="row" id="printableArea">
             <div class="col-lg-8 mb-3 mb-lg-0">
                 <!-- Card -->
-                <div class="card mb-3 mb-lg-5">
+                <div class="card mb-3 mb-lg-5 {{ $ordersRmsUi ? 'mf-od mf-od-card' : '' }}">
                     <!-- Header -->
                     <div class="card-header border-0 align-items-start flex-wrap">
                         <div class="order-invoice-left d-flex d-sm-flex justify-content-between">

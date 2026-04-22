@@ -11,6 +11,13 @@
 
 
          @if(\App\CentralLogics\Helpers::employee_module_permission_check('dashboard'))
+        @php($store = \App\CentralLogics\Helpers::get_store_data())
+        @php($vt = strtolower((string) ($store?->vendor_type ?? config('vendor_types.default','shopkeeper'))))
+        @php($isManufacturerDash = in_array($vt, ['manufacturer','manufuture'], true))
+
+        @if($isManufacturerDash)
+            @include('vendor-views.partials._dashboard_manufacturer_rms')
+        @else
         <!-- Page Header -->
         <div class="page-header">
             <div class="row align-items-center">
@@ -55,9 +62,6 @@
                             </div>
 
                         @endif
-
-
-
 
                     <div class="promo-card-2">
                         <img src="{{asset('assets/admin/img/promo-arrow.png')}}" class="shapes" alt="">
@@ -236,6 +240,7 @@
 
         </div>
         <!-- End Row -->
+        @endif
         @else
         <!-- Page Header -->
         <div class="page-header">

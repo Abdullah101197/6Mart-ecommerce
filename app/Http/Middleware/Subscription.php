@@ -69,6 +69,11 @@ class Subscription
                         'expense_report' => 'expense_report',
                         'disbursement_report' => 'disbursement_report',
                         'vat_report' => 'vat_report',
+                        // Unified vendor panel new modules
+                        'ai_pulse' => 'ai_pulse',
+                        'omnichannel' => 'omnichannel',
+                        'returns' => 'returns',
+                        'helpcenter' => 'helpcenter',
                     ];
 
                     // If an unknown key is used, deny (safer) so missing mappings don't silently bypass access control.

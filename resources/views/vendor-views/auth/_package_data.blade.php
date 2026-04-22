@@ -1,7 +1,8 @@
 <div class="plan-slider owl-theme owl-carousel owl-refresh">
     @forelse ($packages as $key=> $package)
         <label
-            class="__plan-item {{ (count($packages) > 4 && $key == 2) || (count($packages) < 5 && $key == 1) ? 'active' : '' }} ">
+            class="__plan-item {{ (count($packages) > 4 && $key == 2) || (count($packages) < 5 && $key == 1) ? 'active' : '' }}"
+            data-vendor-types='@json($package->vendor_types)'>
             <input type="radio" name="package_id"  {{ (count($packages) > 4 && $key == 2) || (count($packages) < 5 && $key == 1) ? 'checked' : '' }} id="package_id{{ $key }}" value="{{ $package->id }}"
                 class="d-none">
             <div class="inner-div">

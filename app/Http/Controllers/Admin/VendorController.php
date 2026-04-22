@@ -540,16 +540,12 @@ class VendorController extends Controller
         $zone_id = $request->query('zone_id', 'all');
         $type = $request->query('type', 'all');
         $module_id = $request->query('module_id', 'all');
-        $portal = $request->query('portal', 'all');
         $vendor_type = $request->query('vendor_type', 'all');
         $stores = Store::with('vendor', 'module', 'zone')->whereHas('vendor', function ($query) {
             return $query->where('status', 1);
         })
             ->when(is_numeric($zone_id), function ($query) use ($zone_id) {
                 return $query->where('zone_id', $zone_id);
-            })
-            ->when(in_array($portal, ['vendor', 'manufuture'], true), function ($query) use ($portal) {
-                return $query->where('portal', $portal);
             })
             ->when(in_array($vendor_type, ['shopkeeper', 'manufacturer', 'wholesale', 'b2b'], true), function ($query) use ($vendor_type) {
                 return $query->where('vendor_type', $vendor_type);
@@ -609,39 +605,6 @@ class VendorController extends Controller
         $store->vendor_type = $vendorType;
         $store->save();
 
-        Toastr::success(translate('messages.updated_successfully'));
-        return back();
-    }
-
-    public function portal(Request $request, Store $store)
-    {
-        $portal = $request->input('portal');
-        if (!in_array($portal, ['vendor', 'manufuture'], true)) {
-            Toastr::error(translate('messages.invalid_input'));
-            return back();
-        }
-        $store->portal = $portal;
-        $store->save();
-        Toastr::success(translate('messages.updated_successfully'));
-        return back();
-    }
-
-    public function portalBulk(Request $request)
-    {
-        $portal = $request->input('portal');
-        $ids = $request->input('store_ids', []);
-        if ((!is_array($ids) || count($ids) === 0) && $request->filled('store_ids_csv')) {
-            $ids = array_values(array_filter(array_map('intval', explode(',', (string) $request->input('store_ids_csv')))));
-        }
-        if (!in_array($portal, ['vendor', 'manufuture'], true)) {
-            Toastr::error(translate('messages.invalid_input'));
-            return back();
-        }
-        if (!is_array($ids) || count($ids) === 0) {
-            Toastr::error(translate('messages.no_data_found'));
-            return back();
-        }
-        Store::whereIn('id', $ids)->update(['portal' => $portal]);
         Toastr::success(translate('messages.updated_successfully'));
         return back();
     }

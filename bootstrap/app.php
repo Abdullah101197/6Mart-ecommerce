@@ -15,7 +15,6 @@ use App\Http\Middleware\Localization;
 use App\Http\Middleware\LocalizationMiddleware;
 use App\Http\Middleware\ModuleCheckMiddleware;
 use App\Http\Middleware\ModulePermissionMiddleware;
-use App\Http\Middleware\ManufuturePortalMiddleware;
 use App\Http\Middleware\VendorTypeFeatureMiddleware;
 use App\Http\Middleware\ProviderRentalModuleCheckMiddleware;
 use App\Http\Middleware\ReactValid;
@@ -96,7 +95,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'current-module' => CurrentModule::class,
             'admin-rental-module' => AdminRentalModuleCheckMiddleware::class,
             'provider-rental-module' => ProviderRentalModuleCheckMiddleware::class,
-            'manufuture.portal' => ManufuturePortalMiddleware::class,
             'vendor_type' => VendorTypeFeatureMiddleware::class,
         ]);
     })
