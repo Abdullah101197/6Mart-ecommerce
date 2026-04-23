@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
         if (app()->environment(['local', 'testing'])) {
             $seeders[] = UserSeeder::class;
             $seeders[] = SubscriptionPackageSeeder::class;
+            $seeders[] = DummyDataSeeder::class;
+            $seeders[] = SmallTestOrderSeeder::class;
         }
 
         $this->call($seeders);

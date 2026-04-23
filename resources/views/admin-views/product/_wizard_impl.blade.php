@@ -685,6 +685,14 @@
               </div>
               <div class="np-trow">
                 <div>
+                  <div class="np-tlbl">Digital product</div>
+                  <div class="np-tdsc">Show under Digital Products list</div>
+                </div>
+                <label class="np-tog"><input type="checkbox" name="is_digital" value="1" @checked((int) old('is_digital', $product?->is_digital ?? 0) === 1)><span
+                    class="np-tog-track"></span></label>
+              </div>
+              <div class="np-trow">
+                <div>
                   <div class="np-tlbl">Special Offer Badge</div>
                   <div class="np-tdsc">Display sale badge on listing</div>
                 </div>

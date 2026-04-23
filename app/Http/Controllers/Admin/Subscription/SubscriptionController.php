@@ -144,6 +144,12 @@ class SubscriptionController extends Controller
             'dash_top_loyal_buyers' => 'nullable|boolean',
             'dash_omnichannel_summary' => 'nullable|boolean',
             'order_rms_ui' => 'nullable|boolean',
+            'product_rms_ui' => 'nullable|boolean',
+            'product_dashboard_ui' => 'nullable|boolean',
+            'product_inhouse_ui' => 'nullable|boolean',
+            'product_seller_ui' => 'nullable|boolean',
+            'product_digital_ui' => 'nullable|boolean',
+            'brand_rms_ui' => 'nullable|boolean',
             'text' => 'nullable|max:1000',
         ], [
             'price.required' => translate('Must enter Price for the Package'),
@@ -205,6 +211,12 @@ class SubscriptionController extends Controller
         $package->dash_top_loyal_buyers = $request->dash_top_loyal_buyers ?? 0;
         $package->dash_omnichannel_summary = $request->dash_omnichannel_summary ?? 0;
         $package->order_rms_ui = $request->order_rms_ui ?? 0;
+        $package->product_rms_ui = $request->product_rms_ui ?? 0;
+        $package->product_dashboard_ui = $request->product_dashboard_ui ?? 0;
+        $package->product_inhouse_ui = $request->product_inhouse_ui ?? 0;
+        $package->product_seller_ui = $request->product_seller_ui ?? 0;
+        $package->product_digital_ui = $request->product_digital_ui ?? 0;
+        $package->brand_rms_ui = $request->brand_rms_ui ?? 0;
         $package->colour = $request?->colour;
         $package->module_type = $request?->module ?? 'all';
         $package->is_manufuture = $request->has('is_manufuture') ? 1 : 0;
@@ -309,6 +321,12 @@ class SubscriptionController extends Controller
             'dash_top_loyal_buyers' => 'nullable|boolean',
             'dash_omnichannel_summary' => 'nullable|boolean',
             'order_rms_ui' => 'nullable|boolean',
+            'product_rms_ui' => 'nullable|boolean',
+            'product_dashboard_ui' => 'nullable|boolean',
+            'product_inhouse_ui' => 'nullable|boolean',
+            'product_seller_ui' => 'nullable|boolean',
+            'product_digital_ui' => 'nullable|boolean',
+            'brand_rms_ui' => 'nullable|boolean',
             'text' => 'nullable|max:1000',
         ], [
             'price.required' => translate('Must enter Price for the Package'),
@@ -368,6 +386,12 @@ class SubscriptionController extends Controller
         $subscriptionackage->dash_top_loyal_buyers = $request->dash_top_loyal_buyers ?? 0;
         $subscriptionackage->dash_omnichannel_summary = $request->dash_omnichannel_summary ?? 0;
         $subscriptionackage->order_rms_ui = $request->order_rms_ui ?? 0;
+        $subscriptionackage->product_rms_ui = $request->product_rms_ui ?? 0;
+        $subscriptionackage->product_dashboard_ui = $request->product_dashboard_ui ?? 0;
+        $subscriptionackage->product_inhouse_ui = $request->product_inhouse_ui ?? 0;
+        $subscriptionackage->product_seller_ui = $request->product_seller_ui ?? 0;
+        $subscriptionackage->product_digital_ui = $request->product_digital_ui ?? 0;
+        $subscriptionackage->brand_rms_ui = $request->brand_rms_ui ?? 0;
         $subscriptionackage->colour = $request?->colour;
         $subscriptionackage->is_manufuture = $request->has('is_manufuture') ? 1 : 0;
         $vendorTypes = $request->input('vendor_types', []);

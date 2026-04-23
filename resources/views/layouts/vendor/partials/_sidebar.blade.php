@@ -40,6 +40,12 @@
                 @php($subscription_can_my_shop = $subscription_allow_all || ((int) data_get($store_sub_data, 'my_shop', 0) === 1))
                 @php($subscription_can_reviews = $subscription_allow_all || ((int) data_get($store_sub_data, 'review', 0) === 1))
                 @php($subscription_can_chat = $subscription_allow_all || ((int) data_get($store_sub_data, 'chat', 0) === 1))
+                @php($subscription_can_product_rms = $subscription_allow_all || ((int) data_get($store_sub_data, 'product_rms_ui', 1) === 1))
+                @php($subscription_can_product_dashboard = $subscription_allow_all || ((int) data_get($store_sub_data, 'product_dashboard_ui', 1) === 1))
+                @php($subscription_can_product_inhouse = $subscription_allow_all || ((int) data_get($store_sub_data, 'product_inhouse_ui', 1) === 1))
+                @php($subscription_can_product_seller = $subscription_allow_all || ((int) data_get($store_sub_data, 'product_seller_ui', 1) === 1))
+                @php($subscription_can_product_digital = $subscription_allow_all || ((int) data_get($store_sub_data, 'product_digital_ui', 1) === 1))
+                @php($subscription_can_brand_rms = $subscription_allow_all || ((int) data_get($store_sub_data, 'brand_rms_ui', 1) === 1))
                 <a class="navbar-brand" href="{{ route('vendor.dashboard') }}" aria-label="Front">
                     <img class="navbar-brand-logo initial--36  onerror-image"
                         data-onerror-image="{{ asset('assets/admin/img/160x160/img2.jpg') }}"
@@ -345,6 +351,14 @@
                             </a>
                             <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
                                 style="display: {{ Request::is('vendor-panel/item*') ? 'block' : 'none' }}">
+                                @if($subscription_can_product_rms && $subscription_can_product_dashboard)
+                                    <li class="nav-item {{ Request::is('vendor-panel/item/dashboard') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('vendor.item.dashboard') }}" title="{{ translate('Products Dashboard') }}">
+                                            <span class="tio-circle nav-indicator-icon"></span>
+                                            <span class="text-truncate">{{ translate('Products Dashboard') }}</span>
+                                        </a>
+                                    </li>
+                                @endif
                                 <li class="nav-item {{ Request::is('vendor-panel/item/add-new') ? 'active' : '' }}">
                                     <a class="nav-link " href="{{ route('vendor.item.add-new') }}"
                                         title="{{ translate('messages.add_new_item') }}">
@@ -359,6 +373,33 @@
                                         <span class="text-truncate">{{ translate('messages.list') }}</span>
                                     </a>
                                 </li>
+
+                                @if($subscription_can_product_rms)
+                                    @if($subscription_can_product_inhouse)
+                                        <li class="nav-item {{ Request::is('vendor-panel/item/in-house-products') || (Request::is('vendor-panel/item/list') && request('catalog')==='inhouse') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('vendor.item.inhouse') }}" title="{{ translate('In-House Products') }}">
+                                                <span class="tio-circle nav-indicator-icon"></span>
+                                                <span class="text-truncate">{{ translate('In-House Products') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if($subscription_can_product_seller)
+                                        <li class="nav-item {{ Request::is('vendor-panel/item/seller-products') || (Request::is('vendor-panel/item/list') && request('catalog')==='seller') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('vendor.item.seller') }}" title="{{ translate('Seller Products') }}">
+                                                <span class="tio-circle nav-indicator-icon"></span>
+                                                <span class="text-truncate">{{ translate('Seller Products') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if($subscription_can_product_digital)
+                                        <li class="nav-item {{ Request::is('vendor-panel/item/digital-products') || (Request::is('vendor-panel/item/list') && request('catalog')==='digital') ? 'active' : '' }}">
+                                            <a class="nav-link" href="{{ route('vendor.item.digital') }}" title="{{ translate('Digital Products') }}">
+                                                <span class="tio-circle nav-indicator-icon"></span>
+                                                <span class="text-truncate">{{ translate('Digital Products') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+                                @endif
 
                                 @if (\App\CentralLogics\Helpers::get_mail_status('product_approval'))
                                     <li
@@ -460,6 +501,14 @@
                                         <span class="text-truncate">{{ translate('messages.sub_category') }}</span>
                                     </a>
                                 </li>
+                                @if($subscription_can_brand_rms)
+                                    <li class="nav-item {{ Request::is('vendor-panel/item/brands*') ? 'active' : '' }}">
+                                        <a class="nav-link" href="{{ route('vendor.item.brands') }}" title="{{ translate('Brands') }}">
+                                            <span class="tio-circle nav-indicator-icon"></span>
+                                            <span class="text-truncate">{{ translate('Brands') }}</span>
+                                        </a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
                     @endif

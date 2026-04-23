@@ -15,6 +15,47 @@
     @php($module_type = \App\CentralLogics\Helpers::get_store_data()->module->module_type)
     @php(Config::set('module.current_module_type', $module_type))
     @php($openai_config = \App\CentralLogics\Helpers::get_business_settings('openai_config'))
+    @php($storeData = \App\CentralLogics\Helpers::get_store_data())
+    @php($sub = $storeData?->store_sub ?? $storeData?->store_sub_update_application)
+    @php($allowAll = ($storeData?->store_business_model ?? null) === 'commission')
+    @php($productsRmsUi = $allowAll || ((int) data_get($sub, 'product_rms_ui', 1) === 1))
+
+    @if($productsRmsUi)
+        @push('css_or_js')
+            <style>
+                .mf-products{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+                .mf-products .mf-welcome{
+                    background: linear-gradient(125deg, var(--dark-clr, #005555) 0%, var(--primary, #006161) 45%, var(--primary-clr, #107980) 100%);
+                    border-radius:14px;padding:18px 20px;color:#fff;position:relative;overflow:hidden
+                }
+                .mf-products .mf-welcome:before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04)}
+                .mf-products .mf-welcome:after{content:'';position:absolute;right:60px;bottom:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.03)}
+                .mf-products .mf-welcome h1{font-size:16px;font-weight:900;margin:0;color:#fff;position:relative}
+                .mf-products .mf-welcome p{font-size:12px;opacity:.82;margin:6px 0 0;color:#fff;position:relative}
+                .mf-products .mf-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;position:relative}
+                .mf-products .mf-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 12px;font-weight:900;font-size:12px;border:1px solid rgba(255,255,255,.28);text-decoration:none}
+                .mf-products .mf-chip.primary{background:#fff;color:#0f172a;border-color:#fff}
+                .mf-products .mf-chip.ghost{background:rgba(255,255,255,.14);color:#fff}
+            </style>
+        @endpush
+    @endif
+
+    @if($productsRmsUi)
+        <div class="content container-fluid mf-products">
+            <div class="mf-welcome mb-3">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1>{{ translate('messages.add_new_item') }}</h1>
+                        <p>{{ translate('Create a new item using RMS v12 UI') }}</p>
+                        <div class="mf-chips">
+                            <a class="mf-chip primary" href="{{ route('vendor.item.list') }}">{{ translate('Back to Items') }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @include('partials.item._legacy_add_form', [
         'context' => 'vendor',
         'currentModuleType' => $module_type,

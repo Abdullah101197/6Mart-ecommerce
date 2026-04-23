@@ -29,6 +29,7 @@ class Item extends Model
         'store_id' => 'integer',
         'reviews_count' => 'integer',
         'recommended' => 'integer',
+        'is_digital' => 'integer',
         'maximum_cart_quantity' => 'integer',
         'organic' => 'integer',
         'created_at' => 'datetime',

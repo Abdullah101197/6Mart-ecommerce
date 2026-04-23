@@ -23,7 +23,7 @@
     <title>@yield('title')</title>
     <!-- Favicon -->
     @php($logo = \App\Models\BusinessSetting::where(['key'=>'icon'])->first())
-    <link rel="shortcut icon" href="">
+    <link rel="shortcut icon" href="{{\App\CentralLogics\Helpers::get_full_url('business', $logo?->value?? '', $logo?->storage[0]?->value ?? 'public','favicon')}}">
     <link rel="icon" type="image/x-icon" href="{{\App\CentralLogics\Helpers::get_full_url('business', $logo?->value?? '', $logo?->storage[0]?->value ?? 'public','favicon')}}">
     <!-- Font -->
     <link href="{{asset('assets/admin/css/fonts.css')}}" rel="stylesheet">
@@ -238,6 +238,12 @@
 
 <!-- JS Front -->
 <script src="{{ asset('assets/admin/vendor/jquery/jquery.js') }}"></script>
+<script>
+    // Ensure jQuery exists before theme scripts (prevents "$ is not defined")
+    if (typeof jQuery === 'undefined') {
+        document.write('<script src="{{ asset('assets/admin/vendor/jquery/jquery.min.js') }}"><\\/script>');
+    }
+</script>
 <script src="{{asset('assets/admin')}}/js/vendor.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/theme.min.js"></script>
 <script src="{{asset('assets/admin')}}/js/sweet_alert.js"></script>

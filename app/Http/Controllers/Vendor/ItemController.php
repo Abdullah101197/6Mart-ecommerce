@@ -17,6 +17,7 @@ use App\Models\TempProduct;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\FlashSaleItem;
+use App\Models\Order;
 use App\CentralLogics\Helpers;
 use App\Models\CommonCondition;
 use Illuminate\Validation\Rule;
@@ -32,6 +33,268 @@ use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
+    public function brands(Request $request)
+    {
+        $store = Helpers::get_store_data();
+        $sub = $store?->store_sub ?? $store?->store_sub_update_application;
+        $allowAll = ($store?->store_business_model ?? null) === 'commission';
+        $productsRmsUi = $allowAll || ((int) data_get($sub, 'product_rms_ui', 1) === 1);
+        $brandsRmsUi = $allowAll || ((int) data_get($sub, 'brand_rms_ui', 1) === 1);
+        if (!$brandsRmsUi) {
+            Toastr::warning(translate('All Access to service has been blocked due to no active subscription'));
+            return back();
+        }
+
+        $moduleId = $store?->module_id;
+        $search = trim((string) $request->query('search', ''));
+
+        $brandsQuery = Brand::query()
+            ->when($moduleId !== null, function ($q) use ($moduleId) {
+                $q->where(function ($qq) use ($moduleId) {
+                    $qq->whereNull('module_id')->orWhere('module_id', $moduleId);
+                });
+            })
+            ->when($search !== '', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+            ->orderByDesc('status')
+            ->orderBy('name');
+
+        $brands = $brandsQuery->paginate(config('default_pagination'));
+
+        $storeId = Helpers::get_store_id();
+        $brandIds = $brands->getCollection()->pluck('id')->all();
+
+        $stats = collect();
+        if (!empty($brandIds)) {
+            $rows = EcommerceItemDetails::query()
+                ->join('items', 'items.id', '=', 'ecommerce_item_details.item_id')
+                ->where('items.store_id', $storeId)
+                ->where('items.is_approved', 1)
+                ->whereIn('ecommerce_item_details.brand_id', $brandIds)
+                ->selectRaw('ecommerce_item_details.brand_id as brand_id,
+                    COUNT(items.id) as products_count,
+                    COALESCE(SUM(items.price * items.order_count),0) as sales')
+                ->groupBy('ecommerce_item_details.brand_id')
+                ->get();
+            $stats = $rows->keyBy('brand_id');
+        }
+
+        $kpis = [
+            'total_brands' => (int) (clone $brandsQuery)->count(),
+            'featured' => 0,
+            'custom_labels' => 0,
+            'warranty_active' => 0,
+        ];
+
+        return view('vendor-views.product.brands', compact('brands', 'stats', 'kpis', 'productsRmsUi', 'search'));
+    }
+
+    public function brandStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'image' => 'nullable|image|max:5120',
+        ]);
+
+        $store = Helpers::get_store_data();
+        $brand = new Brand();
+        $brand->name = $request->input('name');
+        $brand->status = 1;
+        $brand->module_id = $store?->module_id;
+
+        if ($request->hasFile('image')) {
+            $brand->image = Helpers::upload('brand/', 'png', $request->file('image'));
+        }
+        $brand->save();
+
+        Toastr::success(translate('messages.brand_added_successfully'));
+        return back();
+    }
+
+    public function brandUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'image' => 'nullable|image|max:5120',
+        ]);
+
+        $brand = Brand::findOrFail($id);
+        $brand->name = $request->input('name');
+        if ($request->hasFile('image')) {
+            $brand->image = $brand->image
+                ? Helpers::update('brand/', $brand->image, 'png', $request->file('image'))
+                : Helpers::upload('brand/', 'png', $request->file('image'));
+        }
+        $brand->save();
+
+        Toastr::success(translate('messages.brand_updated_successfully'));
+        return back();
+    }
+
+    public function brandStatus($id, $status)
+    {
+        $brand = Brand::findOrFail($id);
+        $brand->status = (int) $status;
+        $brand->save();
+
+        Toastr::success(translate('messages.brand_status_updated'));
+        return back();
+    }
+
+    public function dashboard(Request $request)
+    {
+        $store = Helpers::get_store_data();
+        $sub = $store?->store_sub ?? $store?->store_sub_update_application;
+        $allowAll = ($store?->store_business_model ?? null) === 'commission';
+        $productsRmsUi = $allowAll || ((int) data_get($sub, 'product_rms_ui', 1) === 1);
+        $productsDashboardUi = $allowAll || ((int) data_get($sub, 'product_dashboard_ui', 1) === 1);
+        if (!$productsRmsUi || !$productsDashboardUi) {
+            Toastr::warning(translate('All Access to service has been blocked due to no active subscription'));
+            return back();
+        }
+
+        $storeId = Helpers::get_store_id();
+        $moduleId = $store?->module_id;
+
+        $itemsBase = Item::query()
+            ->where('store_id', $storeId)
+            ->where('is_approved', 1);
+
+        $totalProducts = (int) (clone $itemsBase)->count();
+        $digitalProducts = (int) (clone $itemsBase)->where('is_digital', 1)->count();
+        $regularProducts = (int) ($totalProducts - $digitalProducts);
+
+        $now = now();
+        $monthStart = $now->copy()->startOfMonth();
+
+        $ordersBase = Order::query()
+            ->where('store_id', $storeId)
+            ->storeOrder();
+
+        $ordersThisMonth = (int) (clone $ordersBase)->where('created_at', '>=', $monthStart)->count();
+        $customersThisMonth = (int) (clone $ordersBase)->where('created_at', '>=', $monthStart)->whereNotNull('user_id')->distinct('user_id')->count('user_id');
+        $salesThisMonth = (float) (clone $ordersBase)->where('created_at', '>=', $monthStart)->whereIn('order_status', ['delivered'])->sum('order_amount');
+        $ordersDeliveredThisMonth = (int) (clone $ordersBase)->where('created_at', '>=', $monthStart)->where('order_status', 'delivered')->count();
+        $ordersRefundedThisMonth = (int) (clone $ordersBase)->where('created_at', '>=', $monthStart)->where('order_status', 'refunded')->count();
+        $ordersPendingThisMonth = (int) (clone $ordersBase)->where('created_at', '>=', $monthStart)->where('order_status', 'pending')->count();
+
+        $totalCategories = $moduleId ? (int) Category::where('status', 1)->where(function ($q) use ($moduleId) {
+            $q->whereNull('module_id')->orWhere('module_id', $moduleId);
+        })->count() : (int) Category::where('status', 1)->count();
+
+        $topCategories = (clone $itemsBase)
+            ->selectRaw('category_id, COUNT(*) as items_count, COALESCE(SUM(price * order_count),0) as revenue')
+            ->groupBy('category_id')
+            ->orderByDesc('revenue')
+            ->limit(5)
+            ->get()
+            ->map(function ($row) {
+                $cat = Category::find($row->category_id);
+                return [
+                    'name' => $cat?->name ?? translate('messages.category_deleted'),
+                    'revenue' => (float) $row->revenue,
+                    'items_count' => (int) $row->items_count,
+                ];
+            });
+
+        $topItems = (clone $itemsBase)
+            ->orderByDesc('order_count')
+            ->limit(5)
+            ->get(['id', 'name', 'price', 'order_count', 'image']);
+
+        $salesLast6Months = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $start = $now->copy()->startOfMonth()->subMonths($i);
+            $end = $start->copy()->endOfMonth();
+            $salesLast6Months[] = [
+                'label' => $start->format('M'),
+                'value' => (float) (clone $ordersBase)
+                    ->whereBetween('created_at', [$start, $end])
+                    ->whereIn('order_status', ['delivered'])
+                    ->sum('order_amount'),
+            ];
+        }
+
+        $salesLast12Months = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $start = $now->copy()->startOfMonth()->subMonths($i);
+            $end = $start->copy()->endOfMonth();
+            $salesLast12Months[] = [
+                'label' => $start->format('M'),
+                'value' => (float) (clone $ordersBase)
+                    ->whereBetween('created_at', [$start, $end])
+                    ->whereIn('order_status', ['delivered'])
+                    ->sum('order_amount'),
+            ];
+        }
+
+        $pendingSellers = (int) TempProduct::where('store_id', $storeId)->where('is_rejected', 0)->count();
+        $approvedSellers = 1;
+
+        $brandsQuery = Brand::active();
+        if ($moduleId !== null) {
+            $brandsQuery->where(function ($q) use ($moduleId) {
+                $q->whereNull('module_id')->orWhere('module_id', $moduleId);
+            });
+        }
+        $brandsCount = (int) (clone $brandsQuery)->count();
+
+        $brandRevenueRows = EcommerceItemDetails::query()
+            ->join('items', 'items.id', '=', 'ecommerce_item_details.item_id')
+            ->where('items.store_id', $storeId)
+            ->where('items.is_approved', 1)
+            ->whereNotNull('ecommerce_item_details.brand_id')
+            ->selectRaw('ecommerce_item_details.brand_id as brand_id, COALESCE(SUM(items.price * items.order_count),0) as revenue')
+            ->groupBy('ecommerce_item_details.brand_id')
+            ->orderByDesc('revenue')
+            ->limit(5)
+            ->get();
+
+        if ($brandRevenueRows->count() > 0) {
+            $brandIds = $brandRevenueRows->pluck('brand_id')->filter()->unique()->values();
+            $brandModels = (clone $brandsQuery)->whereIn('id', $brandIds)->get(['id', 'name', 'image']);
+            $brandModelsById = $brandModels->keyBy('id');
+
+            $topBrands = $brandRevenueRows->map(function ($row) use ($brandModelsById) {
+                $b = $brandModelsById->get((int) $row->brand_id);
+                return [
+                    'id' => (int) $row->brand_id,
+                    'name' => $b?->name ?? translate('Brand'),
+                    'image_full_url' => $b?->image_full_url ?? asset('assets/admin/img/160x160/img2.jpg'),
+                    'revenue' => (float) $row->revenue,
+                ];
+            });
+        } else {
+            $topBrands = (clone $brandsQuery)->orderBy('name')->limit(5)->get(['id', 'name', 'image'])->map(function ($b) {
+                return [
+                    'id' => (int) $b->id,
+                    'name' => $b->name,
+                    'image_full_url' => $b->image_full_url,
+                    'revenue' => null,
+                ];
+            });
+        }
+
+        return view('vendor-views.product.dashboard', compact(
+            'totalProducts',
+            'regularProducts',
+            'digitalProducts',
+            'salesThisMonth',
+            'ordersThisMonth',
+            'ordersDeliveredThisMonth',
+            'ordersRefundedThisMonth',
+            'ordersPendingThisMonth',
+            'customersThisMonth',
+            'totalCategories',
+            'topCategories',
+            'topItems',
+            'salesLast6Months',
+            'salesLast12Months',
+            'brandsCount',
+            'topBrands',
+            'approvedSellers',
+            'pendingSellers'
+        ));
+    }
     public function index()
     {
         if (!Helpers::get_store_data()->item_section && Helpers::get_store_data()->store_business_model == 'commission') {
@@ -402,6 +665,7 @@ class ItemController extends Controller
             $food->organic = $request->organic ?? 0;
         }
         $food->is_halal = $request->is_halal ?? 0;
+        $food->is_digital = $request->has('is_digital') ? 1 : 0;
         $metaData = is_array($food->meta_data) ? $food->meta_data : [];
         $requestMeta = $request->input('meta_data', []);
         if (is_array($requestMeta) && count($requestMeta) > 0) {
@@ -783,6 +1047,7 @@ class ItemController extends Controller
         $p->stock = $request->current_stock ?? 0;
         $p->organic = $request->organic ?? 0;
         $p->is_halal = $request->is_halal ?? 0;
+        $p->is_digital = $request->has('is_digital') ? 1 : 0;
         $metaData = is_array($p->meta_data) ? $p->meta_data : [];
         $requestMeta = $request->input('meta_data', []);
         if (is_array($requestMeta) && count($requestMeta) > 0) {
@@ -1001,8 +1266,29 @@ class ItemController extends Controller
         $category_id = $request->query('category_id', 'all');
         $type = $request->query('type', 'all');
         $sub_category_id = $request->query('sub_category_id', 'all');
+        $status_filter = (string) $request->query('status', 'all'); // all|published|draft|out_of_stock
+        $catalog = (string) $request->query('catalog', 'all'); // all|inhouse|seller|digital (UI alias)
         $key = explode(' ', $request['search']);
-        $items = Item::when(is_numeric($category_id), function ($query) use ($category_id) {
+
+        if (in_array($catalog, ['inhouse', 'seller', 'digital'], true)) {
+            $store = Helpers::get_store_data();
+            $sub = $store?->store_sub ?? $store?->store_sub_update_application;
+            $allowAll = ($store?->store_business_model ?? null) === 'commission';
+            $productsRmsUi = $allowAll || ((int) data_get($sub, 'product_rms_ui', 1) === 1);
+            $catalogFlag = match ($catalog) {
+                'inhouse' => $allowAll || ((int) data_get($sub, 'product_inhouse_ui', 1) === 1),
+                'seller' => $allowAll || ((int) data_get($sub, 'product_seller_ui', 1) === 1),
+                'digital' => $allowAll || ((int) data_get($sub, 'product_digital_ui', 1) === 1),
+                default => true,
+            };
+            if (!$productsRmsUi || !$catalogFlag) {
+                Toastr::warning(translate('All Access to service has been blocked due to no active subscription'));
+                return back();
+            }
+        }
+
+        $base = Item::query()
+            ->when(is_numeric($category_id), function ($query) use ($category_id) {
             return $query->whereHas('category', function ($q) use ($category_id) {
                 return $q->whereId($category_id)->orWhere('parent_id', $category_id);
             });
@@ -1011,6 +1297,9 @@ class ItemController extends Controller
                 return $query->where('category_id', $sub_category_id);
             })
             ->where('is_approved', 1)
+            ->when($status_filter === 'published', fn ($q) => $q->where('status', 1))
+            ->when($status_filter === 'draft', fn ($q) => $q->where('status', 0))
+            ->when($status_filter === 'out_of_stock', fn ($q) => $q->where('stock', '<=', 0))
             ->when(isset($key), function ($q) use ($key) {
                 $q->where(function ($q) use ($key) {
                     foreach ($key as $value) {
@@ -1019,7 +1308,13 @@ class ItemController extends Controller
                 });
             })
 
-            ->type($type)->latest()->paginate(config('default_pagination'));
+            ->type($type);
+
+        if ($catalog === 'digital') {
+            $base->where('is_digital', 1);
+        }
+
+        $items = (clone $base)->latest()->paginate(config('default_pagination'));
         $sub_categories = $category_id != 'all' ? Category::where('parent_id', $category_id)->get(['id', 'name']) : [];
 
         $taxData = Helpers::getTaxSystemType();
@@ -1027,7 +1322,38 @@ class ItemController extends Controller
 
 
         $category = $category_id != 'all' ? Category::findOrFail($category_id) : null;
-        return view('vendor-views.product.list', compact('items', 'category', 'type', 'sub_categories', 'productWiseTax'));
+        $kpis = [
+            'total' => (clone $base)->count(),
+            'published' => (clone $base)->where('status', 1)->count(),
+            'draft' => (clone $base)->where('status', 0)->count(),
+            'out_of_stock' => (clone $base)->where('stock', '<=', 0)->count(),
+        ];
+
+        if ($catalog === 'digital') {
+            $kpis['downloads'] = (int) (clone $base)->sum('order_count');
+            $kpis['revenue'] = (float) (clone $base)->selectRaw('COALESCE(SUM(price * order_count), 0) as rev')->value('rev');
+            $kpis['avg_rating'] = (float) (clone $base)->avg('avg_rating');
+        }
+        if ($catalog === 'seller') {
+            $kpis['seller_total'] = (int) (clone $base)->count();
+            $kpis['seller_approved'] = (int) (clone $base)->where('status', 1)->count();
+            $kpis['seller_pending_review'] = (int) TempProduct::where('store_id', Helpers::get_store_id())->where('is_rejected', 0)->count();
+            $kpis['seller_rejected'] = (int) TempProduct::where('store_id', Helpers::get_store_id())->where('is_rejected', 1)->count();
+        }
+
+        $sellerOptions = null;
+        $pendingApprovalCount = null;
+        $commissionRate = null;
+        if ($catalog === 'seller') {
+            $store = Helpers::get_store_data();
+            $sellerOptions = [
+                (int) Helpers::get_store_id() => (string) ($store?->name ?? translate('Seller')),
+            ];
+            $pendingApprovalCount = (int) TempProduct::where('store_id', Helpers::get_store_id())->count();
+            $commissionRate = (float) ($store?->comission ?? 0);
+        }
+
+        return view('vendor-views.product.list', compact('items', 'category', 'type', 'sub_categories', 'productWiseTax', 'status_filter', 'kpis', 'catalog', 'sellerOptions', 'pendingApprovalCount', 'commissionRate'));
     }
 
     public function search(Request $request)
@@ -1543,6 +1869,12 @@ class ItemController extends Controller
     {
         $product = Item::find($request['id']);
 
+        if (!$product) {
+            return response()->json([
+                'view' => '<div class="p-3 text-center text-danger">'.translate('messages.no_data_found').'</div>',
+            ], 404);
+        }
+
         return response()->json([
             'view' => view('vendor-views.product.partials._get_stock_data', compact('product'))->render()
         ]);
@@ -1551,6 +1883,11 @@ class ItemController extends Controller
     public function get_stock(Request $request)
     {
         $product = Item::withoutGlobalScope(StoreScope::class)->find($request['id']);
+        if (!$product) {
+            return response()->json([
+                'view' => '<div class="p-3 text-center text-danger">'.translate('messages.no_data_found').'</div>',
+            ], 404);
+        }
         return response()->json([
             'view' => view('vendor-views.product.partials._get_stock_data', compact('product'))->render()
         ]);
@@ -1686,14 +2023,13 @@ class ItemController extends Controller
 
     public function pending_item_list(Request $request)
     {
-
-        abort_if(Helpers::get_mail_status('product_approval') != 1, 404);
+        // Do not hard-404 this page; UI is used for RMS navigation/testing even when approval is disabled.
 
         $key = explode(' ', $request['search']);
         $sub_category_id = $request->query('sub_category_id', 'all');
         $category_id = $request->query('category_id', 'all');
         $type = $request->query('type', 'all');
-        $items = TempProduct::when(is_numeric($category_id), function ($query) use ($category_id) {
+        $base = TempProduct::when(is_numeric($category_id), function ($query) use ($category_id) {
             return $query->whereHas('category', function ($q) use ($category_id) {
                 return $q->whereId($category_id)->orWhere('parent_id', $category_id);
             });
@@ -1709,11 +2045,19 @@ class ItemController extends Controller
             ->when(is_numeric($sub_category_id), function ($query) use ($sub_category_id) {
                 return $query->where('category_id', $sub_category_id);
             })
+            ->type($type);
 
-            ->type($type)->latest()->paginate(config('default_pagination'));
+        $kpis = [
+            'total' => (int) (clone $base)->count(),
+            'pending' => (int) (clone $base)->where('is_rejected', 0)->count(),
+            'rejected' => (int) (clone $base)->where('is_rejected', 1)->count(),
+        ];
+
+        $items = (clone $base)->latest()->paginate(config('default_pagination'));
+        $kpis['showing'] = (int) $items->count();
         $sub_categories = $category_id != 'all' ? Category::where('parent_id', $category_id)->get(['id', 'name']) : [];
         $category = $category_id != 'all' ? Category::findOrFail($category_id) : null;
-        return view('vendor-views.product.pending_list', compact('items', 'category', 'type', 'sub_categories'));
+        return view('vendor-views.product.pending_list', compact('items', 'category', 'type', 'sub_categories', 'kpis'));
     }
 
     public function requested_item_view($id)

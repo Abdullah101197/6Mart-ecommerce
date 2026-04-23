@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\Store;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -13,8 +14,23 @@ class DummyDataSeeder extends Seeder
 {
     public function run()
     {
-        $moduleId = 1;
-        $storeId = 1;
+        $storeIds = Store::query()->pluck('id')->all();
+        if (!count($storeIds)) {
+            $this->command?->warn('DummyDataSeeder skipped (no stores found).');
+            return;
+        }
+
+        $moduleIds = Store::query()
+            ->whereNotNull('module_id')
+            ->distinct()
+            ->pluck('module_id')
+            ->map(fn ($v) => (int) $v)
+            ->filter()
+            ->values()
+            ->all();
+        if (!count($moduleIds)) {
+            $moduleIds = [1];
+        }
 
         // 1. Ensure Brands exist
         $brandsData = [
@@ -26,39 +42,17 @@ class DummyDataSeeder extends Seeder
         ];
 
         $brandIds = [];
-        foreach ($brandsData as $b) {
-            $brandIds[] = Brand::updateOrCreate(
-                ['name' => $b['name']],
-                [
-                    'slug' => Str::slug($b['name']),
-                    'status' => 1,
-                    'module_id' => $moduleId,
-                    'image' => 'brand.png'
-                ]
-            )->id;
-        }
-
-        // 2. Ensure Categories exist (Position 0)
-        $categoriesData = [
-            ['name' => 'Fruits & Vegetables'],
-            ['name' => 'Dairy & Eggs'],
-            ['name' => 'Beverages'],
-            ['name' => 'Bakery'],
-            ['name' => 'Snacks'],
-        ];
-
-        $catIds = [];
-        foreach ($categoriesData as $c) {
-            $catIds[] = Category::updateOrCreate(
-                ['name' => $c['name']],
-                [
-                    'slug' => Str::slug($c['name']),
-                    'status' => 1,
-                    'module_id' => $moduleId,
-                    'position' => 0,
-                    'priority' => 1
-                ]
-            )->id;
+        foreach ($moduleIds as $moduleId) {
+            foreach ($brandsData as $b) {
+                $brandIds[] = Brand::updateOrCreate(
+                    ['name' => $b['name'], 'module_id' => $moduleId],
+                    [
+                        'slug' => Str::slug($b['name']),
+                        'status' => 1,
+                        'image' => 'brand.png'
+                    ]
+                )->id;
+            }
         }
 
         // 3. Create/Update 20 Products (11 existing + 9 more, or just 20 total)
@@ -86,36 +80,63 @@ class DummyDataSeeder extends Seeder
             ['name' => 'Multivitamin Gummies', 'price' => 28.00, 'stock' => 0, 'status' => 1, 'expiry_days' => 365], // OOS
         ];
 
-        foreach ($products as $index => $p) {
-            $item = Item::updateOrCreate(
-                ['name' => $p['name']],
-                [
-                    'price' => $p['price'],
-                    'tax' => 5,
-                    'status' => $p['status'],
-                    'stock' => $p['stock'],
-                    'module_id' => $moduleId,
-                    'store_id' => $storeId,
-                    'category_id' => $catIds[$index % count($catIds)],
-                    'is_approved' => 1,
-                    'expiry_days' => $p['expiry_days'],
-                    'image' => 'product.png',
-                    'images' => json_encode(['product.png']),
-                    'slug' => Str::slug($p['name']),
-                ]
-            );
+        $totalSeeded = 0;
+        foreach ($storeIds as $storeId) {
+            $store = Store::query()->find($storeId);
+            $moduleId = (int) ($store?->module_id ?? 1);
 
-            // Add brand relationship (ecommerce_item_details)
-            DB::table('ecommerce_item_details')->updateOrInsert(
-                ['item_id' => $item->id],
-                [
-                    'brand_id' => $brandIds[$index % count($brandIds)],
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]
-            );
+            // Ensure Categories exist per module (Position 0)
+            $categoriesData = [
+                ['name' => 'Fruits & Vegetables'],
+                ['name' => 'Dairy & Eggs'],
+                ['name' => 'Beverages'],
+                ['name' => 'Bakery'],
+                ['name' => 'Snacks'],
+            ];
+
+            $catIds = [];
+            foreach ($categoriesData as $c) {
+                $catIds[] = Category::updateOrCreate(
+                    ['name' => $c['name'], 'module_id' => $moduleId, 'position' => 0],
+                    [
+                        'slug' => Str::slug($c['name']),
+                        'status' => 1,
+                        'priority' => 1
+                    ]
+                )->id;
+            }
+
+            foreach ($products as $index => $p) {
+                $item = Item::updateOrCreate(
+                    ['name' => $p['name'], 'store_id' => $storeId],
+                    [
+                        'price' => $p['price'],
+                        'tax' => 5,
+                        'status' => $p['status'],
+                        'stock' => $p['stock'],
+                        'module_id' => $moduleId,
+                        'category_id' => $catIds[$index % count($catIds)],
+                        'is_approved' => 1,
+                        'expiry_days' => $p['expiry_days'],
+                        'image' => 'product.png',
+                        'images' => json_encode(['product.png']),
+                        'slug' => Str::slug($p['name']),
+                    ]
+                );
+
+                // Add brand relationship (ecommerce_item_details)
+                DB::table('ecommerce_item_details')->updateOrInsert(
+                    ['item_id' => $item->id],
+                    [
+                        'brand_id' => $brandIds[($moduleId * 100 + $index) % count($brandIds)],
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]
+                );
+                $totalSeeded++;
+            }
         }
 
-        echo "Seeded " . count($products) . " products.\n";
+        echo "Seeded {$totalSeeded} products across " . count($storeIds) . " stores.\n";
     }
 }

@@ -870,6 +870,30 @@ aside .navbar-vertical-aside-has-menu .nav-sub .nav-link {
     font-size: 0.8rem;
 }
 
+/* Vendor sidebar submenu: proper full-row hover/active highlight */
+#navbar-vertical-content .nav-sub .nav-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin: 2px 10px;
+    transition: background-color .15s ease, color .15s ease;
+}
+#navbar-vertical-content .nav-sub .nav-item.active > .nav-link,
+#navbar-vertical-content .nav-sub .nav-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff !important;
+}
+#navbar-vertical-content .nav-sub .nav-link:hover .text-truncate,
+#navbar-vertical-content .nav-sub .nav-item.active > .nav-link .text-truncate {
+    color: #ffffff !important;
+}
+#navbar-vertical-content .nav-sub .nav-indicator-icon {
+    margin-inline-end: 10px;
+    opacity: .9;
+}
+
 aside .navbar-nav > .nav-item:not(:first-child) {
     margin-top: 15px !important;
 }

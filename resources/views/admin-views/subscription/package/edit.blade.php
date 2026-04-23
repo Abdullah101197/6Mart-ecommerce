@@ -378,6 +378,51 @@ active
                                 <span class="form-check-label text-dark">{{ translate('Orders RMS UI') }}</span>
                             </label>
                         </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ (int)($subscriptionackage->product_rms_ui ?? 1) == 1 ? 'checked' : '' }} name="product_rms_ui" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Products RMS UI') }}</span>
+                            </label>
+                        </div>
+                        <div class="w-100 pl-4 mf-product-subflags">
+                            <div class="check-item">
+                                <label class="form-group form-check form--check">
+                                    <input type="checkbox" class="form-check-input package-available-feature" {{ (int)($subscriptionackage->product_dashboard_ui ?? 1) == 1 ? 'checked' : '' }} name="product_dashboard_ui" value="1">
+                                    <span class="form-check-label text-dark">{{ translate('Products: Dashboard') }}</span>
+                                </label>
+                            </div>
+                            <div class="check-item">
+                                <label class="form-group form-check form--check">
+                                    <input type="checkbox" class="form-check-input package-available-feature" {{ (int)($subscriptionackage->product_inhouse_ui ?? 1) == 1 ? 'checked' : '' }} name="product_inhouse_ui" value="1">
+                                    <span class="form-check-label text-dark">{{ translate('Products: In-House List') }}</span>
+                                </label>
+                            </div>
+                            <div class="check-item">
+                                <label class="form-group form-check form--check">
+                                    <input type="checkbox" class="form-check-input package-available-feature" {{ (int)($subscriptionackage->product_seller_ui ?? 1) == 1 ? 'checked' : '' }} name="product_seller_ui" value="1">
+                                    <span class="form-check-label text-dark">{{ translate('Products: Seller List') }}</span>
+                                </label>
+                            </div>
+                            <div class="check-item">
+                                <label class="form-group form-check form--check">
+                                    <input type="checkbox" class="form-check-input package-available-feature" {{ (int)($subscriptionackage->product_digital_ui ?? 1) == 1 ? 'checked' : '' }} name="product_digital_ui" value="1">
+                                    <span class="form-check-label text-dark">{{ translate('Products: Digital List') }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <style>
+                            .check--item-wrapper .mf-product-subflags .check-item {
+                                width: 100%;
+                                max-width: 100%;
+                                padding-bottom: 12px;
+                            }
+                        </style>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ (int)($subscriptionackage->brand_rms_ui ?? 1) == 1 ? 'checked' : '' }} name="brand_rms_ui" value="1">
+                                <span class="form-check-label text-dark">{{ translate('Brands RMS UI') }}</span>
+                            </label>
+                        </div>
 
                         <div class="w-100 mt-3 mb-1">
                             <div class="text--title font-weight-bold">{{ translate('Dashboard') }}</div>

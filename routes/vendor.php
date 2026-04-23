@@ -154,6 +154,11 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
         });
 
         Route::group(['prefix' => 'item', 'as' => 'item.', 'middleware' => ['module:item' ,'subscription:item','vendor_type:item']], function () {
+            Route::get('dashboard', 'ItemController@dashboard')->name('dashboard');
+            Route::get('brands', 'ItemController@brands')->name('brands');
+            Route::post('brands', 'ItemController@brandStore')->name('brands.store');
+            Route::post('brands/{id}', 'ItemController@brandUpdate')->name('brands.update');
+            Route::get('brands/status/{id}/{status}', 'ItemController@brandStatus')->name('brands.status');
             Route::get('add-new', 'ItemController@index')->name('add-new');
             Route::post('variant-combination', 'ItemController@variant_combination')->name('variant-combination');
             Route::post('store', 'ItemController@store')->name('store');
@@ -190,6 +195,20 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::get('flash-sale', 'ItemController@flash_sale')->name('flash_sale');
 
              Route::get('get-brand-list', [ItemController::class, 'getBrandList'])->name('getBrandList');
+
+            // RMS reference pages (same list, but keep distinct URLs)
+            Route::get('in-house-products', function (\Illuminate\Http\Request $request) {
+                $request->merge(['catalog' => 'inhouse']);
+                return app(\App\Http\Controllers\Vendor\ItemController::class)->list($request);
+            })->name('inhouse');
+            Route::get('seller-products', function (\Illuminate\Http\Request $request) {
+                $request->merge(['catalog' => 'seller']);
+                return app(\App\Http\Controllers\Vendor\ItemController::class)->list($request);
+            })->name('seller');
+            Route::get('digital-products', function (\Illuminate\Http\Request $request) {
+                $request->merge(['catalog' => 'digital']);
+                return app(\App\Http\Controllers\Vendor\ItemController::class)->list($request);
+            })->name('digital');
 
         });
 

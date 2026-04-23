@@ -16,14 +16,15 @@
 </div>
 
 <input name="product_id" value="{{$product->id}}" type="hidden" class="initial-hidden">
+@php($variations = json_decode($product['variations'] ?? '[]', true) ?? [])
 <div id="quantity" class="form-group">
     <label for="total_qty" class="input-label" >
         {{translate('Total_Quantity')}}
     </label>
-    <input type="number" min="1" class="form-control" id="total_qty" name="current_stock" value="{{$product->stock}}" id="quantity" {{count(json_decode($product['variations'],true)) > 0 ? 'readonly' : ""}}>
+    <input type="number" min="1" class="form-control" id="total_qty" name="current_stock" value="{{$product->stock}}" id="quantity" {{count($variations) > 0 ? 'readonly' : ""}}>
 </div>
 
-@if (count(json_decode($product['variations'],true)) > 0)
+@if (count($variations) > 0)
 
 <div class="table-responsive mb-5">
     <table class="table table-borderless table-thead-bordered table-nowrap table-align-middle mb-0">
@@ -36,7 +37,7 @@
             </tr>
         </thead>
         <tbody id="set-rows">
-            @foreach (json_decode($product['variations'],true) ?? [] as $key => $combination)
+            @foreach ($variations as $key => $combination)
                 <tr>
                     <td class="">{{ $key + 1 }}</td>
                     <td class="">

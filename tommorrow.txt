@@ -1,0 +1,180 @@
+Tomorrow plan (continue from current state)
+Project: 6MartAdminpanel (Vendor Panel RMS v12 UI)
+Date: 2026-04-17
+
+Context / where we stopped
+- Orders List page (`resources/views/vendor-views/order/list.blade.php`) is already upgraded to RMS style and controlled by subscription flag `order_rms_ui`.
+- Order Details page (`resources/views/vendor-views/order/order-view.blade.php`) has:
+  - RMS v12 header banner (PO-ID, buyer/city, channel, status) when `order_rms_ui` is enabled.
+  - RMS styling applied to the first main summary card (without changing existing Blade logic).
+- Remaining work is to finish RMS v12 layout for the rest of the Order Details content while keeping all existing functionality.
+
+Goal for tomorrow
+- Make the Order Details page match `manufuture-rms-v12.html` more closely (RMS panels + spacing + typography)
+- Keep ALL current actions working (print/invoice, status updates, modals, attachments, etc.)
+- Ensure it applies to ALL vendor types when enabled by subscription (`order_rms_ui`), not just manufacturers
+
+Work items (in order)
+
+1) Inventory the existing Order Details sections (no behavior changes)
+   - Identify the main blocks after the header card:
+     - Items table / order details lines
+     - Amount breakdown (subtotal, tax, discount, delivery fee, etc.)
+     - Customer / delivery address / map (if present)
+     - Order timeline / status history (if present)
+     - Any action buttons (confirm/processing/picked_up/delivered/cancel/refund/etc.)
+   - Mark which blocks are safe to restyle purely with CSS wrappers, and which require markup changes.
+
+2) RMS “two-column” layout for details page (UI-only)
+   - When `order_rms_ui` is ON:
+     - Left column: items table + notes/attachments (primary content)
+     - Right column (sticky on desktop): summary panels (payment, totals, buyer, channel, status)
+   - Use existing project theme variables (same approach as dashboard/orders list):
+     - `--dark-clr`, `--primary-clr`, and existing Bootstrap/HS classes where possible
+
+3) Restyle Items table to RMS v12 look (keep data/actions)
+   - Convert visual style to RMS table (header chips, row spacing, badges/pills)
+   - Keep existing columns/data logic exactly the same
+   - Ensure responsiveness:
+     - Mobile: horizontal scroll allowed, key columns visible
+
+4) Restyle Totals / Payment / Status blocks into RMS panels
+   - Create RMS panel styles (borders, subtle shadow, section titles)
+   - Display key values clearly:
+     - Payment status + method
+     - Order status + order type/channel
+     - Scheduled time (if scheduled)
+     - Cancellation reason (if any)
+   - Do NOT remove existing buttons that open modals or trigger actions
+
+5) Preserve and validate “dangerous” areas (must not break)
+   - Attachments / prescription image modal(s)
+   - Any refund / return / cancellation flows
+   - Any “reference code” modal/button
+   - Print invoice / invoice links
+   - Prev/next navigation
+
+6) Subscription gating verification
+   - Confirm the view is still fully usable when `order_rms_ui` is OFF (legacy UI)
+   - Confirm the RMS version is shown only when `order_rms_ui` is ON
+   - Confirm no vendor_type checks exist on order pages (it must be package-driven)
+
+7) Quick cleanup
+   - Ensure CSS is scoped (only affects RMS mode): `.mf-od` wrappers / `.mf-od-card` / `.mf-orders` etc.
+   - Remove duplicate/unused CSS if created during iterations
+
+8) Test checklist (local)
+   - Visit:
+     - `/vendor-panel/order/list/all` (RMS list UI)
+     - `/vendor-panel/order/details/{id}` (RMS details UI)
+   - Check in Orders list:
+     - Status tabs work and counts display
+     - Search/export/column dropdown still works
+   - Check in Order details:
+     - Print invoice works
+     - Modals open (attachments/reference code/etc.)
+     - Status-related actions (if any on the page) still function
+   - Run cache clears if needed:
+     - `php artisan view:clear`
+     - `php artisan optimize:clear`
+
+Notes / constraints
+- Do not re-introduce any `portal=manufuture` or `/vendor-panel/mf/*` logic.
+- Keep a single unified vendor panel; all gating is `vendor_type` + subscription features.
+- For Orders UI specifically, it must be controlled by `order_rms_ui` only (package toggle).
+
+============================================================
+Reusable PROMPT (copy/paste for continuing work)
+============================================================
+
+Use this prompt whenever you start the next module or next page:
+
+PROMPT:
+Continue from the current codebase state in `C:\laragon\www\6MartAdminpanel`.
+Goal: Upgrade the Vendor Panel UI to match `manufuture-rms-v12.html` page-by-page, but keep the system unified:
+- No `portal=manufuture` and no `/vendor-panel/mf/*` routes.
+- All vendors use the same vendor panel; show/hide modules only by subscription feature flags (and vendor_type only where business rules require it).
+
+Critical rules:
+- Do not break any existing actions/modals/forms; only restyle and reorganize layout.
+- If a feature should be optional, add a subscription flag (boolean) for it:
+  - Add column to `subscription_packages` + `store_subscriptions` (default true)
+  - Add casts in `SubscriptionPackage` + `StoreSubscription`
+  - Add admin checkboxes in subscription package create/edit pages
+  - Gate view sections + routes using existing subscription middleware/helpers
+- Keep CSS scoped (e.g. `.mf-orders`, `.mf-od`, `.mf-*`) so old UI remains unchanged when the flag is OFF.
+- Use existing theme variables (`--dark-clr`, `--primary-clr`, `--primary`, etc.).
+
+Deliverables each time:
+- Updated Blade view(s) with RMS v12 layout/styling
+- Controller data wiring if needed (with safe fallbacks)
+- Subscription toggles (if needed) + admin UI + migration
+- Quick test checklist and cache clear commands if needed
+
+============================================================
+Action checklist (make sure everything still works)
+============================================================
+
+For every upgraded page, verify:
+- Navigation works (links/routes exist, use `Route::has()` if route might be missing).
+- Buttons still do the same thing (no removed `data-toggle`, `data-target`, form actions, method spoofing).
+- Modals open and submit correctly.
+- Export/search/filters still work (if present).
+- Responsive layout works (mobile + desktop).
+- Subscription OFF => legacy UI unchanged; Subscription ON => RMS UI shown.
+
+Common “dangerous areas” to never break:
+- Invoice/print routes
+- Status update flows (pending/confirmed/processing/picked_up/delivered/canceled/refund/return)
+- Attachments/prescriptions image modals
+- Any AJAX calls + datatable initialization
+
+============================================================
+Module-by-module roadmap (after Orders)
+============================================================
+
+Follow this order so work stays consistent and easy:
+
+A) Orders (finish)
+- [DONE] Orders list RMS UI (`resources/views/vendor-views/order/list.blade.php`)
+- [IN PROGRESS] Order details RMS UI (`resources/views/vendor-views/order/order-view.blade.php`)
+- Next for Orders:
+  - RMS-style items table + right-side summary panels
+  - RMS-style timeline/status history (if present)
+  - Ensure all actions work and remain visible
+
+B) Products
+- Target pages:
+  - Product list
+  - Add/edit product
+  - Product details (if exists)
+- Approach:
+  - Add a subscription flag if you want “product_rms_ui”
+  - Otherwise reuse a shared UI flag naming convention similar to orders
+
+C) POS
+- Target pages:
+  - POS screen layout + cart + customer select
+  - POS order history/list
+- Ensure POS is not mixed with Orders unless intended (keep routes and behaviors intact).
+
+D) Returns
+- Target pages:
+  - Returns list + return details
+- Gate by existing subscription flag `returns` (already added) and optionally add `returns_rms_ui` if needed.
+
+E) Omnichannel
+- Target pages:
+  - Omnichannel dashboard/summary
+- Gate by existing subscription flag `omnichannel`.
+
+F) AI Pulse
+- Target pages:
+  - AI Pulse index + insights
+- Gate by existing subscription flag `ai_pulse`.
+
+G) Help Center
+- Target pages:
+  - Help center index
+- Gate by existing subscription flag `helpcenter`.
+

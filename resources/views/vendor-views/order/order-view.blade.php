@@ -13,19 +13,29 @@
     $max_processing_time = explode('-', $order['store']['delivery_time'])[0];
     ?>
     <div class="content container-fluid">
-        @php($storeData = \App\CentralLogics\Helpers::get_store_data())
-        @php($sub = $storeData?->store_sub ?? $storeData?->store_sub_update_application)
-        @php($allowAll = ($storeData?->store_business_model ?? null) === 'commission')
-        @php($ordersRmsUi = $allowAll || ((int) data_get($sub, 'order_rms_ui', 1) === 1))
-        @php($addr = $order->is_guest ? (json_decode((string)($order->delivery_address ?? '{}'), true) ?: []) : (json_decode((string)($order->delivery_address ?? '{}'), true) ?: []))
-        @php($buyer = $order->is_guest ? (string) data_get($addr,'contact_person_name','') : trim((string)($order?->customer?->f_name ?? '').' '.(string)($order?->customer?->l_name ?? '')))
-        @php($city = (string) data_get($addr,'city',''))
-        @php($channel = $order['order_type'] === 'take_away' ? 'Click & Collect' : ($order['order_type'] === 'pos' ? 'In-Store' : 'Online'))
+        @php
+            $storeData = \App\CentralLogics\Helpers::get_store_data();
+            $sub = $storeData?->store_sub ?? $storeData?->store_sub_update_application;
+            $allowAll = ($storeData?->store_business_model ?? null) === 'commission';
+            $ordersRmsUi = $allowAll || ((int) data_get($sub, 'order_rms_ui', 1) === 1);
+            $addr = $order->is_guest
+                ? (json_decode((string) ($order->delivery_address ?? '{}'), true) ?: [])
+                : (json_decode((string) ($order->delivery_address ?? '{}'), true) ?: []);
+            $buyer = $order->is_guest
+                ? (string) data_get($addr, 'contact_person_name', '')
+                : trim((string) ($order?->customer?->f_name ?? '') . ' ' . (string) ($order?->customer?->l_name ?? ''));
+            $city = (string) data_get($addr, 'city', '');
+            $channel = $order['order_type'] === 'take_away'
+                ? 'Click & Collect'
+                : ($order['order_type'] === 'pos' ? 'In-Store' : 'Online');
+        @endphp
 
         @if($ordersRmsUi)
             @push('css_or_js')
                 <style>
                     .mf-od{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+                    .mf-od .mf-od-sticky{position:sticky;top:76px}
+                    @media (max-width: 991.98px){.mf-od .mf-od-sticky{position:static;top:auto}}
                     .mf-od .mf-welcome{
                         background: linear-gradient(125deg, var(--dark-clr, #005555) 0%, var(--primary, #006161) 45%, var(--primary-clr, #107980) 100%);
                         border-radius:14px;padding:18px 20px;color:#fff;position:relative;overflow:hidden
@@ -44,6 +54,33 @@
                     .mf-od-card .page-header-title{font-size:16px;font-weight:900;color:#0f172a}
                     .mf-od-card .order-invoice-right-contents h6{font-size:12px;margin-bottom:8px}
                     .mf-od-card .order-invoice-left>div>span{font-size:12px;color:#475569}
+                    .mf-od .mf-od-panel-title{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:900;margin:0}
+                    .mf-od .mf-od-table{border-collapse:separate;border-spacing:0}
+                    .mf-od .mf-od-table thead.thead-light th{
+                        font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#64748b;
+                        background:#f8fafc;border-bottom:1px solid #e2e8f0
+                    }
+                    .mf-od .mf-od-table tbody td{border-bottom:1px solid #f1f5f9}
+                    .mf-od .mf-od-table tbody tr:last-child td{border-bottom:none}
+                    .mf-od .mf-od-table tbody tr:hover td{background:#fafafa}
+                    .mf-od .mf-od-table .media--sm .avatar{border-radius:10px;overflow:hidden}
+                    .mf-od .mf-od-table strong{color:#0f172a}
+                    .mf-od .mf-od-dl dt{color:#475569;font-weight:700}
+                    .mf-od .mf-od-dl dd{color:#0f172a;font-weight:900}
+                    .mf-od-card .card-header-title{font-weight:900}
+                    .mf-od-card .card-header-title span{color:#0f172a}
+                    .mf-od .mf-od-card .card-header{background:#fff}
+                    .mf-od .mf-od-card .card-body{padding:16px 18px}
+                    .mf-od .mf-od-card .card-header{padding:14px 18px}
+                    .mf-od .mf-od-card .card-header .card-header-icon{opacity:.7}
+                    .mf-od .mf-od-card .btn--primary,
+                    .mf-od .mf-od-card .btn--danger,
+                    .mf-od .mf-od-card .btn--secondary{
+                        border-radius:10px
+                    }
+                    .mf-od .mf-od-card .btn.w-100{font-weight:800}
+                    .mf-od .mf-od-card .delivery--information-single .name{color:#64748b;font-weight:800}
+                    .mf-od .mf-od-card .delivery--information-single .info{color:#0f172a;font-weight:800}
                 </style>
             @endpush
         @endif
@@ -359,7 +396,7 @@
                         ?>
                         <div class="table-responsive">
                             <table
-                                class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer mb-0">
+                                class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table dataTable no-footer mb-0 {{ $ordersRmsUi ? 'mf-od-table' : '' }}">
                                 <thead class="thead-light">
                                     <tr>
                                         <th class="border-0">{{ translate('messages.#') }}</th>
@@ -588,6 +625,7 @@
                         $store_discount_amount = $order['store_discount_amount'];
 
                         ?>
+                        @if(!$ordersRmsUi)
                         <div class="row justify-content-md-end mb-3 mx-0 mt-4">
                             <div class="col-md-9 col-lg-8">
                                 <dl class="row text-right">
@@ -712,6 +750,7 @@
                             </div>
                         </div>
                         <!-- End Row -->
+                        @endif
                     </div>
                     <!-- End Body -->
                 </div>
@@ -720,10 +759,118 @@
 
             <div class="col-lg-4">
                 <!-- Card -->
+                @if($ordersRmsUi)
+                    <div class="mf-od mf-od-sticky">
+                        <div class="card mb-2 mf-od-card">
+                            <div class="card-header bg-white">
+                                <h6 class="mf-od-panel-title mb-0">{{ translate('messages.summary') }}</h6>
+                            </div>
+                            <div class="card-body">
+                                @php($del_c = $order['delivery_charge'])
+                                @php($additional_charge = $order['additional_charge'])
+                                <dl class="row mb-0 mf-od-dl">
+                                    <dt class="col-7">{{ translate('messages.items_price') }}</dt>
+                                    <dd class="col-5 text-right">{{ \App\CentralLogics\Helpers::format_currency($product_price) }}</dd>
+
+                                    @if ($order->store->module->module_type == 'food')
+                                        <dt class="col-7">{{ translate('messages.addon_cost') }}</dt>
+                                        <dd class="col-5 text-right">{{ \App\CentralLogics\Helpers::format_currency($total_addon_price) }}</dd>
+                                    @endif
+
+                                    <dt class="col-7">{{ translate('messages.subtotal') }}
+                                        @if ($order->tax_status == 'included' ||  $tax_included ==  1)
+                                            ({{ translate('messages.TAX_Included') }})
+                                        @endif
+                                    </dt>
+                                    <dd class="col-5 text-right">
+                                        @if ($order->prescription_order == 1 && in_array($order['order_status'],['pending','confirmed','processing','accepted']))
+                                            <button class="btn btn-sm" type="button" data-toggle="modal"
+                                                data-target="#edit-order-amount"><i class="tio-edit"></i></button>
+                                        @endif
+                                        {{ \App\CentralLogics\Helpers::format_currency($product_price + $total_addon_price) }}
+                                    </dd>
+
+                                    <dt class="col-7">{{ translate('messages.discount') }}</dt>
+                                    <dd class="col-5 text-right">
+                                        @if ($order->prescription_order == 1 && in_array($order['order_status'],['pending','confirmed','processing','accepted']))
+                                            <button class="btn btn-sm" type="button" data-toggle="modal"
+                                                data-target="#edit-discount-amount"><i class="tio-edit"></i></button>
+                                        @endif
+                                        - {{ \App\CentralLogics\Helpers::format_currency($store_discount_amount + $admin_flash_discount_amount  +$store_flash_discount_amount) }}
+                                    </dd>
+
+                                    <dt class="col-7">{{ translate('messages.coupon_discount') }}</dt>
+                                    <dd class="col-5 text-right">- {{ \App\CentralLogics\Helpers::format_currency($coupon_discount_amount) }}</dd>
+
+                                    @if ($ref_bonus_amount > 0)
+                                        <dt class="col-7">{{ translate('messages.Referral_Discount') }}</dt>
+                                        <dd class="col-5 text-right">- {{ \App\CentralLogics\Helpers::format_currency($ref_bonus_amount) }}</dd>
+                                    @endif
+
+                                    @if ($order->tax_status == 'excluded' || $order->tax_status == null  )
+                                        <dt class="col-7">{{ translate('messages.vat/tax') }}</dt>
+                                        <dd class="col-5 text-right">+ {{ \App\CentralLogics\Helpers::format_currency($total_tax_amount) }}</dd>
+                                    @endif
+
+                                    <dt class="col-7">{{ translate('messages.delivery_man_tips') }}</dt>
+                                    <dd class="col-5 text-right">+ {{ \App\CentralLogics\Helpers::format_currency($order->dm_tips) }}</dd>
+
+                                    <dt class="col-7">{{ translate('messages.delivery_fee') }}</dt>
+                                    <dd class="col-5 text-right">+ {{ \App\CentralLogics\Helpers::format_currency($del_c) }}</dd>
+
+                                    <dt class="col-7">{{ \App\CentralLogics\Helpers::get_business_data('additional_charge_name')??translate('messages.additional_charge') }}</dt>
+                                    <dd class="col-5 text-right">+ {{ \App\CentralLogics\Helpers::format_currency($additional_charge) }}</dd>
+
+                                    @if ($extra_packaging_amount > 0)
+                                        <dt class="col-7">{{ translate('messages.Extra_Packaging_Amount') }}</dt>
+                                        <dd class="col-5 text-right">+ {{ \App\CentralLogics\Helpers::format_currency($extra_packaging_amount) }}</dd>
+                                    @endif
+
+                                    @if ($order['partially_paid_amount'] > 0)
+                                        @php($partially_paid_amount = $order['partially_paid_amount'])
+                                        <dt class="col-7">{{ translate('messages.partially_paid_amount') }}</dt>
+                                        <dd class="col-5 text-right">{{ \App\CentralLogics\Helpers::format_currency($partially_paid_amount) }}</dd>
+                                        <dt class="col-7">{{ translate('messages.due_amount') }}</dt>
+                                        <dd class="col-5 text-right">
+                                            @if ($order['payment_method'] == 'partial_payment')
+                                                {{ \App\CentralLogics\Helpers::format_currency($order->order_amount-$partially_paid_amount) }}
+                                            @else
+                                                {{ \App\CentralLogics\Helpers::format_currency(0) }}
+                                            @endif
+                                        </dd>
+                                    @endif
+
+                                    <dt class="col-7">{{ translate('messages.total') }}</dt>
+                                    <dd class="col-5 text-right">
+                                        {{ \App\CentralLogics\Helpers::format_currency($product_price + $del_c + $total_tax_amount + $total_addon_price + $additional_charge - $coupon_discount_amount - $store_discount_amount - $admin_flash_discount_amount  - $ref_bonus_amount + $extra_packaging_amount-$store_flash_discount_amount + $order->dm_tips) }}
+                                    </dd>
+                                </dl>
+
+                                @if ($order?->payments)
+                                    <hr class="my-3">
+                                    <dl class="row mb-0 mf-od-dl">
+                                        @foreach ($order?->payments as $payment)
+                                            @if ($payment->payment_status == 'paid')
+                                                @if ( $payment->payment_method == 'cash_on_delivery')
+                                                    <dt class="col-7">{{ translate('messages.Paid_with_Cash') }} ({{  translate('COD')}})</dt>
+                                                @else
+                                                    <dt class="col-7">{{ translate('messages.Paid_by') }} {{  translate($payment->payment_method) }}</dt>
+                                                @endif
+                                            @else
+                                                <dt class="col-7">{{ translate('Due_Amount') }} ({{  $payment->payment_method == 'cash_on_delivery' ?  translate('messages.COD') : translate($payment->payment_method) }})</dt>
+                                            @endif
+                                            <dd class="col-5 text-right">{{ \App\CentralLogics\Helpers::format_currency($payment->amount) }}</dd>
+                                        @endforeach
+                                    </dl>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
                 @if ($order->order_status != 'refund_requested' &&
                     $order->order_status != 'refunded' &&
                     $order->order_status != 'delivered')
-                    <div class="card mb-2">
+                    <div class="card mb-2 {{ $ordersRmsUi ? 'mf-od mf-od-card' : '' }}">
                         <!-- Header -->
                         <div class="card-header justify-content-center text-center px-0 mx-4">
                             <h5 class="card-header-title text-capitalize">
@@ -837,7 +984,7 @@
             @endif
                 @if ($order['order_type'] != 'take_away')
                     <!-- Card -->
-                    <div class="card mb-2">
+                    <div class="card mb-2 {{ $ordersRmsUi ? 'mf-od mf-od-card' : '' }}">
                         <!-- Header -->
                         <div class="card-header">
                             <h4 class="card-header-title">
@@ -910,7 +1057,7 @@
                 <!-- End Card -->
 
                 <!-- order proof -->
-                <div class="card mb-2 mt-2">
+                <div class="card mb-2 mt-2 {{ $ordersRmsUi ? 'mf-od mf-od-card' : '' }}">
                     <div class="card-header border-0 text-center pb-0">
                         <h4 class="m-0">{{ translate('messages.delivery_proof') }} </h4>
                         @if ($order['store']['sub_self_delivery'])
@@ -973,7 +1120,7 @@
                 </div>
 
                 <!-- Card -->
-                <div class="card">
+                <div class="card {{ $ordersRmsUi ? 'mf-od mf-od-card' : '' }}">
                     <!-- Header -->
                     <div class="card-header">
                         <h4 class="card-header-title">
@@ -1183,6 +1330,37 @@
                         </div>
                         <!-- End Input Group -->
                         <div class="text-right mt-2">
+                            <button class="btn btn--primary">{{ translate('messages.submit') }}</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
+    <!-- Modal -->
+    <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content {{ $ordersRmsUi ? 'mf-od mf-od-card' : '' }}">
+                <div class="modal-header">
+                    <h5 class="modal-title h4" id="mySmallModalLabel">{{ translate('messages.reference_code_add') }}</h5>
+                    <button type="button" class="btn btn-xs btn-icon btn-ghost-secondary" data-dismiss="modal"
+                        aria-label="Close">
+                        <i class="tio-clear tio-lg"></i>
+                    </button>
+                </div>
+
+                <form action="{{ route('vendor.order.add-payment-ref-code', [$order['id']]) }}" method="post">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" name="transaction_reference" class="form-control"
+                                placeholder="{{ translate('messages.Ex:') }} Code123" required>
+                        </div>
+                        <div class="text-right">
                             <button class="btn btn--primary">{{ translate('messages.submit') }}</button>
                         </div>
                     </div>

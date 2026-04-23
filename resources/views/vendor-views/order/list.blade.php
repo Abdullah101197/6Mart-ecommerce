@@ -50,6 +50,9 @@
                     .mf-orders .mf-btn{border-radius:10px;height:40px;display:inline-flex;align-items:center;gap:6px;font-weight:900}
                     .mf-orders .mf-btn.primary{background:var(--primary-clr,#107980);border-color:var(--primary-clr,#107980);color:#fff}
                     .mf-orders .mf-btn.light{background:#fff;border:1px solid #e2e8f0;color:#0f172a}
+                    .mf-orders .mf-actions{display:inline-flex;gap:8px;align-items:center;justify-content:center;flex-wrap:nowrap}
+                    .mf-orders .mf-actions .action-btn{min-width:64px}
+                    .mf-orders .mf-actions .action-btn.btn-sm{padding:.35rem .6rem}
                 </style>
             @endpush
 
@@ -583,8 +586,10 @@
                                     <td><span class="mf-pill {{ $stCls }}">{{ translate(ucwords(str_replace('_',' ',$st))) }}</span></td>
                                     <td>{{ $eta }}</td>
                                     <td class="text-center">
-                                        <a class="btn btn-sm btn--warning btn-outline-warning action-btn" href="{{route('vendor.order.details',['id'=>$order['id']])}}">{{ translate('View') }}</a>
-                                        <a class="btn btn-sm btn--primary btn-outline-primary action-btn" target="_blank" href="{{route('vendor.order.generate-invoice',[$order['id']])}}">{{ translate('Invoice') }}</a>
+                                        <div class="mf-actions">
+                                            <a class="btn btn-sm btn--warning btn-outline-warning action-btn" href="{{route('vendor.order.details',['id'=>$order['id']])}}">{{ translate('View') }}</a>
+                                            <a class="btn btn-sm btn--primary btn-outline-primary action-btn" target="_blank" href="{{route('vendor.order.generate-invoice',[$order['id']])}}">{{ translate('Invoice') }}</a>
+                                        </div>
                                     </td>
                                 @endif
                             </tr>
