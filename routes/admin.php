@@ -231,7 +231,9 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::get('disbursement-export/{id}/{type}', 'VendorController@disbursement_export')->name('disbursement-export');
                 Route::get('view/{store}/{tab?}/{sub_tab?}', 'VendorController@view')->name('view');
                 Route::get('list', 'VendorController@list')->name('list');
+                Route::get('all-sellers', 'VendorController@all_sellers')->name('all-sellers');
                 Route::get('pending-requests', 'VendorController@pending_requests')->name('pending-requests');
+                Route::get('pending-sellers', 'VendorController@pending_sellers')->name('pending-sellers');
                 Route::get('deny-requests', 'VendorController@deny_requests')->name('deny-requests');
                 Route::post('search', 'VendorController@search')->name('search');
                 Route::get('export', 'VendorController@export')->name('export');

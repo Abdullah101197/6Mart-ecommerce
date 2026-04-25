@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Vendor\AiPulseController;
 use App\Http\Controllers\Vendor\ItemController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Vendor\OmnichannelController;
+use App\Http\Controllers\Vendor\ReturnsController;
 use App\Http\Controllers\Vendor\SubscriptionController;
+use Illuminate\Support\Facades\Route;
 
 
 Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
@@ -43,22 +46,36 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             ->name('feature.comingSoon');
 
         // Unified vendor panel advanced modules (Coming Soon; gated by vendor_type + subscription)
-        Route::get('ai-pulse', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+        Route::get('ai-pulse', [AiPulseController::class, 'index'])
             ->middleware(['vendor_type:ai_pulse', 'subscription:ai_pulse'])
-            ->defaults('feature', 'ai_pulse')
             ->name('ai_pulse');
-        Route::get('omnichannel', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+        Route::get('omnichannel', [OmnichannelController::class, 'index'])
             ->middleware(['vendor_type:omnichannel', 'subscription:omnichannel'])
-            ->defaults('feature', 'omnichannel')
             ->name('omnichannel');
-        Route::get('returns', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+        Route::get('returns', [ReturnsController::class, 'index'])
             ->middleware(['vendor_type:returns', 'subscription:returns'])
-            ->defaults('feature', 'returns')
             ->name('returns');
+        Route::get('returns/{id}', [ReturnsController::class, 'show'])
+            ->middleware(['vendor_type:returns', 'subscription:returns'])
+            ->name('returns.show');
         Route::get('help-center', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
             ->middleware(['vendor_type:helpcenter', 'subscription:helpcenter'])
             ->defaults('feature', 'helpcenter')
             ->name('helpcenter');
+
+        // RMS Sellers/Vendors section (placeholders)
+        Route::get('vendor-promotions', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor'])
+            ->defaults('feature', 'vendor_promotions')
+            ->name('vendor_promotions');
+        Route::get('sponsored-ads', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor'])
+            ->defaults('feature', 'sponsored_ads')
+            ->name('sponsored_ads');
+        Route::get('vendor-payouts', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+            ->middleware(['vendor'])
+            ->defaults('feature', 'vendor_payouts')
+            ->name('vendor_payouts');
 
 
         Route::group(['prefix' => 'pos', 'as' => 'pos.'], function () {

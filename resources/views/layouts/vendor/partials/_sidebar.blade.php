@@ -109,7 +109,7 @@
                     @endif
 
                     @if($typeAllows('ai_pulse') && $subscription_can_ai_pulse)
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/ai-pulse') ? 'active' : '' }}">
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/ai-pulse*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.ai_pulse') }}" title="{{ translate('AI Pulse') }}">
                                 <i class="tio-bolt nav-icon"></i>
                                 <span class="text-truncate">{{ translate('AI Pulse') }}</span>
@@ -117,7 +117,7 @@
                         </li>
                     @endif
                     @if($typeAllows('omnichannel') && $subscription_can_omnichannel)
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/omnichannel') ? 'active' : '' }}">
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/omnichannel*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.omnichannel') }}" title="{{ translate('Omnichannel') }}">
                                 <i class="tio-globe nav-icon"></i>
                                 <span class="text-truncate">{{ translate('Omnichannel') }}</span>
@@ -125,7 +125,7 @@
                         </li>
                     @endif
                     @if($typeAllows('returns') && $subscription_can_returns)
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/returns') ? 'active' : '' }}">
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/returns*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.returns') }}" title="{{ translate('Returns') }}">
                                 <i class="tio-back-ui nav-icon"></i>
                                 <span class="text-truncate">{{ translate('Returns') }}</span>
@@ -137,6 +137,55 @@
                             <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.helpcenter') }}" title="{{ translate('Help Center') }}">
                                 <i class="tio-book-opened nav-icon"></i>
                                 <span class="text-truncate">{{ translate('Help Center') }}</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if($subscription_can_product_rms)
+                        <li class="nav-item mt-2">
+                            <small class="nav-subtitle">{{ translate('Sellers / Vendors') }}</small>
+                            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.dashboard') }}" title="{{ translate('Vendor Dashboard') }}">
+                                <i class="tio-dashboard-vs nav-icon"></i>
+                                <span class="text-truncate">{{ translate('Vendor Dashboard') }}</span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/item/seller-products') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.item.seller') }}" title="{{ translate('All Sellers') }}">
+                                <i class="tio-user nav-icon"></i>
+                                <span class="text-truncate">{{ translate('All Sellers') }}</span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/item/pending/item/list') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.item.pending_item_list') }}" title="{{ translate('Pending Sellers') }}">
+                                <i class="tio-alarm nav-icon"></i>
+                                <span class="text-truncate sidebar--badge-container">
+                                    {{ translate('Pending Sellers') }}
+                                    <span class="badge badge-soft-danger badge-pill ml-1">HOT</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/vendor-promotions') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.vendor_promotions') }}" title="{{ translate('Vendor Promotions') }}">
+                                <i class="tio-megaphone nav-icon"></i>
+                                <span class="text-truncate sidebar--badge-container">
+                                    {{ translate('Vendor Promotions') }}
+                                    <span class="badge badge-soft-info badge-pill ml-1">AI</span>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/sponsored-ads') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.sponsored_ads') }}" title="{{ translate('Sponsored Ads') }}">
+                                <i class="tio-target nav-icon"></i>
+                                <span class="text-truncate">{{ translate('Sponsored Ads') }}</span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('vendor-panel/vendor-payouts') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('vendor.vendor_payouts') }}" title="{{ translate('Vendor Payouts') }}">
+                                <i class="tio-money-vs nav-icon"></i>
+                                <span class="text-truncate">{{ translate('Vendor Payouts') }}</span>
                             </a>
                         </li>
                     @endif

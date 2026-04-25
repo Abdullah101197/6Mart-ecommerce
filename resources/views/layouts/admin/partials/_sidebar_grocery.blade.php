@@ -634,12 +634,28 @@
                         </span>
                             </a>
                         </li>
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store/list')  ||  Request::is('admin/store/view/*')  ? 'active' : '' }}">
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store/list') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
-                               href="{{ route('admin.store.list') }}" title="{{ translate('messages.stores_list') }}">
+                               href="{{ route('admin.store.list') }}" title="{{ translate('Stores List') }}">
                                 <span class="tio-layout nav-icon"></span>
-                                <span class="text-truncate">{{ translate('messages.stores') }}
-                                    {{ translate('list') }}</span>
+                                <span class="text-truncate">{{ translate('Stores List') }}</span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store/all-sellers') ||  Request::is('admin/store/view/*')  ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link"
+                               href="{{ route('admin.store.all-sellers') }}" title="{{ translate('All Sellers') }}">
+                                <span class="tio-layout nav-icon"></span>
+                                <span class="text-truncate">{{ translate('All Sellers') }}</span>
+                            </a>
+                        </li>
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store/pending-sellers') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link"
+                               href="{{ route('admin.store.pending-sellers') }}" title="{{ translate('Pending Sellers') }}">
+                                <span class="tio-time nav-icon"></span>
+                                <span class="text-truncate position-relative overflow-visible">
+                                    {{ translate('Pending Sellers') }}
+                                    <span class="badge badge-soft-danger ml-1">HOT</span>
+                                </span>
                             </a>
                         </li>
 

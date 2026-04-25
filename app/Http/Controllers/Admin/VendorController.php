@@ -574,7 +574,21 @@ class VendorController extends Controller
                 })->orderByRaw('FIELD(name, ?) DESC', [$request->search]);
             })
             ->module(Config::get('module.current_module_id'))
-            ->with('vendor', 'module')->type($type)->latest()->paginate(config('default_pagination'));
+            ->with('vendor', 'module')
+            ->withCount('items')
+            ->addSelect([
+                'rms_store_revenue' => OrderTransaction::query()
+                    ->join('orders', 'orders.id', '=', 'order_transactions.order_id')
+                    ->whereColumn('orders.store_id', 'stores.id')
+                    ->NotRefunded()
+                    ->selectRaw('COALESCE(SUM(order_transactions.store_amount),0)'),
+                'rms_store_commission_sum' => OrderTransaction::query()
+                    ->join('orders', 'orders.id', '=', 'order_transactions.order_id')
+                    ->whereColumn('orders.store_id', 'stores.id')
+                    ->NotRefunded()
+                    ->selectRaw('COALESCE(SUM(order_transactions.admin_commission),0)'),
+            ])
+            ->type($type)->latest()->paginate(config('default_pagination'));
         $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
 
         $result = OrderTransaction::where('module_id', Config::get('module.current_module_id'))
@@ -585,13 +599,160 @@ class VendorController extends Controller
         $total_transaction = $result->total_transaction;
         $comission_earned = max(0, $result->commission_earned);
 
+        $vendorRevenue = (float) OrderTransaction::query()
+            ->where('order_transactions.module_id', Config::get('module.current_module_id'))
+            ->NotRefunded()
+            ->sum('store_amount');
+
+        $avgVendorRating = (float) Store::query()
+            ->whereHas('vendor', fn ($q) => $q->where('status', 1))
+            ->module(Config::get('module.current_module_id'))
+            ->avg('rating');
+
+        $pendingSellersCount = (int) Store::query()
+            ->whereHas('vendor', fn ($q) => $q->whereNull('status'))
+            ->module(Config::get('module.current_module_id'))
+            ->count();
+
+        // Vendor revenue split (top vendors + others)
+        $topVendorRows = OrderTransaction::query()
+            ->join('orders', 'orders.id', '=', 'order_transactions.order_id')
+            ->join('stores', 'stores.id', '=', 'orders.store_id')
+            ->where('order_transactions.module_id', Config::get('module.current_module_id'))
+            ->NotRefunded()
+            ->groupBy('orders.store_id', 'stores.name')
+            ->selectRaw('stores.name as name, COALESCE(SUM(order_transactions.store_amount),0) as total')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $totalVendorRevenue = (float) OrderTransaction::query()
+            ->where('order_transactions.module_id', Config::get('module.current_module_id'))
+            ->NotRefunded()
+            ->sum('store_amount');
+
+        $revLabels = $topVendorRows->pluck('name')->values()->all();
+        $revData = $topVendorRows->pluck('total')->map(fn ($v) => (float) $v)->values()->all();
+        $topSum = array_sum($revData);
+        $others = max(0, $totalVendorRevenue - $topSum);
+        if ($others > 0.01) {
+            $revLabels[] = translate('Others');
+            $revData[] = $others;
+        }
+
         $store_withdraws = WithdrawRequest::wherehas('store', function ($query) {
             $query->where('module_id', Config::get('module.current_module_id'));
         })
             ->where(['approved' => 1])
             ->sum('amount');
 
-        return view('admin-views.vendor.list', compact('stores', 'zone', 'type', 'total_store', 'active_stores', 'inactive_stores', 'recent_stores', 'total_transaction', 'comission_earned', 'store_withdraws'));
+        return view('admin-views.vendor.list', compact(
+            'stores',
+            'zone',
+            'type',
+            'total_store',
+            'active_stores',
+            'inactive_stores',
+            'recent_stores',
+            'total_transaction',
+            'comission_earned',
+            'vendorRevenue',
+            'avgVendorRating',
+            'pendingSellersCount',
+            'store_withdraws',
+            'revLabels',
+            'revData'
+        ));
+    }
+
+    public function all_sellers(Request $request)
+    {
+        $status = $request->query('status', 'all');
+        $key = array_filter(explode(' ', $request->get('search', '')));
+        $zone_id = $request->query('zone_id', 'all');
+        $type = $request->query('type', 'all');
+        $module_id = $request->query('module_id', 'all');
+        $vendor_type = $request->query('vendor_type', 'all');
+
+        $moduleId = Config::get('module.current_module_id');
+
+        $pendingCount = Store::query()->module($moduleId)->whereHas('vendor', fn ($v) => $v->whereNull('status'))->count();
+        $approvedCount = Store::query()->module($moduleId)->whereHas('vendor', fn ($v) => $v->where('status', 1))->where('stores.status', 1)->count();
+        $suspendedCount = Store::query()->module($moduleId)->where(function ($qq) {
+            $qq->where('stores.status', 0)->orWhereHas('vendor', fn ($v) => $v->where('status', 0));
+        })->count();
+        $totalSellers = Store::query()->module($moduleId)->count();
+
+        $stores = Store::query()
+            ->with('vendor', 'module', 'zone')
+            ->withCount('items')
+            ->addSelect([
+                'rms_store_revenue' => OrderTransaction::query()
+                    ->join('orders', 'orders.id', '=', 'order_transactions.order_id')
+                    ->whereColumn('orders.store_id', 'stores.id')
+                    ->NotRefunded()
+                    ->selectRaw('COALESCE(SUM(order_transactions.store_amount),0)'),
+                'rms_store_commission_sum' => OrderTransaction::query()
+                    ->join('orders', 'orders.id', '=', 'order_transactions.order_id')
+                    ->whereColumn('orders.store_id', 'stores.id')
+                    ->NotRefunded()
+                    ->selectRaw('COALESCE(SUM(order_transactions.admin_commission),0)'),
+            ])
+            ->when($status === 'approved', function ($q) {
+                $q->whereHas('vendor', fn ($v) => $v->where('status', 1))->where('stores.status', 1);
+            })
+            ->when($status === 'pending', function ($q) {
+                $q->whereHas('vendor', fn ($v) => $v->whereNull('status'));
+            })
+            ->when($status === 'suspended', function ($q) {
+                $q->where(function ($qq) {
+                    $qq->where('stores.status', 0)
+                        ->orWhereHas('vendor', fn ($v) => $v->where('status', 0));
+                });
+            })
+            ->when(is_numeric($zone_id), fn ($q) => $q->where('zone_id', $zone_id))
+            ->when(in_array($vendor_type, ['shopkeeper', 'manufacturer', 'wholesale', 'b2b'], true), fn ($q) => $q->where('vendor_type', $vendor_type))
+            ->when(is_numeric($module_id), fn ($q) => $q->module($request->query('module_id')))
+            ->when(count($key) > 0, function ($q) use ($key, $request) {
+                $q->where(function ($q) use ($key) {
+                    $q->orWhereHas('vendor', function ($q) use ($key) {
+                        $q->where(function ($q) use ($key) {
+                            foreach ($key as $value) {
+                                $q->orWhere('f_name', 'like', "%{$value}%")
+                                    ->orWhere('l_name', 'like', "%{$value}%")
+                                    ->orWhere('email', 'like', "%{$value}%")
+                                    ->orWhere('phone', 'like', "%{$value}%");
+                            }
+                        });
+                    })->orWhere(function ($q) use ($key) {
+                        foreach ($key as $value) {
+                            $q->orWhere('name', 'like', "%{$value}%")
+                                ->orWhere('email', 'like', "%{$value}%")
+                                ->orWhere('phone', 'like', "%{$value}%");
+                        }
+                    });
+                });
+                if ($request->filled('search')) {
+                    $q->orderByRaw('FIELD(stores.name, ?) DESC', [$request->search]);
+                }
+            })
+            ->module($moduleId)
+            ->type($type)
+            ->latest()
+            ->paginate(config('default_pagination'));
+
+        $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
+
+        return view('admin-views.vendor.all-sellers', compact(
+            'stores',
+            'zone',
+            'type',
+            'status',
+            'pendingCount',
+            'approvedCount',
+            'suspendedCount',
+            'totalSellers'
+        ));
     }
 
     public function vendorType(Request $request, Store $store)
@@ -618,6 +779,29 @@ class VendorController extends Controller
         $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
 
         return view('admin-views.vendor.pending_requests', compact('stores', 'zone', 'type', 'search_by'));
+    }
+
+    public function pending_sellers(Request $request)
+    {
+        // same pending-store applications but rendered in RMS cards layout
+        $stores = $this->getNewStores($request, null);
+
+        $kpiBase = Store::query()
+            ->whereHas('vendor', function ($q) {
+                $q->whereNull('status');
+            })
+            ->module(Config::get('module.current_module_id'));
+
+        $pendingReview = (int) (clone $kpiBase)->count();
+        $documentsSubmitted = (int) (clone $kpiBase)->whereNotNull('email')->count(); // best-effort placeholder
+        $avgReviewDays = 1.4; // placeholder until we track review timestamps
+
+        return view('admin-views.vendor.pending_sellers', compact(
+            'stores',
+            'pendingReview',
+            'documentsSubmitted',
+            'avgReviewDays'
+        ));
     }
 
     private function getNewStores($request, $storeApproveStatus)

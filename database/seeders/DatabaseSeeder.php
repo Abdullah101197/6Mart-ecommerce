@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             $seeders[] = SubscriptionPackageSeeder::class;
             $seeders[] = DummyDataSeeder::class;
             $seeders[] = SmallTestOrderSeeder::class;
+            $seeders[] = OrderTransactionTestSeeder::class;
         }
 
         $this->call($seeders);

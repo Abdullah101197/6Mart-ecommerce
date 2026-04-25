@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Models\Category;
+use App\Models\CategoryDiscount;
 use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,8 @@ class CategoryController extends Controller
     function index(Request $request)
     {
         $key = explode(' ', $request['search']);
-        $categories=Category::where(['position'=>0])->module(Helpers::get_store_data()->module_id)
+        $store = Helpers::get_store_data();
+        $categories=Category::where(['position'=>0])->module($store->module_id)
         ->when(isset($key) , function($q) use($key){
             $q->where(function ($q) use ($key) {
                 foreach ($key as $value) {
@@ -30,7 +32,28 @@ class CategoryController extends Controller
 
         $taxData = Helpers::getTaxSystemType();
         $categoryWiseTax = $taxData['categoryWiseTax'];
-        return view('vendor-views.category.index',compact('categories','categoryWiseTax'));
+        $moduleId = $store->module_id;
+        $mainCategoriesCount = Category::where(['position' => 0])->module($moduleId)->count();
+        $subCategoriesCount = Category::where(['position' => 1])->module($moduleId)->count();
+
+        $categoryDiscounts = CategoryDiscount::query()
+            ->with(['category:id,name'])
+            ->where('store_id', (int) $store->id)
+            ->latest('id')
+            ->take(8)
+            ->get();
+        $categoryDiscountsCount = CategoryDiscount::query()
+            ->where('store_id', (int) $store->id)
+            ->count();
+
+        return view('vendor-views.category.index', compact(
+            'categories',
+            'categoryWiseTax',
+            'mainCategoriesCount',
+            'subCategoriesCount',
+            'categoryDiscounts',
+            'categoryDiscountsCount'
+        ));
     }
 
     public function get_all(Request $request){
@@ -58,7 +81,15 @@ class CategoryController extends Controller
                 });
             })
         ->latest()->paginate(config('default_pagination'));
-        return view('vendor-views.category.sub-index',compact('categories'));
+        $moduleId = Helpers::get_store_data()->module_id;
+        $mainCategoriesCount = Category::where(['position' => 0])->module($moduleId)->count();
+        $subCategoriesCount = Category::where(['position' => 1])->module($moduleId)->count();
+
+        return view('vendor-views.category.sub-index', compact(
+            'categories',
+            'mainCategoriesCount',
+            'subCategoriesCount'
+        ));
     }
 
     // public function search(Request $request){

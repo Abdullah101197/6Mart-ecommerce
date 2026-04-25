@@ -623,17 +623,25 @@
                                 </a>
                             </li>
 
-                            <li class="navbar-item {{ Request::is('admin/store/list') ||  Request::is('admin/store/view/*')  ? 'active' : '' }}">
-                                <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.store.list') }}" title="{{ translate('messages.stores_list') }}">
+                            <li class="navbar-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.store.list') }}" title="{{ translate('Stores List') }}">
                                     <span class="tio-circle nav-indicator-icon"></span>
-                                    <span class="text-truncate">{{ translate('messages.stores') }}
-                                        {{ translate('list') }}</span>
+                                    <span class="text-truncate">{{ translate('Stores List') }}</span>
                                 </a>
                             </li>
-                            <li class="navbar-item {{ Request::is('admin/store/pending-requests') ? 'active' : '' }}">
-                                <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.store.pending-requests') }}" title="{{ translate('messages.pending_requests') }}">
+
+                            <li class="navbar-item {{ Request::is('admin/store/all-sellers') || Request::is('admin/store/list') ||  Request::is('admin/store/view/*')  ? 'active' : '' }}">
+                                <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.store.all-sellers') }}" title="{{ translate('All Sellers') }}">
                                     <span class="tio-circle nav-indicator-icon"></span>
-                                    <span class="text-truncate text-capitalize">{{ translate('new_joining_requests') }}</span>
+                                    <span class="text-truncate">{{ translate('All Sellers') }}</span>
+                                </a>
+                            </li>
+                            <li class="navbar-item {{ Request::is('admin/store/pending-sellers') ? 'active' : '' }}">
+                                <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.store.pending-sellers') }}" title="{{ translate('Pending Sellers') }}">
+                                    <span class="tio-circle nav-indicator-icon"></span>
+                                    <span class="text-truncate text-capitalize">
+                                        {{ translate('Pending Sellers') }} <span class="badge badge-soft-danger ml-1">HOT</span>
+                                    </span>
                                 </a>
                             </li>
 

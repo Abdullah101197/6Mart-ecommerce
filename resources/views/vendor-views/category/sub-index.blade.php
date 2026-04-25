@@ -2,12 +2,46 @@
 
 @section('title',translate('messages.sub_category'))
 
+@php($store_data = \App\CentralLogics\Helpers::get_store_data())
+@php($sub = $store_data?->store_sub ?? $store_data?->store_sub_update_application)
+@php($allowAll = ($store_data?->store_business_model ?? null) === 'commission')
+@php($categoryRmsUi = $allowAll || ((int) data_get($sub, 'product_rms_ui', 1) === 1))
+
 @push('css_or_js')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @if ($categoryRmsUi)
+        <style>
+            .mf-cat-rms .mf-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+            .mf-cat-rms .mf-kpi{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px}
+            .mf-cat-rms .mf-kpi .t{font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
+            .mf-cat-rms .mf-kpi .v{font-size:22px;font-weight:900;color:#0f172a;margin-top:4px}
+            .mf-cat-rms .mf-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+        </style>
+    @endif
 @endpush
 
 @section('content')
-    <div class="content container-fluid">
+    <div class="content container-fluid @if($categoryRmsUi) mf-cat-rms @endif">
+        @if ($categoryRmsUi)
+            <div class="mf-bar">
+                <a class="btn btn-sm btn-outline-secondary" href="{{ route('vendor.category.add') }}">{{ translate('messages.category_list') }}</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ route('vendor.item.list') }}">{{ translate('messages.items') }}</a>
+            </div>
+            <div class="mf-strip">
+                <div class="mf-kpi">
+                    <div class="t">{{ translate('messages.main') }} {{ translate('messages.categories') }}</div>
+                    <div class="v">{{ $mainCategoriesCount ?? 0 }}</div>
+                </div>
+                <div class="mf-kpi">
+                    <div class="t">{{ translate('messages.sub') }} {{ translate('messages.categories') }}</div>
+                    <div class="v">{{ $subCategoriesCount ?? 0 }}</div>
+                </div>
+                <div class="mf-kpi">
+                    <div class="t">{{ translate('messages.sub_category') }}</div>
+                    <div class="v">{{ $categories->total() }}</div>
+                </div>
+            </div>
+        @endif
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-header-title">

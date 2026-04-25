@@ -30,14 +30,15 @@ class OrderTransaction extends Model
 
     public function scopeNotRefunded($query)
     {
-        return $query->where(function($query){
-            $query->whereNotIn('status', ['refunded_with_delivery_charge', 'refunded_without_delivery_charge'])->orWhereNull('status');
+        return $query->where(function ($query) {
+            $query->whereNotIn('order_transactions.status', ['refunded_with_delivery_charge', 'refunded_without_delivery_charge'])
+                ->orWhereNull('order_transactions.status');
         });
     }
     public function scopeRefunded($query)
     {
-        return $query->where(function($query){
-            $query->whereIn('status', ['refunded_with_delivery_charge', 'refunded_without_delivery_charge']);
+        return $query->where(function ($query) {
+            $query->whereIn('order_transactions.status', ['refunded_with_delivery_charge', 'refunded_without_delivery_charge']);
         });
     }
     protected static function booted()
