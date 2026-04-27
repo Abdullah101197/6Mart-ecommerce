@@ -865,7 +865,6 @@
                                 @endif
                             </div>
                         </div>
-                    </div>
                 @endif
                 @if ($order->order_status != 'refund_requested' &&
                     $order->order_status != 'refunded' &&
@@ -1282,6 +1281,9 @@
                     <!-- End Body -->
                 </div>
                 <!-- End Card -->
+                @if($ordersRmsUi)
+                    </div>
+                @endif
             </div>
         </div>
         <!-- End Row -->

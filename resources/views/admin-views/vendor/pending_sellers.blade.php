@@ -73,9 +73,10 @@
                                 <span class="text-muted">{{ translate('Applied') }} {{ optional($store->created_at)->format('M d, Y') }}</span>
                             </div>
                             <div class="d-flex flex-wrap mt-2" style="gap:8px">
-                                <span class="chip warn">{{ translate('Documents Pending') }}</span>
-                                <span class="chip blue">{{ translate('Fashion Category') }}</span>
-                                <span class="chip ok">{{ translate('50+ products planned') }}</span>
+                                <span class="chip warn">{{ translate('Pending Review') }}</span>
+                                @if(!empty($store->zone))
+                                    <span class="chip blue">{{ $store->zone?->name }}</span>
+                                @endif
                             </div>
                         </div>
                         <div class="d-flex flex-wrap align-items-center" style="gap:8px">
