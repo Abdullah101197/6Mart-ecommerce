@@ -1253,6 +1253,45 @@ class VendorController extends Controller
         return view('admin-views.wallet.withdraw', compact('withdraw_req'));
     }
 
+    public function vendor_payouts(Request $request)
+    {
+        if (! Helpers::module_permission_check('withdraw_list')) {
+            return view('admin-views.wallet.withdraw-dashboard');
+        }
+
+        $status = $request->query('status', 'all'); // all|pending|approved|denied
+        $search = $request->query('search');
+        $key = $search ? explode(' ', $search) : [];
+
+        $baseQuery = WithdrawRequest::query()
+            ->with(['vendor.stores', 'method'])
+            ->when($status === 'approved', fn ($q) => $q->where('approved', 1))
+            ->when($status === 'denied', fn ($q) => $q->where('approved', 2))
+            ->when($status === 'pending', fn ($q) => $q->where('approved', 0))
+            ->when($search, function ($query) use ($key) {
+                return $query->whereHas('vendor', function ($query) use ($key) {
+                    $query->whereHas('stores', function ($q) use ($key) {
+                        foreach ($key as $value) {
+                            $q->where('name', 'like', "%{$value}%");
+                        }
+                    });
+                });
+            });
+
+        $kpis = [
+            'pendingCount' => (clone $baseQuery)->where('approved', 0)->count(),
+            'pendingAmount' => (float) (clone $baseQuery)->where('approved', 0)->sum('amount'),
+            'approvedCount' => (clone $baseQuery)->where('approved', 1)->count(),
+            'approvedAmount' => (float) (clone $baseQuery)->where('approved', 1)->sum('amount'),
+            'deniedCount' => (clone $baseQuery)->where('approved', 2)->count(),
+            'totalAmount' => (float) (clone $baseQuery)->sum('amount'),
+        ];
+
+        $withdraw_req = $baseQuery->latest()->paginate(config('default_pagination'))->withQueryString();
+
+        return view('admin-views.vendor.payouts', compact('withdraw_req', 'kpis', 'status', 'search'));
+    }
+
     public function withdraw_export(Request $request)
     {
         $key = isset($request['search']) ? explode(' ', $request['search']) : [];

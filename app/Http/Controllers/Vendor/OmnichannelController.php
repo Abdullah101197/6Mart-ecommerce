@@ -29,8 +29,14 @@ class OmnichannelController extends Controller
             ['key' => 'parcel', 'label' => translate('messages.parcel'), 'count' => $parcel, 'pct' => round($parcel / $total * 100)],
         ];
 
+        $pending30 = (int) Order::query()->where('store_id', $storeId)->where('created_at', '>=', $since)->whereIn('order_status', ['pending', 'confirmed', 'processing'])->count();
+        $delivered30 = (int) Order::query()->where('store_id', $storeId)->where('created_at', '>=', $since)->whereIn('order_status', ['delivered'])->count();
+        $cancelled30 = (int) Order::query()->where('store_id', $storeId)->where('created_at', '>=', $since)->whereIn('order_status', ['canceled', 'cancelled', 'failed'])->count();
+        $avgOrderValue30 = (float) Order::query()->where('store_id', $storeId)->where('created_at', '>=', $since)->avg('order_amount');
+
         $recentOrders = Order::query()
-            ->select(['id', 'order_amount', 'order_status', 'order_type', 'created_at'])
+            ->select(['id', 'order_amount', 'order_status', 'order_type', 'created_at', 'user_id'])
+            ->with(['customer:id,f_name,l_name,phone', 'guest:id,ip_address'])
             ->where('store_id', $storeId)
             ->where('created_at', '>=', $since)
             ->latest()
@@ -54,6 +60,10 @@ class OmnichannelController extends Controller
         return view('vendor-views.omnichannel.index', compact(
             'channels',
             'recentOrders',
+            'pending30',
+            'delivered30',
+            'cancelled30',
+            'avgOrderValue30',
             'trendLabels',
             'trendOnline',
             'trendClickCollect',

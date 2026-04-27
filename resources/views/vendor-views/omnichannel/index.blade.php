@@ -26,11 +26,59 @@
         .mf-oc .chip.c2{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10);color:#16a34a}
         .mf-oc .chip.c3{border-color:rgba(14,165,233,.35);background:rgba(14,165,233,.10);color:#0284c7}
         .mf-oc .chip.c4{border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.10);color:#ea580c}
+        .mf-oc .st{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:900;border:1px solid #e2e8f0;background:#fff}
+        .mf-oc .st.pending{border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.10);color:#ea580c}
+        .mf-oc .st.processing{border-color:rgba(14,165,233,.35);background:rgba(14,165,233,.10);color:#0284c7}
+        .mf-oc .st.delivered{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10);color:#16a34a}
+        .mf-oc .st.cancelled{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10);color:#dc2626}
     </style>
 @endpush
 
 @section('content')
     <div class="content container-fluid mf-oc">
+        <div class="mf-strip">
+            <div class="mf-kpi">
+                <div>
+                    <div class="t">{{ translate('Pending') }}</div>
+                    <div class="v">{{ (int) ($pending30 ?? 0) }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="mf-badge">{{ translate('30d') }}</div>
+                    <div class="s mt-1">{{ translate('Needs action') }}</div>
+                </div>
+            </div>
+            <div class="mf-kpi">
+                <div>
+                    <div class="t">{{ translate('Delivered') }}</div>
+                    <div class="v">{{ (int) ($delivered30 ?? 0) }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="mf-badge">{{ translate('30d') }}</div>
+                    <div class="s mt-1">{{ translate('Completed') }}</div>
+                </div>
+            </div>
+            <div class="mf-kpi">
+                <div>
+                    <div class="t">{{ translate('Cancelled') }}</div>
+                    <div class="v">{{ (int) ($cancelled30 ?? 0) }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="mf-badge">{{ translate('30d') }}</div>
+                    <div class="s mt-1">{{ translate('Lost') }}</div>
+                </div>
+            </div>
+            <div class="mf-kpi">
+                <div>
+                    <div class="t">{{ translate('Avg order value') }}</div>
+                    <div class="v">{{ \App\CentralLogics\Helpers::format_currency((float) ($avgOrderValue30 ?? 0)) }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="mf-badge">{{ translate('30d') }}</div>
+                    <div class="s mt-1">{{ translate('Trend') }}</div>
+                </div>
+            </div>
+        </div>
+
         <div class="mf-strip">
             @foreach ($channels as $ch)
                 <div class="mf-kpi">
@@ -77,6 +125,7 @@
                     <thead class="thead-light">
                     <tr>
                         <th>{{ translate('messages.order_id') }}</th>
+                        <th>{{ translate('Buyer') }}</th>
                         <th>{{ translate('Channel') }}</th>
                         <th>{{ translate('messages.amount') }}</th>
                         <th>{{ translate('Fulfilment') }}</th>
@@ -87,8 +136,14 @@
                     <tbody>
                     @forelse(($recentOrders ?? []) as $o)
                         @php($ot = (string) ($o->order_type ?? 'delivery'))
+                        @php($buyer = $o->customer ?? $o->guest)
+                        @php($buyerName = $o->customer ? trim(($o->customer?->f_name ?? '').' '.($o->customer?->l_name ?? '')) : translate('Guest'))
                         <tr>
                             <td class="font-weight-bold">OM-{{ str_pad((string) $o->id, 5, '0', STR_PAD_LEFT) }}</td>
+                            <td>
+                                <div class="font-weight-bold">{{ \Illuminate\Support\Str::limit($buyerName, 18) }}</div>
+                                <div class="text-muted small">{{ $o->customer?->phone ? \Illuminate\Support\Str::limit($o->customer->phone, 16) : '—' }}</div>
+                            </td>
                             <td>
                                 @if($ot==='delivery')
                                     <span class="chip c1">{{ translate('Online') }}</span>
@@ -103,12 +158,16 @@
                             <td class="font-weight-bold">{{ \App\CentralLogics\Helpers::format_currency((float) ($o->order_amount ?? 0)) }}</td>
                             <td class="text-muted small">{{ $ot==='delivery' ? translate('Standard Delivery') : ($ot==='take_away' ? translate('In-Store Pickup') : ($ot==='pos' ? translate('In-Store Pickup') : translate('Express'))) }}</td>
                             <td>
-                                <span class="badge badge-soft-info">{{ $o->order_status ?? '—' }}</span>
+                                @php($st = (string) ($o->order_status ?? ''))
+                                @php($stKey = in_array($st, ['pending','confirmed'], true) ? 'pending' : (in_array($st, ['processing','picked_up','out_for_delivery'], true) ? 'processing' : (in_array($st, ['delivered'], true) ? 'delivered' : (in_array($st, ['canceled','cancelled','failed','refund_requested','refunded'], true) ? 'cancelled' : 'processing'))))
+                                <span class="st {{ $stKey }}">{{ ucfirst(str_replace('_',' ', $st ?: '—')) }}</span>
                             </td>
-                            <td class="text-muted small">{{ $o->created_at?->format('M d') }}</td>
+                            <td class="text-muted small">
+                                {{ $o->created_at ? \Carbon\Carbon::parse($o->created_at)->format('M d') : '—' }}
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-center text-muted py-5">{{ translate('no_data_found') }}</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-5">{{ translate('no_data_found') }}</td></tr>
                     @endforelse
                     </tbody>
                 </table>

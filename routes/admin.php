@@ -268,6 +268,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             });
 
             Route::group(['middleware' => ['module:withdraw_list']], function () {
+                Route::get('vendor-payouts', 'VendorController@vendor_payouts')->name('vendor-payouts');
                 Route::post('withdraw-status/{id}', 'VendorController@withdrawStatus')->name('withdraw_status');
                 Route::get('withdraw_list', 'VendorController@withdraw')->name('withdraw_list');
                 Route::post('withdraw_search', 'VendorController@withdraw_search')->name('withdraw_search');

@@ -16,6 +16,9 @@
             .mf-cat-rms .mf-kpi .t{font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
             .mf-cat-rms .mf-kpi .v{font-size:22px;font-weight:900;color:#0f172a;margin-top:4px}
             .mf-cat-rms .mf-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+            .mf-cat-rms .mf-pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:900}
+            .mf-cat-rms .mf-pill.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+            .mf-cat-rms .mf-pill.off{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
         </style>
     @endif
 @endpush
@@ -107,45 +110,78 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive datatable-custom">
-                            <table id="columnSearchDatatable"
-                                class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
-                                data-hs-datatables-options='{
-                                    "search": "#datatableSearch",
-                                    "entries": "#datatableEntries",
-                                    "isResponsive": false,
-                                    "isShowPaging": false,
-                                    "paging":false,
-                                }'>
-                                <thead class="thead-light">
+                        @if($categoryRmsUi)
+                            <div class="table-responsive">
+                                <table class="table table-hover table-thead-bordered table-nowrap card-table mb-0">
+                                    <thead class="thead-light">
                                     <tr>
-                                        <th class="border-0">{{translate('messages.#')}}</th>
-                                        <th class="border-0">{{translate('messages.category_id')}}</th>
-                                        <th class="border-0">{{translate('messages.main_category')}}</th>
-                                        <th class="border-0">{{translate('messages.sub_category')}}</th>
+                                        <th>{{ translate('Sub Category') }}</th>
+                                        <th>{{ translate('Main Category') }}</th>
+                                        <th class="text-center">{{ translate('Products') }}</th>
+                                        <th class="text-right">{{ translate('Top Sales') }}</th>
+                                        <th class="text-center">{{ translate('Status') }}</th>
                                     </tr>
-                                </thead>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($categories as $category)
+                                        <tr>
+                                            <td class="font-weight-bold">{{ \Illuminate\Support\Str::limit($category->name, 32) }}</td>
+                                            <td class="text-muted">{{ \Illuminate\Support\Str::limit($category->parent?->name ?? translate('messages.category_deleted'), 26) }}</td>
+                                            <td class="text-center">{{ (int) ($category->mf_products ?? 0) }}</td>
+                                            <td class="text-right font-weight-bold">{{ \App\CentralLogics\Helpers::format_currency((float) ($category->mf_sales ?? 0)) }}</td>
+                                            <td class="text-center">
+                                                @if((int) ($category->status ?? 0) === 1)
+                                                    <span class="mf-pill ok">{{ translate('Active') }}</span>
+                                                @else
+                                                    <span class="mf-pill off">{{ translate('Inactive') }}</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="table-responsive datatable-custom">
+                                <table id="columnSearchDatatable"
+                                    class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+                                    data-hs-datatables-options='{
+                                        "search": "#datatableSearch",
+                                        "entries": "#datatableEntries",
+                                        "isResponsive": false,
+                                        "isShowPaging": false,
+                                        "paging":false,
+                                    }'>
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="border-0">{{translate('messages.#')}}</th>
+                                            <th class="border-0">{{translate('messages.category_id')}}</th>
+                                            <th class="border-0">{{translate('messages.main_category')}}</th>
+                                            <th class="border-0">{{translate('messages.sub_category')}}</th>
+                                        </tr>
+                                    </thead>
 
-                                <tbody id="set-rows">
-                                @foreach($categories as $key=>$category)
-                                    <tr>
-                                        <td>{{$key+$categories->firstItem()}}</td>
-                                        <td>{{$category->id}}</td>
-                                        <td>
-                                            <span class="d-block font-size-sm text-body">
-                                                {{Str::limit($category->parent?$category->parent['name']:translate('messages.category_deleted'),20,'...')}}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="d-block font-size-sm text-body">
-                                                {{Str::limit($category->name,20,'...')}}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    <tbody id="set-rows">
+                                    @foreach($categories as $key=>$category)
+                                        <tr>
+                                            <td>{{$key+$categories->firstItem()}}</td>
+                                            <td>{{$category->id}}</td>
+                                            <td>
+                                                <span class="d-block font-size-sm text-body">
+                                                    {{Str::limit($category->parent?$category->parent['name']:translate('messages.category_deleted'),20,'...')}}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="d-block font-size-sm text-body">
+                                                    {{Str::limit($category->name,20,'...')}}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     </div>
                     <div class="card-footer page-area">
                         <!-- Pagination -->

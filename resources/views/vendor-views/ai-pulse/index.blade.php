@@ -25,6 +25,13 @@
         .mf-ap .mf-it .d{color:#64748b;font-weight:800;font-size:12px;margin-top:4px}
         .mf-ap .mf-it a{font-weight:900;font-size:12px;color:#5566ff;text-decoration:none}
         .mf-ap .mf-it a:hover{text-decoration:underline}
+        .mf-ap .mf-split{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-top:14px}
+        @media(max-width:1199.98px){.mf-ap .mf-split{grid-template-columns:1fr}}
+        .mf-ap .mf-mini{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px}
+        .mf-ap .mf-mini .tt{font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#64748b}
+        .mf-ap .mf-mini .rowi{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9}
+        .mf-ap .mf-mini .rowi:last-child{border-bottom:0}
+        .mf-ap .mf-pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:900;border:1px solid #e2e8f0;background:#f8fafc;color:#0f172a}
     </style>
 @endpush
 
@@ -48,6 +55,10 @@
                 <div class="v">{{ $orders30d }}</div>
             </div>
             <div class="mf-kpi">
+                <div class="t">{{ translate('Revenue') }} (7d)</div>
+                <div class="v">{{ \App\CentralLogics\Helpers::format_currency((float) ($revenue7d ?? 0)) }}</div>
+            </div>
+            <div class="mf-kpi">
                 <div class="t">{{ translate('Open and assign/unassigned orders.') }}</div>
                 <div class="v">{{ $pendingOrders }}</div>
             </div>
@@ -59,28 +70,68 @@
                 <div class="t">{{ translate('low_stock') }}</div>
                 <div class="v">{{ $lowStock }}</div>
             </div>
+            <div class="mf-kpi">
+                <div class="t">{{ translate('Out of stock') }}</div>
+                <div class="v">{{ (int) ($outOfStock ?? 0) }}</div>
+            </div>
         </div>
 
-        <div class="mf-grid">
-            @foreach(($insights ?? []) as $box)
-                <div class="mf-card">
-                    <div class="mf-card-h">
-                        <div class="tt">{{ $box['group'] ?? '' }}</div>
-                        <div style="font-weight:900">{{ $box['icon'] ?? '' }}</div>
+        <div class="mf-split">
+            <div class="mf-grid" style="margin-top:0">
+                @foreach(($insights ?? []) as $box)
+                    <div class="mf-card">
+                        <div class="mf-card-h">
+                            <div class="tt">{{ $box['group'] ?? '' }}</div>
+                            <div style="font-weight:900">{{ $box['icon'] ?? '' }}</div>
+                        </div>
+                        <div class="mf-card-b">
+                            @foreach(($box['items'] ?? []) as $it)
+                                <div class="mf-it">
+                                    <div class="t">{{ $it['t'] ?? '' }}</div>
+                                    <div class="d">{{ $it['d'] ?? '' }}</div>
+                                    @if(!empty($it['a']))
+                                        <div class="mt-1"><a href="{{ $it['a'] }}">{{ translate('View') }} →</a></div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                    <div class="mf-card-b">
-                        @foreach(($box['items'] ?? []) as $it)
-                            <div class="mf-it">
-                                <div class="t">{{ $it['t'] ?? '' }}</div>
-                                <div class="d">{{ $it['d'] ?? '' }}</div>
-                                @if(!empty($it['a']))
-                                    <div class="mt-1"><a href="{{ $it['a'] }}">{{ translate('View') }} →</a></div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
+                @endforeach
+            </div>
+            <div class="mf-mini">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="tt">{{ translate('Quick Actions') }}</div>
+                    <span class="mf-pill">{{ translate('Today') }}</span>
                 </div>
-            @endforeach
+                <div class="rowi">
+                    <div>
+                        <div class="font-weight-bold">{{ translate('Review orders') }}</div>
+                        <div class="text-muted small">{{ translate('Pending/processing') }}</div>
+                    </div>
+                    <a class="btn btn-sm btn--primary" href="{{ route('vendor.order.list', ['status' => 'all']) }}">{{ translate('Open') }}</a>
+                </div>
+                <div class="rowi">
+                    <div>
+                        <div class="font-weight-bold">{{ translate('Low stock list') }}</div>
+                        <div class="text-muted small">{{ translate('Replenish fast movers') }}</div>
+                    </div>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ route('vendor.item.stock-limit-list') }}">{{ translate('View') }}</a>
+                </div>
+                <div class="rowi">
+                    <div>
+                        <div class="font-weight-bold">{{ translate('Omnichannel') }}</div>
+                        <div class="text-muted small">{{ translate('Channel performance') }}</div>
+                    </div>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ route('vendor.omnichannel') }}">{{ translate('Open') }}</a>
+                </div>
+                <div class="rowi">
+                    <div>
+                        <div class="font-weight-bold">{{ translate('Vendor Promotions') }}</div>
+                        <div class="text-muted small">{{ translate('Boost demand') }}</div>
+                    </div>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ route('vendor.vendor_promotions') }}">{{ translate('Try') }}</a>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

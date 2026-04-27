@@ -156,7 +156,7 @@
                     <div class="card-body d-flex flex-column mf-qa" style="gap:10px">
                         <a class="btn btn-block primary" href="{{ route('admin.store.pending-sellers') }}">{{ translate('Review Pending') }} ({{ (int) ($pendingSellersCount ?? 0) }})</a>
                         <a class="btn btn-block primary" href="javascript:">{{ translate('Vendor Promotions') }}</a>
-                        <a class="btn btn-block soft" href="{{ route('admin.store.withdraw_list') }}">{{ translate('Process Payouts') }}</a>
+                        <a class="btn btn-block soft" href="{{ route('admin.store.vendor-payouts') }}">{{ translate('Process Payouts') }}</a>
                     </div>
                 </div>
             </div>

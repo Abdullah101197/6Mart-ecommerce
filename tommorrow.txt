@@ -2,6 +2,9 @@ Tomorrow plan (continue from current state)
 Project: 6MartAdminpanel (Vendor Panel RMS v12 UI)
 Date: 2026-04-17
 
+Prototype reference (open in browser):
+- file:///C:/laragon/www/6MartAdminpanel/manufuture-rms-v12.html
+
 Context / where we stopped
 - Orders List page (`resources/views/vendor-views/order/list.blade.php`) is already upgraded to RMS style and controlled by subscription flag `order_rms_ui`.
 - Order Details page (`resources/views/vendor-views/order/order-view.blade.php`) has:
@@ -177,4 +180,25 @@ G) Help Center
 - Target pages:
   - Help center index
 - Gate by existing subscription flag `helpcenter`.
+
+============================================================
+New RMS work done (today)
+============================================================
+
+Admin
+- Vendor Payouts RMS dashboard:
+  - Route: `/admin/store/vendor-payouts`
+  - File: `resources/views/admin-views/vendor/payouts.blade.php`
+
+Vendor
+- Bulk Import/Export unified into one RMS screen:
+  - URL: `/vendor-panel/item/bulk-import`
+  - Dynamic export filters + recent exports download
+- Omnichannel upgraded:
+  - Buyer column + status chips + KPIs
+- AI Pulse upgraded:
+  - Revenue pulse + top movers + quick actions
+- Category Discounts CRUD:
+  - List/Add: `/vendor-panel/category/discounts`
+  - Edit: `/vendor-panel/category/discounts/{id}/edit`
 

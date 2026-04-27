@@ -126,6 +126,15 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::get('sub-category-list', 'CategoryController@sub_index')->name('add-sub-category');
             Route::get('export-categories', 'CategoryController@export_categories')->name('export-categories');
             Route::get('export-sub-categories', 'CategoryController@export_sub_categories')->name('export-sub-categories');
+            Route::get('{category}/edit', 'CategoryController@edit')->name('edit');
+            Route::put('{category}', 'CategoryController@update')->name('update');
+
+            // Category discounts (RMS)
+            Route::get('discounts', 'CategoryController@discounts_index')->name('discounts.index');
+            Route::post('discounts', 'CategoryController@discounts_store')->name('discounts.store');
+            Route::get('discounts/{discount}/edit', 'CategoryController@discounts_edit')->name('discounts.edit');
+            Route::put('discounts/{discount}', 'CategoryController@discounts_update')->name('discounts.update');
+            Route::delete('discounts/{discount}', 'CategoryController@discounts_destroy')->name('discounts.destroy');
         });
 
         Route::group(['prefix' => 'custom-role', 'as' => 'custom-role.', 'middleware' => ['module:role' ,'subscription:role','vendor_type:role']], function () {

@@ -15,6 +15,12 @@
             .mf-cat-rms .mf-kpi .t{font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
             .mf-cat-rms .mf-kpi .v{font-size:22px;font-weight:900;color:#0f172a;margin-top:4px}
             .mf-cat-rms .mf-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+            .mf-cat-rms .mf-badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:900;border:1px solid #e2e8f0;background:#f8fafc;color:#0f172a}
+            .mf-cat-rms .mf-pill{display:inline-flex;align-items:center;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:900}
+            .mf-cat-rms .mf-pill.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+            .mf-cat-rms .mf-pill.off{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+            .mf-cat-rms .mf-pill.disc{background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd}
+            .mf-cat-rms .mf-pill.none{background:#f8fafc;color:#64748b;border:1px dashed #cbd5e1}
         </style>
     @endif
 @endpush
@@ -28,16 +34,20 @@
             </div>
             <div class="mf-strip">
                 <div class="mf-kpi">
-                    <div class="t">{{ translate('messages.main') }} {{ translate('messages.categories') }}</div>
-                    <div class="v">{{ $mainCategoriesCount ?? 0 }}</div>
+                    <div class="t">{{ translate('Total Categories') }}</div>
+                    <div class="v">{{ (int) ($totalCategoriesCount ?? 0) }}</div>
                 </div>
                 <div class="mf-kpi">
-                    <div class="t">{{ translate('messages.sub') }} {{ translate('messages.categories') }}</div>
-                    <div class="v">{{ $subCategoriesCount ?? 0 }}</div>
+                    <div class="t">{{ translate('Active') }}</div>
+                    <div class="v">{{ (int) ($activeCategoriesCount ?? 0) }}</div>
                 </div>
                 <div class="mf-kpi">
-                    <div class="t">{{ translate('messages.category_list') }}</div>
-                    <div class="v">{{ $categories->total() }}</div>
+                    <div class="t">{{ translate('Sub-Categories') }}</div>
+                    <div class="v">{{ (int) ($subCategoriesCount ?? 0) }}</div>
+                </div>
+                <div class="mf-kpi">
+                    <div class="t">{{ translate('Category Discounts') }}</div>
+                    <div class="v">{{ (int) ($categoryDiscountsCount ?? 0) }}</div>
                 </div>
             </div>
         @endif
@@ -108,61 +118,111 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive datatable-custom">
-                            <table id="columnSearchDatatable"
-                                class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
-                                data-hs-datatables-options='{
-                                    "search": "#datatableSearch",
-                                    "entries": "#datatableEntries",
-                                    "isResponsive": false,
-                                    "isShowPaging": false,
-                                    "paging":false,
-                                }'>
-                                <thead class="thead-light">
+                        @if($categoryRmsUi)
+                            <div class="table-responsive">
+                                <table class="table table-hover table-thead-bordered table-nowrap card-table mb-0">
+                                    <thead class="thead-light">
                                     <tr>
-                                        <th class="w-33p border-0 text-center">{{ translate('messages.#') }}</th>
-                                        <th class="w-33p border-0 text-center">{{ translate('messages.category_id') }}</th>
-                                        <th class="w-33p border-0 text-center">{{ translate('messages.category_name') }}
-                                        </th>
-
-                                        @if ($categoryWiseTax)
-                                            <th class="border-0 ">{{ translate('messages.Vat/Tax') }}</th>
-                                        @endif
+                                        <th>{{ translate('Category') }}</th>
+                                        <th class="text-center">{{ translate('Sub-Cats') }}</th>
+                                        <th class="text-center">{{ translate('Products') }}</th>
+                                        <th class="text-right">{{ translate('Top Sales') }}</th>
+                                        <th class="text-center">{{ translate('Discount') }}</th>
+                                        <th class="text-center">{{ translate('Status') }}</th>
+                                        <th class="text-center">{{ translate('Actions') }}</th>
                                     </tr>
-                                </thead>
-
-                                <tbody id="table-div">
-                                    @foreach ($categories as $key => $category)
+                                    </thead>
+                                    <tbody>
+                                    @foreach($categories as $category)
+                                        @php($disc = $category->mf_discount ?? null)
                                         <tr>
-                                            <td class="text-center">{{ $key + $categories->firstItem() }}</td>
-                                            <td class="text-center">{{ $category->id }}</td>
+                                            <td class="font-weight-bold">{{ \Illuminate\Support\Str::limit($category->name, 32) }}</td>
+                                            <td class="text-center">{{ (int) ($category->mf_subcats ?? 0) }}</td>
+                                            <td class="text-center">{{ (int) ($category->mf_products ?? 0) }}</td>
+                                            <td class="text-right font-weight-bold">{{ \App\CentralLogics\Helpers::format_currency((float) ($category->mf_sales ?? 0)) }}</td>
                                             <td class="text-center">
-                                                <span class="d-block font-size-sm text-body">
-                                                    {{ Str::limit($category['name'], 20, '...') }}
-                                                </span>
-                                            </td>
-
-
-
-                                            @if ($categoryWiseTax)
-                                                <td>
-                                                    <span class="d-block font-size-sm text-body">
-                                                        @forelse ($category?->taxVats?->pluck('tax.name', 'tax.tax_rate')->toArray() as $key => $tax)
-                                                            <span> {{ $tax }} : <span class="font-bold">
-                                                                    ({{ $key }}%)
-                                                                </span> </span>
-                                                            <br>
-                                                        @empty
-                                                            <span> {{ translate('messages.no_tax') }} </span>
-                                                        @endforelse
+                                                @if($disc)
+                                                    <span class="mf-pill disc">
+                                                        @if(($disc->discount_type ?? 'percent') === 'amount')
+                                                            {{ \App\CentralLogics\Helpers::format_currency((float) ($disc->discount ?? 0)) }}
+                                                        @else
+                                                            {{ number_format((float) ($disc->discount ?? 0), 1) }}% {{ translate('off') }}
+                                                        @endif
                                                     </span>
-                                                </td>
-                                            @endif
+                                                @else
+                                                    <span class="mf-pill none">—</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                @if((int) ($category->status ?? 0) === 1)
+                                                    <span class="mf-pill ok">{{ translate('Active') }}</span>
+                                                @else
+                                                    <span class="mf-pill off">{{ translate('Inactive') }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                <a class="btn btn-sm btn-outline-primary" href="{{ route('vendor.category.edit', $category->id) }}">{{ translate('Edit') }}</a>
+                                            </td>
                                         </tr>
                                     @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="table-responsive datatable-custom">
+                                <table id="columnSearchDatatable"
+                                    class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+                                    data-hs-datatables-options='{
+                                        "search": "#datatableSearch",
+                                        "entries": "#datatableEntries",
+                                        "isResponsive": false,
+                                        "isShowPaging": false,
+                                        "paging":false,
+                                    }'>
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="w-33p border-0 text-center">{{ translate('messages.#') }}</th>
+                                            <th class="w-33p border-0 text-center">{{ translate('messages.category_id') }}</th>
+                                            <th class="w-33p border-0 text-center">{{ translate('messages.category_name') }}
+                                            </th>
+
+                                            @if ($categoryWiseTax)
+                                                <th class="border-0 ">{{ translate('messages.Vat/Tax') }}</th>
+                                            @endif
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="table-div">
+                                        @foreach ($categories as $key => $category)
+                                            <tr>
+                                                <td class="text-center">{{ $key + $categories->firstItem() }}</td>
+                                                <td class="text-center">{{ $category->id }}</td>
+                                                <td class="text-center">
+                                                    <span class="d-block font-size-sm text-body">
+                                                        {{ Str::limit($category['name'], 20, '...') }}
+                                                    </span>
+                                                </td>
+
+                                                @if ($categoryWiseTax)
+                                                    <td>
+                                                        <span class="d-block font-size-sm text-body">
+                                                            @forelse ($category?->taxVats?->pluck('tax.name', 'tax.tax_rate')->toArray() as $key => $tax)
+                                                                <span> {{ $tax }} : <span class="font-bold">
+                                                                        ({{ $key }}%)
+                                                                    </span> </span>
+                                                                <br>
+                                                            @empty
+                                                                <span> {{ translate('messages.no_tax') }} </span>
+                                                            @endforelse
+                                                        </span>
+                                                    </td>
+                                                @endif
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
                     </div>
                     <div class="card-footer page-area">
                         <!-- Pagination -->
@@ -179,13 +239,12 @@
                     </div>
                 </div>
             </div>
-        </div>
             @if($categoryRmsUi)
                 <div class="col-lg-4">
                     <div class="card">
                         <div class="card-header py-2 border-0 d-flex justify-content-between align-items-center">
                             <div class="font-weight-bold">{{ translate('Category Discounts') }}</div>
-                            <a class="btn btn-sm btn--primary" href="javascript:" title="{{ translate('Add Discount') }}">
+                            <a class="btn btn-sm btn--primary" href="{{ route('vendor.category.discounts.index') }}" title="{{ translate('Add Discount') }}">
                                 + {{ translate('Add Discount') }}
                             </a>
                         </div>
@@ -210,6 +269,14 @@
                                             <div class="text-muted small mt-1">
                                                 {{ ($d->status ?? false) ? translate('Active') : translate('Inactive') }}
                                             </div>
+                                            <div class="mt-2 d-flex" style="gap:8px">
+                                                <a class="btn btn-sm btn-outline-primary" href="{{ route('vendor.category.discounts.edit', $d->id) }}">{{ translate('Edit') }}</a>
+                                                <form method="POST" action="{{ route('vendor.category.discounts.destroy', $d->id) }}" onsubmit="return confirm('{{ translate('Are you sure?') }}')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-sm btn-outline-danger" type="submit">{{ translate('Delete') }}</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -220,6 +287,7 @@
                     </div>
                 </div>
             @endif
+        </div>
     </div>
 
 @endsection
