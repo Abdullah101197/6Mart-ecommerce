@@ -37,6 +37,7 @@
                     .mf-products .mf-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
                     .mf-products .mf-card .card-header{background:#fff;border-bottom:1px solid #eef2f7}
                     .mf-products .mf-catalogue-title{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;font-weight:900;margin:0}
+                    .mf-products .mf-export-btn{margin-top:12px;height:42px;border-radius:10px;font-weight:900}
                 </style>
             @endpush
 
@@ -90,7 +91,7 @@
                 </span>
             </h1>
         </div>
-        <div class="card {{ $productsRmsUi ? 'mf-products mf-card' : '' }}">
+        <div class="card {{ $productsRmsUi ? 'mf-products mf-card' : '' }} {{ $productsRmsUi ? 'd-none' : '' }}">
             <div class="card-body">
                 <div class="export-steps style-2">
                     <div class="export-steps-item">
@@ -148,27 +149,147 @@
                 </div>
             </div>
         </div>
-        <form class="product-form" id="import_form" action="{{route('vendor.item.bulk-import')}}" method="POST"
-                enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="button" id="btn_value">
-            <div class="card mt-2 rest-part {{ $productsRmsUi ? 'mf-products mf-card' : '' }}">
-                <div class="card-body">
-                    <h4 class="mb-3">{{translate('messages.import_items_file')}}</h4>
-                    <div class="custom-file custom--file">
-                        <input type="file" name="products_file" class="form-control" id="products_file">
-                        <label class="custom-file-label" for="products_file">{{ translate('messages.Choose File') }}</label>
-                    </div>
-                    <div class="btn--container justify-content-end mt-20">
-                        <button id="reset_btn" type="reset" class="btn btn--reset">{{translate('messages.reset')}}</button>
-                        <button type="submit" name="button" value="update" class="btn btn--warning submit_btn">{{translate('messages.update')}}</button>
-                        <button type="submit" name="button" value="import" class="btn btn--primary submit_btn">{{translate('messages.Import')}}</button>
+        @if($productsRmsUi)
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <form class="product-form" id="import_form" action="{{route('vendor.item.bulk-import')}}" method="POST"
+                            enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="button" id="btn_value">
+                        <div class="card mt-2 rest-part mf-products mf-card" style="margin-top: 0 !important;">
+                            <div class="card-body">
+                                <h4 class="mb-3">{{translate('messages.bulk_import')}} {{ translate('messages.products') }}</h4>
+                                <div id="mf_dropzone" class="p-3 p-md-4 mb-3" style="border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;">
+                                    <div class="text-center">
+                                        <div class="mb-2" style="font-weight:900;color:#0f172a;">{{ translate('Drop CSV / Excel file here') }}</div>
+                                        <div class="mb-3" style="font-size:12px;color:#64748b;">{{ translate('or click to browse') }} — {{ translate('Max 10MB') }}</div>
+                                        <button type="button" class="btn btn--primary" id="mf_choose_file_btn">{{ translate('messages.Choose File') }}</button>
+                                        <div class="mt-2" style="font-size:12px;color:#64748b;">
+                                            <span id="mf_file_name">{{ translate('No file chosen') }}</span>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="products_file" class="d-none" id="products_file">
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label class="input-label">{{ translate('Import Type') }}</label>
+                                    <select class="form-control">
+                                        <option>{{ translate('Products') }}</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-0">
+                                    <label class="input-label">{{ translate('Duplicate Handling') }}</label>
+                                    <select class="form-control">
+                                        <option>{{ translate('Skip duplicates') }}</option>
+                                    </select>
+                                </div>
+                                <div class="btn--container justify-content-end mt-20">
+                                    <button id="reset_btn" type="reset" class="btn btn--reset">{{translate('messages.reset')}}</button>
+                                    <button type="submit" name="button" value="update" class="btn btn--warning submit_btn">{{translate('messages.update')}}</button>
+                                    <button type="submit" name="button" value="import" class="btn btn--primary submit_btn">{{translate('messages.Import')}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card mt-2 rest-part mf-products mf-card" style="margin-top: 0 !important;">
+                        <div class="card-body">
+                            <h4 class="mb-3">{{translate('messages.bulk_export')}} {{ translate('messages.products') }}</h4>
+                            <form class="product-form" action="{{route('vendor.item.bulk-export')}}" method="POST">
+                                @csrf
+                                <input type="hidden" name="type" value="all">
+
+                                <div class="form-group mb-2">
+                                    <label class="input-label">{{ translate('Export Format') }}</label>
+                                    <select class="form-control" name="format">
+                                        <option value="csv">CSV</option>
+                                        <option value="xlsx" selected>XLSX</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label class="input-label">{{ translate('Filter by Category') }}</label>
+                                    <select class="form-control" name="category_id">
+                                        <option value="">{{ translate('All Categories') }}</option>
+                                        @foreach(($categories ?? []) as $cat)
+                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-2">
+                                    <label class="input-label">{{ translate('Product Type') }}</label>
+                                    <select class="form-control" name="product_type">
+                                        <option value="">{{ translate('All Products') }}</option>
+                                        @if(($module_type ?? null) === 'food')
+                                            <option value="veg">{{ translate('Veg') }}</option>
+                                            <option value="non_veg">{{ translate('Non Veg') }}</option>
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <button class="btn btn--primary w-100 mf-export-btn" type="submit">{{ translate('Export Now') }}</button>
+                            </form>
+
+                            <div class="mt-4">
+                                <div class="text-uppercase font-weight-bold" style="font-size:11px;letter-spacing:.08em;color:#94a3b8;">
+                                    {{ translate('Recent exports') }}
+                                </div>
+                                <div class="mt-2">
+                                    @forelse(($recentExports ?? []) as $ex)
+                                        <div class="d-flex align-items-center justify-content-between py-2 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                            <div>
+                                                <div class="font-weight-bold" style="font-size:13px;">{{ $ex['title'] ?? translate('All Products') }}</div>
+                                                <div style="font-size:11px;color:#94a3b8;">
+                                                    {{ \Carbon\Carbon::parse($ex['created_at'] ?? now())->format('M d, Y') }}
+                                                </div>
+                                            </div>
+                                            <a class="btn btn-sm btn-outline-secondary"
+                                               href="{{ route('vendor.item.bulk-export-download', array_filter([
+                                                    'type' => data_get($ex,'params.type','all'),
+                                                    'category_id' => data_get($ex,'params.category_id'),
+                                                    'product_type' => data_get($ex,'params.product_type'),
+                                                    'format' => data_get($ex,'params.format','xlsx'),
+                                               ])) }}">
+                                                {{ translate('Download') }}
+                                            </a>
+                                        </div>
+                                    @empty
+                                        <div class="py-3 text-center" style="font-size:12px;color:#94a3b8;">
+                                            {{ translate('No exports yet') }}
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </form>
+        @else
+            <form class="product-form" id="import_form" action="{{route('vendor.item.bulk-import')}}" method="POST"
+                    enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="button" id="btn_value">
+                <div class="card mt-2 rest-part">
+                    <div class="card-body">
+                        <h4 class="mb-3">{{translate('messages.import_items_file')}}</h4>
+                        <div class="custom-file custom--file">
+                            <input type="file" name="products_file" class="form-control" id="products_file">
+                            <label class="custom-file-label" for="products_file">{{ translate('messages.Choose File') }}</label>
+                        </div>
+                        <div class="btn--container justify-content-end mt-20">
+                            <button id="reset_btn" type="reset" class="btn btn--reset">{{translate('messages.reset')}}</button>
+                            <button type="submit" name="button" value="update" class="btn btn--warning submit_btn">{{translate('messages.update')}}</button>
+                            <button type="submit" name="button" value="import" class="btn btn--primary submit_btn">{{translate('messages.Import')}}</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        @endif
 
-        <form action="javascript:" method="post" id="item_form" enctype="multipart/form-data">
+        <form action="javascript:" method="post" id="item_form" enctype="multipart/form-data" class="{{ $productsRmsUi ? 'd-none' : '' }}">
             <div id="food_variation_section" style="display: none">
                 <div class="card mt-2 rest-part">
                     <div class="card-header">
@@ -200,7 +321,7 @@
             </div>
         </form>
 <br>
-        <form action="javascript:" method="post" id="item_form_2" enctype="multipart/form-data">
+        <form action="javascript:" method="post" id="item_form_2" enctype="multipart/form-data" class="{{ $productsRmsUi ? 'd-none' : '' }}">
             <div id="attribute_section" style="display: none">
                 <h4 class="mb-3">{{translate('Generate Variation')}}</h4>
                 <div class="card card mt-2 rest-part">
@@ -274,6 +395,42 @@
         let countRow = 0;
         let element = 0;
         $(document).ready(function() {
+            @if($productsRmsUi)
+                const $file = $('#products_file');
+                const $name = $('#mf_file_name');
+                const setName = () => {
+                    const f = $file[0]?.files?.[0];
+                    $name.text(f ? f.name : '{{ translate('No file chosen') }}');
+                };
+                $('#mf_choose_file_btn').on('click', function () { $file.trigger('click'); });
+                $('#mf_dropzone').on('click', function (e) {
+                    if ($(e.target).is('button,a,input,select,textarea,label')) return;
+                    $file.trigger('click');
+                });
+                $file.on('change', setName);
+                setName();
+
+                const dz = document.getElementById('mf_dropzone');
+                if (dz) {
+                    ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, function (e) {
+                        e.preventDefault(); e.stopPropagation();
+                        dz.style.background = '#eef2ff';
+                        dz.style.borderColor = '#94a3b8';
+                    }));
+                    ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, function (e) {
+                        e.preventDefault(); e.stopPropagation();
+                        dz.style.background = '#f8fafc';
+                        dz.style.borderColor = '#cbd5e1';
+                    }));
+                    dz.addEventListener('drop', function (e) {
+                        const files = e.dataTransfer?.files;
+                        if (files && files.length) {
+                            $file[0].files = files;
+                            setName();
+                        }
+                    });
+                }
+            @endif
             @if($module_type== 'food')
             $('#food_variation_section').show();
             $('#attribute_section').hide();
@@ -636,5 +793,7 @@
                 }
             })
         }
+
+        // RMS export panel uses fixed "all" export.
     </script>
 @endpush

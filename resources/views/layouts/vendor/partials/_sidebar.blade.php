@@ -486,21 +486,12 @@
                                 @endif
                                 @if (\App\CentralLogics\Helpers::get_store_data()->item_section)
                                     <li
-                                        class="nav-item {{ Request::is('vendor-panel/item/bulk-import') ? 'active' : '' }}">
+                                        class="nav-item {{ (Request::is('vendor-panel/item/bulk-import') || Request::is('vendor-panel/item/bulk-export')) ? 'active' : '' }}">
                                         <a class="nav-link " href="{{ route('vendor.item.bulk-import') }}"
                                             title="{{ translate('messages.bulk_import') }}">
                                             <span class="tio-circle nav-indicator-icon"></span>
                                             <span
                                                 class="text-truncate text-capitalize">{{ translate('messages.bulk_import') }}</span>
-                                        </a>
-                                    </li>
-                                    <li
-                                        class="nav-item {{ Request::is('vendor-panel/item/bulk-export') ? 'active' : '' }}">
-                                        <a class="nav-link " href="{{ route('vendor.item.bulk-export-index') }}"
-                                            title="{{ translate('messages.bulk_export') }}">
-                                            <span class="tio-circle nav-indicator-icon"></span>
-                                            <span
-                                                class="text-truncate text-capitalize">{{ translate('messages.bulk_export') }}</span>
                                         </a>
                                     </li>
                                 @endif

@@ -682,6 +682,8 @@ class VendorController extends Controller
             $qq->where('stores.status', 0)->orWhereHas('vendor', fn ($v) => $v->where('status', 0));
         })->count();
         $totalSellers = Store::query()->module($moduleId)->count();
+        $totalProducts = (int) Item::query()->whereHas('store', fn ($q) => $q->module($moduleId))->count();
+        $avgProductsPerSeller = $totalSellers > 0 ? round($totalProducts / $totalSellers, 1) : 0;
 
         $stores = Store::query()
             ->with('vendor', 'module', 'zone')
@@ -751,7 +753,8 @@ class VendorController extends Controller
             'pendingCount',
             'approvedCount',
             'suspendedCount',
-            'totalSellers'
+            'totalSellers',
+            'avgProductsPerSeller'
         ));
     }
 

@@ -1431,7 +1431,29 @@ class ItemController extends Controller
     public function bulk_import_index()
     {
         $module_type = Helpers::get_store_data()->module->module_type;
-        return view('vendor-views.product.bulk-import', compact('module_type'));
+        $module_id = Helpers::get_store_data()->module->id;
+        $categories = \App\Models\Category::active()
+            ->module($module_id)
+            ->orderBy('priority')
+            ->orderBy('id')
+            ->get(['id', 'parent_id', 'name']);
+
+        $recentKey = 'mf_recent_exports_store_' . Helpers::get_store_id();
+        $recentExports = session($recentKey, []);
+
+        return view('vendor-views.product.bulk-import', compact('module_type', 'categories', 'recentExports'));
+    }
+
+    public function bulk_export_download(Request $request)
+    {
+        // Same export as bulk_export_data, but via GET for "Recent exports" download links.
+        $request->merge([
+            'type' => $request->query('type', 'all'),
+            'category_id' => $request->query('category_id'),
+            'product_type' => $request->query('product_type'),
+            'format' => $request->query('format', 'xlsx'),
+        ]);
+        return $this->bulk_export_data($request);
     }
 
     public function bulk_import_data(Request $request)
@@ -1814,6 +1836,13 @@ class ItemController extends Controller
 
     public function bulk_export_index()
     {
+        $store_data = Helpers::get_store_data();
+        $sub = $store_data?->store_sub ?? $store_data?->store_sub_update_application;
+        $allowAll = ($store_data?->store_business_model ?? null) === 'commission';
+        $productsRmsUi = $allowAll || ((int) data_get($sub, 'product_rms_ui', 1) === 1);
+        if ($productsRmsUi) {
+            return redirect()->route('vendor.item.bulk-import');
+        }
         return view('vendor-views.product.bulk-export');
     }
 
@@ -1826,20 +1855,82 @@ class ItemController extends Controller
 
         $request->validate([
             'type' => 'required',
+            'category_id' => 'nullable|integer',
+            'product_type' => 'nullable|string',
+            'format' => 'nullable|string',
             'start_id' => 'required_if:type,id_wise',
             'end_id' => 'required_if:type,id_wise',
             'from_date' => 'required_if:type,date_wise',
             'to_date' => 'required_if:type,date_wise'
         ]);
-        $products = Item::when($request['type'] == 'date_wise', function ($query) use ($request) {
-            $query->whereBetween('created_at', [$request['from_date'] . ' 00:00:00', $request['to_date'] . ' 23:59:59']);
-        })
+
+        $module_type = Helpers::get_store_data()->module->module_type;
+
+        $productsQuery = Item::query()
+            ->when($request['type'] == 'date_wise', function ($query) use ($request) {
+                $query->whereBetween('created_at', [$request['from_date'] . ' 00:00:00', $request['to_date'] . ' 23:59:59']);
+            })
             ->when($request['type'] == 'id_wise', function ($query) use ($request) {
                 $query->whereBetween('id', [$request['start_id'], $request['end_id']]);
             })
-            ->where('store_id', Helpers::get_store_id())
-            ->get();
-        return (new FastExcel(ProductLogic::format_export_items(Helpers::Export_generator($products), Helpers::get_store_data()->module->module_type)))->download('Items.xlsx');
+            ->when(is_numeric($request->input('category_id')), function ($query) use ($request) {
+                $categoryId = (int) $request->input('category_id');
+                $cat = \App\Models\Category::find($categoryId);
+
+                // Many items store sub-category id in `items.category_id`.
+                // If user selects a parent category, include all its children too.
+                if ($cat && ((int) $cat->parent_id === 0 || empty($cat->parent_id))) {
+                    $childIds = \App\Models\Category::where('parent_id', $categoryId)->pluck('id')->toArray();
+                    $ids = array_values(array_unique(array_merge([$categoryId], $childIds)));
+                    $query->whereIn('category_id', $ids);
+                } else {
+                    $query->where('category_id', $categoryId);
+                }
+            })
+            ->when($module_type === 'food' && in_array($request->input('product_type'), ['veg', 'non_veg'], true), function ($query) use ($request) {
+                $query->type($request->input('product_type'));
+            })
+            ->where('store_id', Helpers::get_store_id());
+
+        $products = $productsQuery->get();
+
+        // Save recent export meta in session (per store)
+        try {
+            $recentKey = 'mf_recent_exports_store_' . Helpers::get_store_id();
+            $recentExports = session($recentKey, []);
+
+            $catId = $request->input('category_id');
+            $catName = null;
+            if (is_numeric($catId)) {
+                $catName = \App\Models\Category::where('id', (int) $catId)->value('name');
+            }
+            $pt = $request->input('product_type');
+            $ptLabel = ($module_type === 'food' && $pt) ? strtoupper(str_replace('_', ' ', $pt)) : 'ALL PRODUCTS';
+            $title = $catName ? ($catName . ' • ' . $ptLabel) : $ptLabel;
+
+            array_unshift($recentExports, [
+                'title' => $title,
+                'created_at' => now()->toDateTimeString(),
+                'params' => [
+                    'type' => $request->input('type', 'all'),
+                    'category_id' => is_numeric($catId) ? (int) $catId : null,
+                    'product_type' => $pt,
+                    'format' => $request->input('format', 'xlsx'),
+                ],
+            ]);
+            $recentExports = array_slice($recentExports, 0, 5);
+            session()->put($recentKey, $recentExports);
+            // Ensure session persists even when returning a download response.
+            session()->save();
+        } catch (\Throwable $e) {
+            // non-blocking
+        }
+
+        $format = strtolower((string) $request->input('format', 'xlsx'));
+        $filename = $format === 'csv' ? 'Items.csv' : 'Items.xlsx';
+        return (new FastExcel(
+            ProductLogic::format_export_items(Helpers::Export_generator($products), $module_type)
+        ))->download($filename);
     }
 
     public function stock_limit_list(Request $request)

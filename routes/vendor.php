@@ -209,6 +209,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::post('bulk-import', 'ItemController@bulk_import_data');
             Route::get('bulk-export', 'ItemController@bulk_export_index')->name('bulk-export-index');
             Route::post('bulk-export', 'ItemController@bulk_export_data')->name('bulk-export');
+            Route::get('bulk-export-download', 'ItemController@bulk_export_download')->name('bulk-export-download');
             Route::get('flash-sale', 'ItemController@flash_sale')->name('flash_sale');
 
              Route::get('get-brand-list', [ItemController::class, 'getBrandList'])->name('getBrandList');

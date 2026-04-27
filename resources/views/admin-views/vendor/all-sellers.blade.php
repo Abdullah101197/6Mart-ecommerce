@@ -17,6 +17,9 @@
         .mf-as-card h5 { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #64748b; margin-bottom: 14px; }
         .store-cell-link { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px; }
         .store-cell-link:hover .text--title { color: #0d9488; }
+        .mf-as-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+        .mf-as-filters .form-control{height:40px;border-radius:12px}
+        .mf-as-filters .btn{height:40px;border-radius:12px;font-weight:900}
     </style>
 @endpush
 
@@ -54,6 +57,11 @@
                 <div class="val">{{ $suspendedCount }}</div>
                 <div class="sub">{{ translate('messages.inactive_stores') }}</div>
             </div>
+            <div class="mf-as-kpi" style="border-left-color:#5566ff">
+                <div class="lbl">{{ translate('Avg products/seller') }}</div>
+                <div class="val">{{ number_format((float) ($avgProductsPerSeller ?? 0), 1) }}</div>
+                <div class="sub">{{ translate('messages.products') }}</div>
+            </div>
         </div>
 
         <div class="mf-as-card mb-3">
@@ -66,12 +74,12 @@
                 </div>
             </div>
 
-            <form method="GET" action="{{ route('admin.store.all-sellers') }}" class="d-flex flex-wrap" style="gap:10px;align-items:center">
+            <form method="GET" action="{{ route('admin.store.all-sellers') }}" class="mf-as-filters">
                 @foreach (array_filter(request()->only(['status', 'zone_id', 'type', 'module_id'])) as $gk => $gv)
                     <input type="hidden" name="{{ $gk }}" value="{{ $gv }}">
                 @endforeach
-                <input type="search" name="search" value="{{ request('search') }}" class="form-control" style="min-width:200px;max-width:280px" placeholder="{{ translate('Search sellers...') }}">
-                <select name="vendor_type" class="form-control js-select2-custom" style="min-width:160px;max-width:220px">
+                <input type="search" name="search" value="{{ request('search') }}" class="form-control" style="min-width:220px;max-width:320px" placeholder="{{ translate('Search sellers...') }}">
+                <select name="vendor_type" class="form-control js-select2-custom" style="min-width:180px;max-width:240px">
                     <option value="">{{ translate('All Vendor Types') }}</option>
                     <option value="shopkeeper" {{ request('vendor_type') === 'shopkeeper' ? 'selected' : '' }}>{{ translate('Shopkeeper') }}</option>
                     <option value="manufacturer" {{ request('vendor_type') === 'manufacturer' ? 'selected' : '' }}>{{ translate('Manufacturer') }}</option>
