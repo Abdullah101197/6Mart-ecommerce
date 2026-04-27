@@ -64,17 +64,14 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             ->name('helpcenter');
 
         // RMS Sellers/Vendors section (placeholders)
-        Route::get('vendor-promotions', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+        Route::get('vendor-promotions', [\App\Http\Controllers\Vendor\FeatureController::class, 'vendorPromotions'])
             ->middleware(['vendor'])
-            ->defaults('feature', 'vendor_promotions')
             ->name('vendor_promotions');
-        Route::get('sponsored-ads', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+        Route::get('sponsored-ads', [\App\Http\Controllers\Vendor\FeatureController::class, 'sponsoredAds'])
             ->middleware(['vendor'])
-            ->defaults('feature', 'sponsored_ads')
             ->name('sponsored_ads');
-        Route::get('vendor-payouts', [\App\Http\Controllers\Vendor\FeatureController::class, 'comingSoon'])
+        Route::get('vendor-payouts', [\App\Http\Controllers\Vendor\FeatureController::class, 'vendorPayouts'])
             ->middleware(['vendor'])
-            ->defaults('feature', 'vendor_payouts')
             ->name('vendor_payouts');
 
 
