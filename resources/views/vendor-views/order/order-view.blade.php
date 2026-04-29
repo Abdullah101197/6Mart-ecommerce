@@ -766,6 +766,52 @@
                                 <h6 class="mf-od-panel-title mb-0">{{ translate('messages.summary') }}</h6>
                             </div>
                             <div class="card-body">
+                                {{-- RMS extra context (kept UI-only; does not change any actions/flows) --}}
+                                <div class="mb-3">
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        <span class="mf-od-panel-title mb-0">{{ translate('messages.payment_status') }}</span>
+                                        @if ($order['payment_status'] == 'paid')
+                                            <span class="badge badge-soft-success">{{ translate('messages.paid') }}</span>
+                                        @elseif ($order['payment_status'] == 'partially_paid')
+                                            @if ($order->payments()->where('payment_status','unpaid')->exists())
+                                                <span class="badge badge-soft-danger">{{ translate('messages.partially_paid') }}</span>
+                                            @else
+                                                <span class="badge badge-soft-success">{{ translate('messages.partially_paid') }}</span>
+                                            @endif
+                                        @else
+                                            <span class="badge badge-soft-danger">{{ translate('messages.unpaid') }}</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                        <span class="mf-od-panel-title mb-0">{{ translate('messages.payment_method') }}</span>
+                                        <span class="badge badge-soft-primary text-capitalize">
+                                            {{ translate(str_replace('_', ' ', $order['payment_method'])) }}
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                        <span class="mf-od-panel-title mb-0">{{ translate('messages.order_status') }}</span>
+                                        @if ($order['order_status'] == 'pending')
+                                            <span class="badge badge-soft-info text-capitalize">{{ translate('messages.pending') }}</span>
+                                        @elseif($order['order_status'] == 'confirmed')
+                                            <span class="badge badge-soft-info text-capitalize">{{ translate('messages.confirmed') }}</span>
+                                        @elseif($order['order_status'] == 'processing')
+                                            <span class="badge badge-soft-warning text-capitalize">{{ translate('messages.processing') }}</span>
+                                        @elseif($order['order_status'] == 'picked_up')
+                                            <span class="badge badge-soft-warning text-capitalize">{{ translate('messages.out_for_delivery') }}</span>
+                                        @elseif($order['order_status'] == 'delivered')
+                                            <span class="badge badge-soft-success text-capitalize">{{ translate('messages.delivered') }}</span>
+                                        @elseif($order['order_status'] == 'failed')
+                                            <span class="badge badge-soft-danger text-capitalize">{{ translate('messages.payment_failed') }}</span>
+                                        @else
+                                            <span class="badge badge-soft-danger text-capitalize">
+                                                {{ str_replace('_', ' ', $order['order_status']) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
                                 @php($del_c = $order['delivery_charge'])
                                 @php($additional_charge = $order['additional_charge'])
                                 <dl class="row mb-0 mf-od-dl">

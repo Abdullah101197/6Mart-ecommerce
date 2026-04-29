@@ -1351,7 +1351,7 @@
                             @if (isset($address))
                                 <span class="d-block">
                                     <a target="_blank"
-                                       href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
+                                       href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] ?? 0 }}+{{ $address['longitude'] ?? 0 }}">
                                         <i class="tio-map"></i> {{ $address['location'] }}<br>
                                     </a>
                                 </span>
@@ -1496,7 +1496,7 @@
                                             @if (isset($address['address']))
                                                 @if ( data_get($address,'latitude', null) &&  data_get($address,'longitude', null))
                                                     <a target="_blank" class="d-flex align-items-center mt-2"
-                                                       href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
+                                                       href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] ?? 0 }}+{{ $address['longitude'] ?? 0 }}">
                                                         <i class="tio-poi"></i>{{ $address['address'] }}
                                                     </a>
                                                 @else
@@ -1769,7 +1769,7 @@
                                 </label>
                                 <div class="col-md-10 js-form-message">
                                     <input type="text" class="form-control" name="address_type"
-                                           value="{{ $address['address_type'] }}" required>
+                                           value="{{ $address['address_type'] ?? '' }}" required>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -1778,7 +1778,7 @@
                                 </label>
                                 <div class="col-md-10 js-form-message">
                                     <input type="text" class="form-control" name="contact_person_number"
-                                           value="{{ $address['contact_person_number'] }}" required>
+                                           value="{{ $address['contact_person_number'] ?? '' }}" required>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -1787,7 +1787,7 @@
                                 </label>
                                 <div class="col-md-10 js-form-message">
                                     <input type="text" class="form-control" name="contact_person_name"
-                                           value="{{ $address['contact_person_name'] }}" required>
+                                           value="{{ $address['contact_person_name'] ?? '' }}" required>
                                 </div>
                             </div>
 
@@ -1825,7 +1825,7 @@
                                 </label>
                                 <div class="col-md-10 js-form-message">
                                     <input type="text" class="form-control" name="address"
-                                           value="{{ $address['address'] }}">
+                                           value="{{ $address['address'] ?? '' }}">
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -1834,14 +1834,14 @@
                                 </label>
                                 <div class="col-md-4 js-form-message">
                                     <input type="text" class="form-control" name="latitude" id="latitude"
-                                           value="{{ $address['latitude'] }}">
+                                           value="{{ $address['latitude'] ?? '' }}">
                                 </div>
                                 <label for="requiredLabel" class="col-md-2 col-form-label input-label text-md-right">
                                     {{ translate('messages.longitude') }}
                                 </label>
                                 <div class="col-md-4 js-form-message">
                                     <input type="text" class="form-control" name="longitude" id="longitude"
-                                           value="{{ $address['longitude'] }}">
+                                           value="{{ $address['longitude'] ?? '' }}">
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -2629,7 +2629,7 @@
         var map = null;
         const mapId = "{{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}"
         @if ($order->order_type == 'parcel')
-        var myLatlng = new google.maps.LatLng({{ $address['latitude'] }}, {{ $address['longitude'] }});
+        var myLatlng = new google.maps.LatLng({{ $address['latitude'] ?? 0 }}, {{ $address['longitude'] ?? 0 }});
         @else
         @php($default_location = App\CentralLogics\Helpers::get_business_settings('default_location'))
         var myLatlng = new google.maps.LatLng(
@@ -2898,8 +2898,8 @@
                 activeIconContent.style.borderRadius = '50%';
                 var marker = new google.maps.marker.AdvancedMarkerElement({
                     map: map,
-                    position: new google.maps.LatLng({{ $address['latitude'] }},
-                        {{ $address['longitude'] }}),
+                    position: new google.maps.LatLng({{ $address['latitude'] ?? 0 }},
+                        {{ $address['longitude'] ?? 0 }}),
                     title: "{{ $order->customer->f_name }} {{ $order->customer->l_name }}",
                     content: activeIconContent,
                 });
@@ -2907,7 +2907,7 @@
                 google.maps.event.addListener(marker, 'click', (function(marker) {
                     return function() {
                         infowindow.setContent(
-                            "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ $order?->customer?->image_full_url ?? asset('assets/admin/img/160x160/img1.jpg') }}'></div><div style='float:right; padding: 10px;'><b>{{ $order->customer->f_name }} {{ $order->customer->l_name }}</b><br />{{ $address['address'] }}</div>"
+                            "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ $order?->customer?->image_full_url ?? asset('assets/admin/img/160x160/img1.jpg') }}'></div><div style='float:right; padding: 10px;'><b>{{ $order->customer->f_name }} {{ $order->customer->l_name }}</b><br />{{ $address['address'] ?? '' }}</div>"
                         );
                         infowindow.open(map, marker);
                     }
