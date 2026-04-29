@@ -810,6 +810,37 @@
                                             </span>
                                         @endif
                                     </div>
+
+                                    @if ($buyer !== '')
+                                        <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                            <span class="mf-od-panel-title mb-0">{{ translate('messages.customer') }}</span>
+                                            <span class="badge badge-soft-primary text-capitalize">{{ $buyer }}</span>
+                                            @if ($city !== '')
+                                                <span class="badge badge-soft-primary">{{ $city }}</span>
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                        <span class="mf-od-panel-title mb-0">{{ translate('messages.order_type') }}</span>
+                                        <span class="badge badge-soft-primary">{{ translate($channel) }}</span>
+                                    </div>
+
+                                    @if ($order->schedule_at && $order->scheduled)
+                                        <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                            <span class="mf-od-panel-title mb-0">{{ translate('messages.scheduled_at') }}</span>
+                                            <span class="badge badge-soft-warning">
+                                                {{ date('d M Y ' . config('timeformat'), strtotime($order['schedule_at'])) }}
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    @if ($order['cancellation_reason'])
+                                        <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                            <span class="mf-od-panel-title mb-0">{{ translate('messages.order_cancellation_reason') }}</span>
+                                            <span class="badge badge-soft-danger">{{ $order['cancellation_reason'] }}</span>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 @php($del_c = $order['delivery_charge'])
