@@ -33,7 +33,7 @@
             <p>{{ translate('Track withdrawal requests and payout status') }}</p>
             <div class="mt-3 d-flex flex-wrap" style="gap:8px">
                 <a class="btn btn-sm btn-light" href="{{ route('vendor.wallet.index') }}">{{ translate('My Wallet') }}</a>
-                <a class="btn btn-sm btn-outline-light" href="{{ route('vendor.wallet.withdraw-request') }}">{{ translate('Request payout') }}</a>
+                <a class="btn btn-sm btn-outline-light" href="{{ route('vendor.wallet.index') }}">{{ translate('Request payout') }}</a>
             </div>
         </div>
 

@@ -73,10 +73,17 @@
                                 <span class="text-muted">{{ translate('Applied') }} {{ optional($store->created_at)->format('M d, Y') }}</span>
                             </div>
                             <div class="d-flex flex-wrap mt-2" style="gap:8px">
-                                <span class="chip warn">{{ translate('Pending Review') }}</span>
-                                @if(!empty($store->zone))
-                                    <span class="chip blue">{{ $store->zone?->name }}</span>
+                                @php($docsOk = !empty($store->email) || !empty($store->vendor?->email))
+                                @php($gstPending = method_exists($store, 'getGstStatusAttribute') ? !$store->gst_status : false)
+
+                                @if($gstPending)
+                                    <span class="chip warn">{{ translate('GST Verification Pending') }}</span>
+                                @else
+                                    <span class="chip {{ $docsOk ? 'ok' : 'warn' }}">{{ $docsOk ? translate('Documents Verified') : translate('Documents Pending') }}</span>
                                 @endif
+
+                                <span class="chip blue">{{ \Illuminate\Support\Str::limit($store->module?->module_name ?? translate('Category'), 18) }}</span>
+                                <span class="chip ok">{{ (int) ($store->items_count ?? 0) }}+ {{ translate('products planned') }}</span>
                             </div>
                         </div>
                         <div class="d-flex flex-wrap align-items-center" style="gap:8px">
