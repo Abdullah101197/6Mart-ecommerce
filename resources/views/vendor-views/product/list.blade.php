@@ -660,24 +660,26 @@
 
 
     {{-- Add Quantity Modal --}}
-    <div class="modal fade update-quantity-modal" id="update-quantity" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body pt-0">
+    <div class="{{ $productsRmsUi ? 'mf-products' : '' }}">
+        <div class="modal fade update-quantity-modal" id="update-quantity" tabindex="-1">
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body pt-0">
 
-                    <form action="{{route('vendor.item.stock-update')}}" method="post">
-                        @csrf
-                        <div class="mt-2 rest-part w-100"></div>
-                        <div class="btn--container justify-content-end">
-                            <button type="reset" data-dismiss="modal" aria-label="Close" class="btn btn--reset">{{translate('cancel')}}</button>
-                            <button type="submit" id="submit_new_customer" class="btn btn--primary">{{translate('update_stock')}}</button>
-                        </div>
-                    </form>
+                        <form action="{{route('vendor.item.stock-update')}}" method="post">
+                            @csrf
+                            <div class="mt-2 rest-part w-100"></div>
+                            <div class="btn--container justify-content-end">
+                                <button type="reset" data-dismiss="modal" aria-label="Close" class="btn btn--reset">{{translate('cancel')}}</button>
+                                <button type="submit" id="submit_new_customer" class="btn btn--primary">{{translate('update_stock')}}</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
